@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/btcsuite/btcjson"
+	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcrpcclient"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
