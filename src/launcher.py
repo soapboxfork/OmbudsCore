@@ -29,6 +29,7 @@ def main():
     # Start btcnode
     opts = ["--testnet", "--configfile="+NODE_CFG, "--datadir="+NODE_DIR]
     cmd = [BIN+"/btcd"] + opts
+    print cmd
     nodeproc = subprocess.Popen(cmd, stdout=null)
 
     # Start btcwallet

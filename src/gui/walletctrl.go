@@ -18,8 +18,6 @@ type QmlWalletData struct {
 	PendingTxOuts string
 	AvailFuel     string
 	AvailCoin     string
-
-	SentBltn      string
 	ConfirmedBltn string
 
 	// A JSON list of BltnListElements

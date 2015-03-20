@@ -141,6 +141,7 @@ func run() error {
 		log.Fatal(err)
 	}
 
+	// TODO make this a real path
 	settingCtrl, err := NewSettingCtrl("settings.json")
 	if err != nil {
 		log.Fatal(err)
