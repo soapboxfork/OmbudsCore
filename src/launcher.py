@@ -15,7 +15,7 @@ if OSX and DEPLOY:
     APP_PATH = abspath(os.path.join(__file__, "./../../.."))
     BIN = os.path.join(APP_PATH, "Contents/MacOS")
 
-APP_DIR = os.path.join(expanduser("~"), "Library/Application Support/Ombudscore")
+APP_DIR = appDataDir("ombudscore")
 NODE_CFG = os.path.join(APP_DIR, "node.conf")
 NODE_DIR = os.path.join(APP_DIR, "node")
 WAL_CFG = os.path.join(APP_DIR, "wallet.conf")
@@ -121,3 +121,18 @@ def sig_handler(procs):
 
 if __name__ == '__main__':
     main()
+
+
+def appDataDir(appname):
+    home = expanduser("~")
+    if sys.platform = "darwin":
+        datadir = os.path.join(home, "Library", "Application Support")
+        return os.path.join(datadir, appname.capitalize())
+
+    if sys.platform = "windows":
+        print "Windows is unsupported"
+        return os.path.join(home, appname)
+
+    # Default app directory
+    return os.path.join(home, appname.lower()
+    

@@ -21,6 +21,14 @@ func (h *SettingCtrl) Commit() error {
 }
 
 func NewSettingCtrl(fpath string) (*SettingCtrl, error) {
+	if !fileExists(fpath) {
+		s := &settings{}
+		err := writefile(fpath, *s)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	g, err := readfile(fpath)
 	if err != nil {
 		return nil, err
@@ -54,18 +62,9 @@ func writefile(fpath string, g settings) error {
 }
 
 func readfile(fpath string) (*settings, error) {
+
 	f, err := os.Open(fpath)
 	defer f.Close()
-	_, isPerr := err.(*os.PathError)
-	if isPerr {
-		s := &settings{}
-		err = writefile(fpath, *s)
-		if err != nil {
-			return nil, err
-		}
-		return s, nil
-	}
-
 	if err != nil {
 		return nil, err
 	}

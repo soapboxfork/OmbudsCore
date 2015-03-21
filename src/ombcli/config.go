@@ -169,7 +169,7 @@ func loadConfig() (*config, []string, error) {
 		return nil, nil, err
 	}
 
-	err = os.MkdirAll(ombudsHomeDir, 0700)
+	err = os.MkdirAll(guiHomeDir, 0700)
 	if err != nil {
 		log.Printf("[WARN] %v", err)
 	}
