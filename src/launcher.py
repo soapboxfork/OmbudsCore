@@ -45,18 +45,26 @@ def main():
     print cmd
     walletproc = subprocess.Popen(cmd, stdout=null)
 
+    # Start ahimsarest
+    opts = []
+    cmd = [BIN+"/ahimsarest"] + opts
+    print cmd
+    # TODO
+    webserverproc = subprocess.Popen(cmd, stdout=null)
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
     # Start ombuds client gui and blocks until process returns.
+    # TODO change bin path
     cmd = ["./ombcli/ombcli"]
     print cmd
     print "WARNING fix this path"
     subprocess.call(cmd, stdout=null)
 
-    nodeproc.kill()
+    webserverproc.kill()
     walletproc.kill()
+    nodeproc.kill()
 
     null.close()
     syslog(LOG_ERR, "All subprocesses successfully started. Bailing out.")
