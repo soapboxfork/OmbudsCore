@@ -75,7 +75,6 @@ ApplicationWindow {
                     }
                 }
                 // End js
-
             }
         }
     }
@@ -91,7 +90,7 @@ ApplicationWindow {
 
     WalletPane {
         id: walletPane
-        visible: true
+        visible: false
         anchors{
             top: toolBar.bottom
             bottom: parent.bottom
@@ -102,8 +101,7 @@ ApplicationWindow {
 
     BrowsePane {
         id: browsePane
-        visible: false
-        Text{ text: "Here are bulletins"}
+        visible: true
         anchors{
             top: toolBar.bottom
             bottom: parent.bottom

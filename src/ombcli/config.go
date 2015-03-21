@@ -35,9 +35,9 @@ const (
 )
 
 var (
-	ombudsHomeDir     = btcutil.AppDataDir("OmbudsCore", false)
+	ombudsHomeDir     = btcutil.AppDataDir("ombudscore", false)
 	guiHomeDir        = filepath.Join(ombudsHomeDir, "gui")
-	btcwalletDir      = filepath.Join(ombudsHomeDir, "Wallet")
+	btcwalletDir      = filepath.Join(ombudsHomeDir, "wallet")
 	defaultCAFile     = filepath.Join(btcwalletDir, defaultCAFilename)
 	defaultConfigFile = filepath.Join(guiHomeDir, defaultConfigFilename)
 	defaultDataDir    = filepath.Join(guiHomeDir, defaultDataDirname)
@@ -167,6 +167,11 @@ func loadConfig() (*config, []string, error) {
 			parser.WriteHelp(os.Stderr)
 		}
 		return nil, nil, err
+	}
+
+	err = os.MkdirAll(ombudsHomeDir, 0700)
+	if err != nil {
+		log.Printf("[WARN] %v", err)
 	}
 
 	// Warn about missing config file after the final command line parse
