@@ -1,5 +1,8 @@
 package main
 
+// Use go generate to pack the qrc resources into the binary.
+//go:generate genqrc qml
+
 import (
 	"fmt"
 	"io/ioutil"
@@ -97,7 +100,7 @@ func run() error {
 
 	engine.On("quit", func() { os.Exit(0) })
 
-	component, err := engine.LoadFile("qml/MainWindow.qml")
+	component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ Rectangle {
                 if (loadRequest.status === WebView.LoadFailedStatus) {
                     loadStatusTxt.text = "Load failed.";
                 } else {
-                    loadStatusTxt.text = "Load worked.";
+                    loadStatusTxt.text = "Load worked!";
                 }
             }
         }

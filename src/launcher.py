@@ -4,15 +4,22 @@ import os, random, subprocess, sys, string, signal
 from syslog import syslog, LOG_ERR
 from os.path import abspath, expanduser
 
-# System params
+DEPLOY = False
+OSX = True
+
+BIN = os.path.join(expanduser("~"), "go/bin")
+
+# System params for an OSX app
 # TODO rename file
-APP_PATH = abspath(os.path.join(__file__, "./../../.."))
-BIN = os.path.join(APP_PATH, "Contents/MacOS")
-APP_DIR = os.path.join(expanduser("~"), "Library/Application Support/OmbudsCore")
+if OSX and DEPLOY:
+    APP_PATH = abspath(os.path.join(__file__, "./../../.."))
+    BIN = os.path.join(APP_PATH, "Contents/MacOS")
+
+APP_DIR = os.path.join(expanduser("~"), "Library/Application Support/Ombudscore")
 NODE_CFG = os.path.join(APP_DIR, "node.conf")
-NODE_DIR = os.path.join(APP_DIR, "Btcd")
+NODE_DIR = os.path.join(APP_DIR, "node")
 WAL_CFG = os.path.join(APP_DIR, "wallet.conf")
-WAL_DIR = os.path.join(APP_DIR, "Wallet")
+WAL_DIR = os.path.join(APP_DIR, "wallet")
 
 
 def main():
@@ -26,23 +33,26 @@ def main():
 
     null = open(os.devnull, "w")
 
-    # Start btcnode
-    opts = ["--testnet", "--configfile="+NODE_CFG, "--datadir="+NODE_DIR]
-    cmd = [BIN+"/btcd"] + opts
+    # Start ombnode
+    opts = ["--testnet" ]
+    cmd = [BIN+"/ombfullnode"] + opts
     print cmd
     nodeproc = subprocess.Popen(cmd, stdout=null)
 
-    # Start btcwallet
-    opts = ["--configfile="+WAL_CFG, "--datadir="+WAL_DIR]
-    cmd = [BIN+"/btcwallet"] + opts
+    # Start ombwallet
+    opts = []
+    cmd = [BIN+"/ombwallet"] + opts
+    print cmd
     walletproc = subprocess.Popen(cmd, stdout=null)
 
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
-    # Start ombudscoregui
-    cmd = [BIN+"/ombudscoregui"]
+    # Start ombuds client gui and blocks until process returns.
+    cmd = ["./ombcli/ombcli"]
+    print cmd
+    print "WARNING fix this path"
     subprocess.call(cmd, stdout=null)
 
     nodeproc.kill()
