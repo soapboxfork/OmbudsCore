@@ -4,22 +4,55 @@ import os, random, subprocess, sys, string, signal
 from syslog import syslog, LOG_ERR
 from os.path import abspath, expanduser
 
-DEPLOY = False
-OSX = True
 
-BIN = os.path.join(expanduser("~"), "go/bin")
+def appDataDir(appname):
+    home = expanduser("~")
+    if sys.platform == "darwin":
+        datadir = os.path.join(home, "Library", "Application Support")
+        return os.path.join(datadir, appname.capitalize())
 
-# System params for an OSX app
-# TODO rename file
-if OSX and DEPLOY:
-    APP_PATH = abspath(os.path.join(__file__, "./../../.."))
-    BIN = os.path.join(APP_PATH, "Contents/MacOS")
+    if sys.platform == "windows":
+        print "Windows is unsupported"
+        return os.path.join(home, appname)
 
+    if appname.startswith("."):
+        appname = appname[1:]
+    hiddendir = "." + appname.lower()
+    # Return the default app directory
+    return os.path.join(home, hiddendir)
+    
+
+
+# APP_PATH = abspath(os.path.join(__file__, "./../../.."))
+# BIN = os.path.join(APP_PATH, "Contents/MacOS")
+
+GO_PATH = os.environ.get("GOPATH")
+BIN = os.path.join(GO_PATH, "bin")
 APP_DIR = appDataDir("ombudscore")
 NODE_CFG = os.path.join(APP_DIR, "node.conf")
 NODE_DIR = os.path.join(APP_DIR, "node")
 WAL_CFG = os.path.join(APP_DIR, "wallet.conf")
 WAL_DIR = os.path.join(APP_DIR, "wallet")
+
+def run_webapp(stdout):
+    static_path = os.path.join(GO_PATH, "src","github.com","NSkelsey","ahimsarest","ombwebapp")
+    opts = ["-staticpath", static_path]
+    cmd = [BIN+"/ombwebapp"] + opts
+    print cmd
+    return subprocess.Popen(cmd, stdout=stdout)
+    
+def run_ombwallet(stdout):
+    opts = []
+    cmd = [BIN+"/ombwallet"] + opts
+    print cmd
+    return subprocess.Popen(cmd, stdout=stdout)
+
+def run_ombfullnode(stdout):
+    opts = ["--testnet" ]
+    cmd = [BIN+"/ombfullnode"] + opts
+    print cmd
+    return subprocess.Popen(cmd, stdout=stdout)
+
 
 
 def main():
@@ -32,37 +65,28 @@ def main():
         make_conf()
 
     null = open(os.devnull, "w")
+    null = sys.stdout
 
     # Start ombnode
-    opts = ["--testnet" ]
-    cmd = [BIN+"/ombfullnode"] + opts
-    print cmd
-    nodeproc = subprocess.Popen(cmd, stdout=null)
+    nodeproc = run_ombfullnode(null)
 
     # Start ombwallet
-    opts = []
-    cmd = [BIN+"/ombwallet"] + opts
-    print cmd
-    walletproc = subprocess.Popen(cmd, stdout=null)
+    walletproc = run_ombwallet(null)
 
     # Start ahimsarest
-    opts = []
-    cmd = [BIN+"/ahimsarest"] + opts
-    print cmd
-    # TODO
-    webserverproc = subprocess.Popen(cmd, stdout=null)
+    webservproc = run_webapp(null)
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
-    # Start ombuds client gui and blocks until process returns.
+    # Start ombuds client gui and block until process returns.
     # TODO change bin path
     cmd = ["./ombcli/ombcli"]
     print cmd
     print "WARNING fix this path"
     subprocess.call(cmd, stdout=null)
 
-    webserverproc.kill()
+    webservproc.kill()
     walletproc.kill()
     nodeproc.kill()
 
@@ -122,17 +146,3 @@ def sig_handler(procs):
 if __name__ == '__main__':
     main()
 
-
-def appDataDir(appname):
-    home = expanduser("~")
-    if sys.platform = "darwin":
-        datadir = os.path.join(home, "Library", "Application Support")
-        return os.path.join(datadir, appname.capitalize())
-
-    if sys.platform = "windows":
-        print "Windows is unsupported"
-        return os.path.join(home, appname)
-
-    # Default app directory
-    return os.path.join(home, appname.lower()
-    
