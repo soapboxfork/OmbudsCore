@@ -9,7 +9,7 @@ Components
 There are several components of this project that need individual explanation. They are ombcli, ombfullnode, ombwallet, ahimsarest, and launcher.py. 
 These are all subcomponents of what makes up OmbudsCore.
 
-### ombudscli
+### ombcli
 [ombcli](https://github.com/soapboxsys/OmbudsCore/tree/master/src/ombcli)
 is a qml fronted that lets a user read and publish bulletins. 
 It is the GUI that sits on top of several pieces of software that handle the heavy lifting.
@@ -30,6 +30,8 @@ is a web frontend for the bulletins stored in the pubrecord.db.
 It exposes topics, authors and bulletins via a json api and in an angular web application.
 The GUI of OmbudsCore uses as a built in browser for easy access.
 It can also be used as a standalone website.
+
+(ahimsa is the name of our proof-of-concept, if you were wondering.)
 
 ### launcher.py
 [launcher.py](https://github.com/soapboxsys/OmbudsCore/blob/master/src/launcher.py) 
