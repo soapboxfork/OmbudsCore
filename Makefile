@@ -13,8 +13,6 @@ $(PKG): pkg
 	
 # TODO switch to btcd to NSkelsey
 external: $(pkg)
-	go get -v github.com/NSkelsey/btcd/...
-	go get -v github.com/NSkelsey/btcwallet/...
 	cp $(GOPATH)/bin/btcd $(BINPATH)
 	cp $(GOPATH)/bin/btcwallet $(BINPATH)
 
@@ -23,6 +21,11 @@ internal: $(PKG)
 
 clean:
 	rm -rf build/$(APP)
+
+install:
+	go get -v github.com/soapboxsys/ombfullnode/...
+	go get -v github.com/soapboxsys/ombwallet/...
+	go get -v github.com/NSkelsey/ahimsarest/...
 
 all: pkg internal external
 
