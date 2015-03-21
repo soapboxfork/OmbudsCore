@@ -9,7 +9,7 @@ Item {
 
     function totalFuel(lst) {
         var total = 0;
-        lst.forEach(function(i){ total += i.fuel });
+        //lst.forEach(function(i){ total += i.fuel });
         return total
     }
 
