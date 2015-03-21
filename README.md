@@ -38,4 +38,4 @@ It can also be used as a standalone website.
 is a python script that launches all of these processes at once. 
 When the project is build using make, the first process that really gets launched is launcher.py.
 It is responsible for cleanly starting all and stopping of the necessary processes that were described above.
-In essence it is the entry point for the whole application.
+It serves as the entry point for the entire application.
