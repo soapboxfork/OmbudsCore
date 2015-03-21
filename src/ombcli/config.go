@@ -38,7 +38,7 @@ var (
 	ombudsHomeDir     = btcutil.AppDataDir("ombudscore", false)
 	guiHomeDir        = filepath.Join(ombudsHomeDir, "gui")
 	btcwalletDir      = filepath.Join(ombudsHomeDir, "wallet")
-	defaultCAFile     = filepath.Join(btcwalletDir, defaultCAFilename)
+	defaultCAFile     = filepath.Join(ombudsHomeDir, defaultCAFilename)
 	defaultConfigFile = filepath.Join(guiHomeDir, defaultConfigFilename)
 	defaultDataDir    = filepath.Join(guiHomeDir, defaultDataDirname)
 )
