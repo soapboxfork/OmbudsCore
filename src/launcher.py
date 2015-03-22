@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, random, subprocess, sys, string, signal
+import os, random, subprocess, sys, string, signal, time
 from syslog import syslog, LOG_ERR
 from os.path import abspath, expanduser
 
@@ -29,28 +29,32 @@ def appDataDir(appname):
 GO_PATH = os.environ.get("GOPATH")
 BIN = os.path.join(GO_PATH, "bin")
 APP_DIR = appDataDir("ombudscore")
-NODE_CFG = os.path.join(APP_DIR, "node.conf")
 NODE_DIR = os.path.join(APP_DIR, "node")
-WAL_CFG = os.path.join(APP_DIR, "wallet.conf")
+NODE_CFG = os.path.join(NODE_DIR, "node.conf")
 WAL_DIR = os.path.join(APP_DIR, "wallet")
+WAL_CFG = os.path.join(WAL_DIR, "wallet.conf")
+GUI_DIR = os.path.join(APP_DIR, "gui")
+GUI_CFG = os.path.join(GUI_DIR, "gui.conf")
+CTL_DIR = os.path.join(APP_DIR, "ctl")
+CTL_CFG = os.path.join(CTL_DIR, "ctl.conf")
 
 def run_webapp(stdout):
     static_path = os.path.join(GO_PATH, "src","github.com","NSkelsey","ahimsarest","ombwebapp")
-    opts = ["-staticpath", static_path]
+    opts = ["-staticpath=" + static_path]
     cmd = [BIN+"/ombwebapp"] + opts
-    print cmd
+    #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
     
 def run_ombwallet(stdout):
     opts = []
     cmd = [BIN+"/ombwallet"] + opts
-    print cmd
+    #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
 def run_ombfullnode(stdout):
-    opts = ["--testnet" ]
+    opts = []
     cmd = [BIN+"/ombfullnode"] + opts
-    print cmd
+    #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
 
@@ -58,20 +62,20 @@ def run_ombfullnode(stdout):
 def main():
     syslog(LOG_ERR, "Starting OmbudsCore")
     # Assert/do some system config
-    if not os.path.isdir(APP_DIR):
-        os.mkdir(APP_DIR)
-        make_conf() 
-    else:
-        make_conf()
-
+    idempotent_conf()
+    
     null = open(os.devnull, "w")
     null = sys.stdout
 
     # Start ombnode
     nodeproc = run_ombfullnode(null)
 
+    time.sleep(3)
+
     # Start ombwallet
     walletproc = run_ombwallet(null)
+
+    time.sleep(3)
 
     # Start ahimsarest
     webservproc = run_webapp(null)
@@ -93,8 +97,25 @@ def main():
     null.close()
     syslog(LOG_ERR, "All subprocesses successfully started. Bailing out.")
 
+def try_mkdir(path):
+    if not os.path.isdir(path): os.mkdir(path)
 
 # Utility functions
+def idempotent_conf():
+
+    if not os.path.isdir(APP_DIR):
+        os.mkdir(APP_DIR)
+
+    try_mkdir(WAL_DIR)
+    try_mkdir(NODE_DIR)
+    try_mkdir(GUI_DIR)
+    try_mkdir(CTL_DIR)
+
+    # try to make the config file too
+    make_conf()
+
+
+
 
 def make_conf():
     '''
@@ -102,31 +123,49 @@ def make_conf():
     NODE_CFG, WAL_CFG
     '''
     uname, pw = generate_secrets(70)
+    print "Running make_conf"
 
     # Configure the wallet
-    if os.path.exists(WAL_CFG): 
-        os.remove(WAL_CFG)
-    r = '''
-[Application Options]
-username={0}
-password={1}
-    '''.format(uname, pw)
+    if not os.path.exists(WAL_CFG): 
+        r = "" +\
+        "[Application Options]\n" +\
+        "username={0}\n"+\
+        "password={1}\n"
+        with open(WAL_CFG, 'w') as f:
+            f.write(r.format(uname, pw))
 
-    with open(WAL_CFG, 'w') as f:
-        f.write(r)
+    # Configure the gui
+    if not os.path.exists(GUI_CFG):
+        r = "" +\
+        "[Application Options]\n" +\
+        "username={0}\n"+\
+        "password={1}\n"
+        with open(GUI_CFG, 'w') as f:
+            f.write(r.format(uname, pw))
 
     # Configure the node
-    if os.path.exists(NODE_CFG):
-        os.remove(NODE_CFG)
+    if not os.path.exists(NODE_CFG):
+        r = "" +\
+        "[Application Options]\n" +\
+        "rpcuser={0}\n"+\
+        "rpcpass={1}\n"+\
+        "testnet=1\n"
+        
+        with open(NODE_CFG, "w") as f:
+            f.write(r.format(uname, pw))
 
-    r = '''
-[Application Options]
-rpcuser={0}
-rpcpass={1}
-    '''.format(uname, pw)
+    # Configure the command line tool
+    if not os.path.exists(CTL_CFG):
+        r = "" +\
+        "[Application Options]\n" +\
+        "rpcuser={0}\n"+\
+        "rpcpass={1}\n"+\
+        "testnet=1\n"
+        
+        with open(CTL_CFG, "w") as f:
+            f.write(r.format(uname, pw))
 
-    with open(NODE_CFG, "w") as f:
-        f.write(r)
+
 
 
 def generate_secrets(l):
