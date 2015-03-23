@@ -10,3 +10,7 @@ If you are running Ubuntu you need to the follow the ubuntu specific installatio
 [instructions](https://github.com/go-qml/qml#requirements-on-ubuntu)
 
 Since this was developed on QtQuick 5.4 and Ubuntu 14.04 support only reaches QtQuick 5.2. Compiling may not work...
+
+## Note
+
+When building for distrobution remember to reset the qrc:// urls and use go generate.
