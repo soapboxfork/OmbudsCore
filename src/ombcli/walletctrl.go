@@ -12,7 +12,7 @@ import (
 type walletCrtl struct {
 }
 
-// Handles passes all relevant and formatted data to the gui
+// Handles passing all relevant and formatted data to the gui
 type QmlWalletData struct {
 	AvailTxOuts   string
 	PendingTxOuts string

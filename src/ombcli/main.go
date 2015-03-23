@@ -30,22 +30,25 @@ func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig) 
 	}
 
 	rpcCfg := &btcrpcclient.ConnConfig{
-		Host:         cfg.RPCConnect,
-		User:         cfg.Username,
-		Pass:         cfg.Password,
-		Certificates: certs,
-		Endpoint:     "ws",
+		Host:                cfg.RPCConnect,
+		User:                cfg.Username,
+		Pass:                cfg.Password,
+		Certificates:        certs,
+		Endpoint:            "ws",
+		DisableConnectOnNew: true,
 	}
 
-	fmt.Println(cfg.CAFile)
 	rpcConn, err := btcrpcclient.New(rpcCfg, nil)
 	if err != nil {
 		log.Print(err)
 		return nil, nil
 	}
-	err = rpcConn.Ping()
+
+	// Make a few attempts at connecting to the websocket.
+	tries := 15
+	err = rpcConn.Connect(tries)
 	if err != nil {
-		log.Print(err)
+		log.Printf("Failed to connect after %d with err: %s\n", tries, err)
 		return nil, nil
 	}
 
@@ -100,7 +103,8 @@ func run() error {
 
 	engine.On("quit", func() { os.Exit(0) })
 
-	component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
+	//component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
+	component, err := engine.LoadFile("ombcli/qml/MainWindow.qml")
 	if err != nil {
 		return err
 	}

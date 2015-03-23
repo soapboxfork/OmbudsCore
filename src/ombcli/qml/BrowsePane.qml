@@ -9,7 +9,7 @@ Rectangle {
 
         WebView {
             id: browseView
-            url: "http://localhost:1055/"
+            url: "http://localhost:1055/api/status"
             anchors.fill: parent
 
             onLoadingChanged: {

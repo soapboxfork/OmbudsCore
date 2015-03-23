@@ -9,8 +9,8 @@ import "utils.js" as Utils
 
 ApplicationWindow {
     id: root
-    width: 650
-    height: 500
+    width: 1000
+    height: 600
     minimumWidth: 650
     minimumHeight: 500
     Component.onCompleted: startupFunction();
