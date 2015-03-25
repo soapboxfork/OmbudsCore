@@ -62,22 +62,16 @@ func run() error {
 	}
 
 	// TODO handle case when rpcConn is nil
-	rpcConn, rpcCfg := setupRpcConn(cfg)
+	walletConn, rpcCfg := setupRpcConn(cfg)
 
-	settingpath := filepath.Join(guiHomeDir, "settings.json")
-	settingCtrl, err := NewSettingCtrl(settingpath)
+	settingPath := filepath.Join(guiHomeDir, "settings.json")
+	settingCtrl, err := NewSettingCtrl(settingPath, walletConn)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Register types and use closure to bring in application variables
 	qml.RegisterTypes("OmbExtensions", 1, 0, []qml.TypeSpec{
-		{
-			Init: func(v *WalletPassphrase, obj qml.Object) {
-				v.rpcConn = rpcConn
-				v.setCtrl = settingCtrl
-			},
-		},
 		{
 			Init: func(v *MarkdownText, obj qml.Object) {
 			},
@@ -104,7 +98,7 @@ func run() error {
 	engine.On("quit", func() { os.Exit(0) })
 
 	//component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
-	component, err := engine.LoadFile("ombcli/qml/MainWindow.qml")
+	component, err := engine.LoadFile("qml/MainWindow.qml")
 	if err != nil {
 		return err
 	}
