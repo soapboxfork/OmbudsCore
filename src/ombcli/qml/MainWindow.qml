@@ -13,15 +13,7 @@ ApplicationWindow {
     height: 600
     minimumWidth: 650
     minimumHeight: 500
-    Component.onCompleted: startupFunction();
 
-    function startupFunction() {
-        if (!appsettings.hasWallet()) {
-            sendWinBtn.enabled = false
-        } else {
-            sendWinBtn.enabled = true
-        }
-    }
 
     // NOTE depends on id: walletPane
     // utils.js defines the functions that unpack this go struct into javascript
@@ -45,7 +37,7 @@ ApplicationWindow {
                 id: sendWinBtn
                 text: "Send"
                 objectName: "sendBulletin"
-                enabled: appsetting.hasWallet() 
+                enabled: true // TODO use check unspent logic.
                 onClicked: {
                     var component = Qt.createComponent("SendWindow.qml")    
                     var window = component.createObject(root)
@@ -61,13 +53,9 @@ ApplicationWindow {
                 // Also functions as toggle on walletPane.visible
                 onClicked: {
                     if (!walletPane.visible) {
-                        if (!appsettings.hasWallet()) {
-                            authWizard.visible = true
-                        } else {
-                            viewBtn.text = "Browse"
-                            browsePane.visible = false
-                            walletPane.visible = true
-                        }
+                        viewBtn.text = "Browse"
+                        browsePane.visible = false
+                        walletPane.visible = true
                     } else {
                         viewBtn.text = "Wallet"
                         walletPane.visible = false 
@@ -79,18 +67,13 @@ ApplicationWindow {
         }
     }
 
-    AuthorWizard {
-        id: authWizard
-        onDoneChanged: sendWinBtn.enabled = true
-    }
-
     AppSettings{
         id: appsettings
     }
 
     WalletPane {
         id: walletPane
-        visible: false
+        visible: true
         anchors{
             top: toolBar.bottom
             bottom: parent.bottom
@@ -101,7 +84,7 @@ ApplicationWindow {
 
     BrowsePane {
         id: browsePane
-        visible: true
+        visible: false
         anchors{
             top: toolBar.bottom
             bottom: parent.bottom

@@ -63,7 +63,7 @@ Item {
                     top: parent.top
                     left: parent.left
                 }
-                text: "mgMDvAfBp2VAYzeQMfPRX4sGgyurT62HCT"
+                text: appsettings.address()
                 font.bold: true
             }
 
