@@ -13,6 +13,7 @@ ApplicationWindow {
     height: 600
     minimumWidth: 650
     minimumHeight: 500
+    title: "OmbudsCore Desktop Client"
 
 
     // NOTE depends on id: walletPane
@@ -21,49 +22,61 @@ ApplicationWindow {
         Utils.updateWallet(walletdata);
     }
 
+    function sendWindow() {
+        var component = Qt.createComponent("SendWindow.qml")    
+        var window = component.createObject(root)
+        window.show()
+    }
+
 
     CustToolBar {
         id: toolBar
 
-        RowLayout {
+        Image {
+            source: "images/logo.png"
+            fillMode: Image.PreserveAspectFit
+            height: 25
             anchors { 
                 verticalCenter: parent.verticalCenter
                 left: parent.left
                 leftMargin: 7
             }
+            
+        }
+
+        RowLayout {
+            anchors { 
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: 7
+            }
+
+            Button {
+                id: walletRevealBtn
+                text: "Account"
+                objectName: "setupWalletBtn"
+                enabled: !walletPane.visible
+                onClicked: {
+                    walletPane.visible = true;
+                }
+            }
 
             
             Button {
                 id: sendWinBtn
-                text: "Send"
+                text: "Reply"
                 objectName: "sendBulletin"
-                enabled: true // TODO use check unspent logic.
-                onClicked: {
-                    var component = Qt.createComponent("SendWindow.qml")    
-                    var window = component.createObject(root)
-                    window.show()
-                }
+                enabled: false // TODO use check unspent logic.
+                onClicked: sendWindow()
             }
+
             Button {
-                id: viewBtn
-                text: walletPane.visible ? "Browse" : "Wallet"
-                objectName: "setupWalletBtn"
-                
-                // Closely bound to the state of accountSetupMachine
-                // Also functions as toggle on walletPane.visible
-                onClicked: {
-                    if (!walletPane.visible) {
-                        viewBtn.text = "Browse"
-                        browsePane.visible = false
-                        walletPane.visible = true
-                    } else {
-                        viewBtn.text = "Wallet"
-                        walletPane.visible = false 
-                        browsePane.visible = true
-                    }
-                }
-                // End js
+                id: newBtn
+                text: "New"
+                enabled: true
+                onClicked: sendWindow()
             }
+
         }
     }
 
@@ -74,17 +87,11 @@ ApplicationWindow {
     WalletPane {
         id: walletPane
         visible: true
-        anchors{
-            top: toolBar.bottom
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
     }
 
     BrowsePane {
         id: browsePane
-        visible: false
+        visible: true
         anchors{
             top: toolBar.bottom
             bottom: parent.bottom
