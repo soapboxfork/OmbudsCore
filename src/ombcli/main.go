@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/btcsuite/btcrpcclient"
 	"gopkg.in/qml.v1"
@@ -64,8 +63,7 @@ func run() error {
 	// TODO handle case when rpcConn is nil
 	walletConn, rpcCfg := setupRpcConn(cfg)
 
-	settingPath := filepath.Join(guiHomeDir, "settings.json")
-	settingCtrl, err := NewSettingCtrl(settingPath, walletConn)
+	settingCtrl, err := NewSettingCtrl(guiHomeDir, walletConn)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +81,7 @@ func run() error {
 			},
 		},
 		{
-			Init: func(v *AppSettings, obj qml.Object) {
+			Init: func(v *AppController, obj qml.Object) {
 				v.gui = settingCtrl
 			},
 		},

@@ -80,8 +80,8 @@ ApplicationWindow {
         }
     }
 
-    AppSettings{
-        id: appsettings
+    AppController{
+        id: appCtrl
     }
 
     WalletPane {

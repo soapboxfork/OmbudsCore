@@ -5,13 +5,19 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
+	"code.google.com/p/rsc/qr"
 	"github.com/btcsuite/btcrpcclient"
+	"github.com/btcsuite/btcutil"
 )
+
+var qrFileName = "qrcode.png"
 
 type SettingCtrl struct {
 	settings settings
-	filepath string
+	file     string
+	dirPath  string
 }
 
 type settings struct {
@@ -19,10 +25,11 @@ type settings struct {
 }
 
 func (h *SettingCtrl) Commit() error {
-	return writefile(h.filepath, h.settings)
+	return writefile(h.file, h.settings)
 }
 
-func NewSettingCtrl(fpath string, walletConn *btcrpcclient.Client) (*SettingCtrl, error) {
+func NewSettingCtrl(dirpath string, walletConn *btcrpcclient.Client) (*SettingCtrl, error) {
+	fpath := filepath.Join(dirpath, "settings.json")
 	if !fileExists(fpath) {
 		s := &settings{}
 		err := writefile(fpath, *s)
@@ -37,7 +44,8 @@ func NewSettingCtrl(fpath string, walletConn *btcrpcclient.Client) (*SettingCtrl
 	}
 
 	h := &SettingCtrl{
-		filepath: fpath,
+		file:     fpath,
+		dirPath:  dirpath,
 		settings: *g,
 	}
 
@@ -50,12 +58,41 @@ func NewSettingCtrl(fpath string, walletConn *btcrpcclient.Client) (*SettingCtrl
 			return nil, err
 		}
 		h.settings.Address = addr.String()
+		// Generate the addresses qr code
+		qrcode, err := createQrCode(addr)
+		if err != nil {
+			return nil, err
+		}
+		err = storeQrCode(qrcode, dirpath)
+		if err != nil {
+			return nil, err
+		}
+
 		if err != h.Commit() {
 			return nil, err
 		}
 	}
 
 	return h, nil
+}
+
+func storeQrCode(qrcode []byte, dirpath string) error {
+	path := filepath.Join(dirpath, qrFileName)
+	err := ioutil.WriteFile(path, qrcode, 0600)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createQrCode(addr btcutil.Address) ([]byte, error) {
+	code, err := qr.Encode(addr.String(), qr.M)
+	if err != nil {
+		return []byte{}, err
+	}
+	return code.PNG(), nil
 }
 
 func writefile(fpath string, g settings) error {
@@ -96,12 +133,4 @@ func readfile(fpath string) (*settings, error) {
 	}
 
 	return &g, nil
-}
-
-type AppSettings struct {
-	gui *SettingCtrl
-}
-
-func (app *AppSettings) Address() string {
-	return app.gui.settings.Address
 }
