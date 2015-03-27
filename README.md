@@ -24,11 +24,11 @@ The forked wallet has extra rpc commands that exposes bulletin creation and tran
 The GUI of OmbudsCore uses these rpc commands to send bulletins into the Bitcoin network.
 The sendbulletin rpc command can also be used from the command line using ombctl.
 
-### ahimsarest
-[ahimsarest](http://github.com/NSkelsey/ahimsarest) 
+### ombwebapp
+[ombwebapp](http://github.com/NSkelsey/ahimsarest/tree/master/ombwebapp) 
 is a web frontend for the bulletins stored in the pubrecord.db. 
 It exposes topics, authors and bulletins via a json api and in an angular web application.
-The GUI of OmbudsCore uses as a built in browser for easy access.
+The GUI of OmbudsCore uses this as a built in browser.
 It can also be used as a standalone website.
 
 (ahimsa is the name of our proof-of-concept, if you were wondering.)
