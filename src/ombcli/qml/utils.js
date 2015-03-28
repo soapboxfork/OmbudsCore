@@ -5,18 +5,22 @@
 function updateWallet(walletData){
     console.log("Updating the wallet");
 
-    walletPane.availTxOuts = walletData.availTxOuts;
-    walletPane.pendingTxOuts = walletData.pendingTxOuts;
-
-    var bltnList = eval(walletData.bltnListJson)
+    walletPane.availBalance = walletData.availBalance
+    var bltnList = JSON.parse(walletData.pendingListJson)
     for (var i = 0; i < bltnList.length; i ++) {
         var bltn = bltnList[i];
-
         bltn.time = formatDate(new Date(1000*bltn.unix))
-        walletPane.bltnModel.append(bltn);
+        walletPane.allModel.append(bltn);
+        walletPane.pendingModel.append(bltn);
     }
-    walletPane.fuelOuts = eval(walletData.fuelOutListJson)
-
+    
+    bltnList = JSON.parse(walletData.confirmedListJson);
+    for (var i = 0; i < bltnList.length; i ++) {
+        var bltn = bltnList[i];
+        bltn.time = formatDate(new Date(1000*bltn.unix))
+        walletPane.allModel.append(bltn);
+        walletPane.confirmedModel.append(bltn);
+    }
 }
 
 

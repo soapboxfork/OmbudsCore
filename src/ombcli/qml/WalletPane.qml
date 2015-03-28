@@ -5,28 +5,31 @@ import QtQuick.Layouts 1.1
 
 Window {
     id: root
-    //anchors.margins: 25
+
     SystemPalette {id: syspal}
     color: syspal.window
     flags: Qt.Sheet
     width: 650
-    height: 500
+    height: 550
 
     // Must be exported so that MainWindow can access these models
-    property alias bltnModel: bltnModel
-    property alias txModel: txModel
-    property alias availTxOuts: availTxOuts.val
-    property alias pendingTxOuts: pendingTxOuts.val
-    property var fuelOuts
-
+    property alias allModel: allModel
+    property alias pendingModel: pendingModel
+    property alias confirmedModel: confirmedModel
+    property alias availBalance: availBalance.text
 
     ListModel{
-        id: bltnModel
+        id: allModel
     }
 
     ListModel{
-        id: txModel
+        id: pendingModel
     }
+
+    ListModel{
+        id: confirmedModel
+    }
+
 
     ColumnLayout {
         id: colLayout 
@@ -39,65 +42,119 @@ Window {
         }
 
         Rectangle {
-            Layout.fillWidth: true
-            Layout.minimumHeight: 200
+            Layout.minimumHeight: 270
             color: syspal.window
 
+            Item {
+                id: addressInfo
+                width: 220
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
 
-            Image {
-                id: qrcode
-                source: appCtrl.addressQrPath()
-                height: 180
-                width: 180
+                Column {
+
+                    spacing: 10
+
+                    Text {
+                        text: "Sending Address"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font { bold: true; pixelSize: 16 }
+                    }
+
+                    WalletAddr {}
+
+                    Image {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        id: qrcode
+                        source: appCtrl.addressQrPath()
+                        height: 150
+                        width: 150
+                    }
+
+
+                }
             }
 
             Item {
-                id: info
-                height: 100
+                id: walletInfo
+                // NOTE this is not dynamic!
+                width: 350
                 anchors {
-                    top: qrcode.top
-                    left: qrcode.right
-                    leftMargin: 20
-                    right: parent.right
+                    top: parent.top
+                    left: addressInfo.right
+                    bottom: parent.bottom
                 }
 
-                Text { 
-                    id: title
-                    text: "Wallet Info"
-                    font { bold: true; pixelSize: 16 }
-                }
+                
+                Column {
+                    spacing: 10
+                    anchors.horizontalCenter: parent.horizontalCenter    
 
-                GridLayout {
-                    anchors {
-                        top: title.bottom
-                        right: parent.right
-                        left: parent.left
-                        bottom: parent.bottom
-                        bottomMargin: 20
+                    Text { 
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        id: title
+                        text: "Wallet Info"
+                        font { bold: true; pixelSize: 16 }
                     }
-                    columns: 2
-                    WalletLbl {
-                        id: availTxOuts
-                        lbl: "Available Outputs:"    
-                        val: "3"
+
+                    Rectangle { 
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        id: walletActionBox
+                        width: 300
+                        radius: 3
+                        height: 55
+                        color: "#C5E3BF"
+                        Text {
+                            id: walletStatus
+                            anchors.centerIn: parent
+                            text: "The wallet seems to be working!" 
+                        }
                     }
-                    WalletLbl {
-                        id: unspentFuel
-                        lbl: "Unspent Fuel:"
-                        val: "43"
+
+                    Item {
+                        height: 40 
+                        width: availBalance.width + balanceUnit.width + balanceUnit.anchors.leftMargin
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        Text {
+                            id: availBalance
+                            text: "0.000"
+                            font { bold: true; pixelSize: 28 }
+                        }
+                        Text {
+                            id: balanceUnit
+                            anchors {
+                                left: availBalance.right
+                                leftMargin: 5
+                                bottom: availBalance.bottom
+                            }
+                            text: "mBTC"
+                            color: "gray"
+                            font { bold: true; pixelSize: 19 }
+                        }
                     }
-                    WalletLbl {
-                        id: pendingTxOuts
-                        lbl: "Pending Outputs:"    
-                        val: "12"
+
+                    Text {
+                        id: roughEstimates
+                        height: 85
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        horizontalAlignment: Text.AlignHCenter
+                        text: "That can create roughly:\nAround 3 Tweets or\nAround 20 paragraphs or\nAround 5000 characters"
+                    
                     }
-                    WalletLbl {
-                        id: unspentCoin
-                        lbl: "Unspent Coin:"
-                        val: "38143"
-                    }
+
                 }
             }
+        }
+
+
+        Text { 
+            id: tableLbl
+            text: "Sent Bulletins"
+            font { bold: true; pixelSize: 16 }
+            anchors { horizontalCenter: parent.horizontalCenter }
         }
 
         TabView {
@@ -108,17 +165,23 @@ Window {
             Tab {
                 title: "All"
                 anchors.margins: 12
+                anchors.fill: parent
 
-                TableView {
-                    id: txTable
-                    model: txModel
-                    TableViewColumn {
-                        title: "Transaction Id"
-                        role: "txid"
-                    }
-
+                WalletTableView {
+                    id: allTable
+                    model: allModel
                 }
+            }
 
+            Tab {
+                title: "Pending"
+                anchors.margins: 12
+                anchors.fill: parent
+
+                WalletTableView {
+                    id: pendingTable
+                    model: pendingModel
+                }
             }
 
             Tab {
@@ -126,32 +189,10 @@ Window {
                 anchors.margins: 12
                 anchors.fill: parent
 
-                TableView {
-                    id: bltnTable
-                    model: bltnModel
-
-                    TableViewColumn {
-                        role: "txid"
-                        title: "Transaction Id"
-                    }
-                    TableViewColumn {
-                        role: "time"
-                        title: "Time (UTC)"
-                    }
-                    TableViewColumn {
-                        role: "board"
-                        title: "Board"
-                    }
-                    TableViewColumn {
-                        role: "depth"
-                        title: "Depth"
-                    }
+                WalletTableView {
+                    id: confirmedTable
+                    model: confirmedModel
                 }
-            }
-            Tab {
-                title: "Pending"
-                anchors.margins: 12
-                anchors.fill: parent
             }
         }
 

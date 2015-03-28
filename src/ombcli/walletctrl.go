@@ -2,33 +2,55 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
-	blkdb "github.com/soapboxsys/ombudslib/blockchaindb"
+	"github.com/btcsuite/btcrpcclient"
+	"gopkg.in/qml.v1"
 )
 
 // Handles interaction with the rpc based wallet
-type walletCrtl struct {
+type WalletCtrl struct {
+	Client *btcrpcclient.Client
+	Root   qml.Object
+}
+
+func NewWalletCtrl(client *btcrpcclient.Client) (*WalletCtrl, error) {
+	ctrl := &WalletCtrl{
+		Client: client,
+	}
+
+	return ctrl, nil
+}
+
+func (ctrl *WalletCtrl) updateBalance() {
+
+}
+
+func (ctrl *WalletCtrl) updateBulletins() {
+
+}
+
+// Starts a goroutine that live updates all of the data stored in the wallet.
+func (ctrl *WalletCtrl) Watch() {
+
+	go func() {
+		for {
+
+		}
+	}()
 }
 
 // Handles passing all relevant and formatted data to the gui
 type QmlWalletData struct {
-	AvailTxOuts   string
-	PendingTxOuts string
-	AvailFuel     string
-	AvailCoin     string
-	ConfirmedBltn string
+	AvailBalance string
 
 	// A JSON list of BltnListElements
 	bltnList []BltnListElem
 	// Converted into a json string
-	BltnListJson string
+	PendingListJson string
 
-	// A JSON list of FuelOuts to use.
-	fuelOutList []blkdb.FuelOut
-	// Converted into a json string for qml
-	FuelOutListJson string
+	// A JSON list of BltnListElements
+	ConfirmedListJson string
 }
 
 // The qml wallet's representation of a bulletin sent from the wallet
@@ -44,35 +66,17 @@ func NewQmlWalletData() *QmlWalletData {
 	// Get the list of sent bulletins from the wallet.
 	now := time.Now().Unix()
 	lst := []BltnListElem{
-		BltnListElem{"deadbeef", now, "ahimsa-dev", "10"},
-		BltnListElem{"beefbeef", now, "haimsa-dev", "95"},
-		BltnListElem{"shredbeef", now, `console.log("iran"); haimsa-dev`, "95"},
+		BltnListElem{"a38e1b9e7212", now, "Ombuds Dev", "10"},
 	}
 
-	bltnListJson, err := json.Marshal(lst)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Get the list of available txout's from the wallet.
-	fuelOuts := []blkdb.FuelOut{
-		blkdb.NewFuelOut(),
-		blkdb.NewFuelOut(),
-		blkdb.NewFuelOut(),
-		blkdb.NewFuelOut(),
-	}
-
-	fuelOutJson, err := json.Marshal(fuelOuts)
-	if err != nil {
-		fmt.Println(err)
-	}
+	pendingListJson, _ := json.Marshal(lst)
+	confirmedListJson, _ := json.Marshal(lst)
 
 	s := &QmlWalletData{
-		AvailTxOuts:   "10",
-		PendingTxOuts: "5",
+		AvailBalance: "575",
 
-		BltnListJson:    string(bltnListJson),
-		FuelOutListJson: string(fuelOutJson),
+		PendingListJson:   string(pendingListJson),
+		ConfirmedListJson: string(confirmedListJson),
 	}
 
 	return s

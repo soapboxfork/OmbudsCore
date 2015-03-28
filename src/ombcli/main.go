@@ -68,6 +68,12 @@ func run() error {
 		log.Fatal(err)
 	}
 
+	// Initialize the wallet controller
+	walletCtrl, err := NewWalletCtrl(walletConn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Register types and use closure to bring in application variables
 	qml.RegisterTypes("OmbExtensions", 1, 0, []qml.TypeSpec{
 		{
@@ -82,11 +88,17 @@ func run() error {
 		},
 		{
 			Init: func(v *AppController, obj qml.Object) {
-				v.gui = settingCtrl
+				v.init(settingCtrl, walletCtrl)
 			},
 		},
 		{
 			Init: func(v *QmlWalletData, obj qml.Object) {
+			},
+		},
+		{
+			Init: func(v *WalletCtrl, obj qml.Object) {
+				v.Root = obj
+				v.Client = walletConn
 			},
 		},
 	})
