@@ -17,6 +17,8 @@ Window {
     property alias pendingModel: pendingModel
     property alias confirmedModel: confirmedModel
     property alias spendableBalance: spendableBalance.text
+    property alias alertColor: alertColor.color
+    property alias alertMessage: walletStatus.text
 
     ListModel{
         id: allModel
@@ -125,26 +127,47 @@ Window {
 
                     Text {
                         id: roughEstimates
-                        height: 85
+                        height: 72
                         anchors.horizontalCenter: parent.horizontalCenter    
                         horizontalAlignment: Text.AlignHCenter
                         text: "That can create roughly:\nAround 3 Tweets or\nAround 20 paragraphs or\nAround 5000 characters"
                     
                     }
 
-                    Rectangle { 
-                    anchors.horizontalCenter: parent.horizontalCenter    
-                    id: walletActionBox
-                    width: 300
-                    radius: 3
-                    height: 55
-                    color: "#C5E3BF"
-                    Text {
-                        id: walletStatus
-                        anchors.centerIn: parent
-                        text: "The wallet seems to be working!" 
+                    Text { 
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        id: message
+                        text: "Wallet Alerts"
+                        font { bold: true; pixelSize: 16 }
                     }
-                }
+
+                    Rectangle { 
+                        anchors.horizontalCenter: parent.horizontalCenter    
+                        id: walletActionBox
+                        width: 300
+                        radius: 3
+                        height: 55
+                        border { width: 1; color: "#888888" }
+                        Image { 
+                            source: "images/empty-stripe.png"
+                            fillMode: Image.Tile
+                            anchors.fill: parent
+                            opacity: 0.3 
+                        } 
+                        Rectangle {
+                            anchors.centerIn: parent
+                            id: alertColor
+                            radius: 5
+                            width: walletStatus.width + 15
+                            height: walletStatus.height + 7
+                            visible:  walletStatus.text === "" ? false : true 
+                            Text {
+                                id: walletStatus
+                                anchors.centerIn: parent
+                                text: "" 
+                            }
+                        }
+                    }
 
 
                 }

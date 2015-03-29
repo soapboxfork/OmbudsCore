@@ -37,7 +37,7 @@ ApplicationWindow {
         id: toolBar
 
         Image {
-            source: "images/logo.png"
+            source: "images/logoTest.png"
             fillMode: Image.PreserveAspectFit
             height: 25
             anchors { 

@@ -4,6 +4,7 @@
 // role handlers.
 function updateWallet(walletData){
     console.log("Updating the wallet");
+    updateWalletAlert(walletData.message)
 
     walletPane.spendableBalance = walletData.spendableBalance
     var bltnList = JSON.parse(walletData.pendingListJson)
@@ -23,6 +24,32 @@ function updateWallet(walletData){
     }
 }
 
+function updateWalletAlert(msg) {
+    if (typeof msg == "undefined") {
+        return ""
+    }
+
+    var message = JSON.parse(msg)
+    
+    var color
+    switch(message.type) {
+        case "WARN":
+            color = "#C5E3BF";
+            break;
+        case "INFO":
+            color = "#3498db";
+            break;
+        case "GOOD":
+            color = "#C5E3BF";
+            break;
+        case "DANG":
+            color = "#e74c3c";
+            break;
+    }
+    
+    walletPane.alertColor = color
+    walletPane.alertMessage = message.body
+}
 
 function formatUnixDate(i){
     

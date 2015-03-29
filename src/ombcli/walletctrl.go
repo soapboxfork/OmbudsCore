@@ -110,6 +110,9 @@ func (ctrl *WalletCtrl) fetchWalletData() (*qmlWalletData, error) {
 		ConfirmedListJson: confirmedJson,
 	}
 
+	m := WalletMessage{MDang, "You cannot send any bulletins."}
+	qmlWalletData.Message = m.Json()
+
 	return qmlWalletData, err
 }
 
@@ -131,10 +134,15 @@ func (ctrl *WalletCtrl) Listen(window *qml.Window) {
 			walletData.Message = WalletMessage{
 				Type: MWarn,
 				Body: err.Error(),
-			}
+			}.Json()
 		}
 		window.Call("updateWallet", walletData)
 	}
+}
+
+func (w WalletMessage) Json() string {
+	s, _ := json.Marshal(w)
+	return string(s)
 }
 
 type messageType string
@@ -142,6 +150,8 @@ type messageType string
 const (
 	MWarn messageType = "WARN"
 	MInfo messageType = "INFO"
+	MGood messageType = "GOOD"
+	MDang messageType = "DANG"
 )
 
 type WalletMessage struct {
@@ -154,7 +164,7 @@ type qmlWalletData struct {
 	SpendableBalance string
 
 	// Information for the user that might be actionable.
-	Message WalletMessage
+	Message string
 
 	// A JSON list of Pendling BltnListElements
 	PendingListJson string
