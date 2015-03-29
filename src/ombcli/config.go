@@ -20,8 +20,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/btcsuite/btcutil"
@@ -41,6 +43,8 @@ var (
 	defaultCAFile     = filepath.Join(ombudsHomeDir, defaultCAFilename)
 	defaultConfigFile = filepath.Join(guiHomeDir, defaultConfigFilename)
 	defaultDataDir    = filepath.Join(guiHomeDir, defaultDataDirname)
+	// NOTE HTTP not https!
+	defaultWebAppURL = "http://localhost:1055"
 )
 
 type config struct {
@@ -52,6 +56,7 @@ type config struct {
 	Password    string `short:"P" long:"password" description:"Password for btcwallet authorization"`
 	MainNet     bool   `long:"mainnet" description:"Use the main Bitcoin network (default testnet3)"`
 	SimNet      bool   `long:"simnet" description:"Use the simulation Bitcoin test network (default testnet3)"`
+	WebAppURL   string `long:"weburl" description:"The location of the backend supplying data to use"`
 }
 
 // cleanAndExpandPath expands environement variables and leading ~ in the
@@ -208,6 +213,22 @@ func loadConfig() (*config, []string, error) {
 
 	if cfg.RPCConnect == "" {
 		cfg.RPCConnect = activeNet.connect
+	}
+
+	if cfg.WebAppURL == "" {
+		cfg.WebAppURL = defaultWebAppURL
+	}
+
+	// Check to see if the url is sane and throw an error if it is not localhost
+	weburl, err := url.Parse(cfg.WebAppURL)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	matches, _ := regexp.Match(`localhost\:\d*`, []byte(weburl.Host))
+	if !matches {
+		err = fmt.Errorf("WebAppUrl specifies a route off of the machine: %s", weburl)
+		return nil, nil, err
 	}
 
 	// If CAFile is unset, choose either the copy or local btcd cert.

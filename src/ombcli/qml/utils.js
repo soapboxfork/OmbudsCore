@@ -5,7 +5,7 @@
 function updateWallet(walletData){
     console.log("Updating the wallet");
 
-    walletPane.availBalance = walletData.availBalance
+    walletPane.spendableBalance = walletData.spendableBalance
     var bltnList = JSON.parse(walletData.pendingListJson)
     for (var i = 0; i < bltnList.length; i ++) {
         var bltn = bltnList[i];

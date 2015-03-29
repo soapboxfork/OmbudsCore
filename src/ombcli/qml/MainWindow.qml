@@ -28,6 +28,10 @@ ApplicationWindow {
         window.show()
     }
 
+    AppFactory{
+        id: appFact
+    }
+
 
     CustToolBar {
         id: toolBar
@@ -78,10 +82,6 @@ ApplicationWindow {
             }
 
         }
-    }
-
-    AppController{
-        id: appCtrl
     }
 
     WalletPane {

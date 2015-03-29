@@ -9,9 +9,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/NSkelsey/ahimsarest"
 	"github.com/btcsuite/btcrpcclient"
 	"gopkg.in/qml.v1"
 )
+
+var cfg *config
 
 func main() {
 	if err := qml.Run(run); err != nil {
@@ -55,7 +58,8 @@ func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig) 
 }
 
 func run() error {
-	cfg, _, err := loadConfig()
+	var err error
+	cfg, _, err = loadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,11 +72,18 @@ func run() error {
 		log.Fatal(err)
 	}
 
+	appCtrl := &AppController{
+		webcli: ahimsarest.NewClient(cfg.WebAppURL),
+	}
+
 	// Initialize the wallet controller
-	walletCtrl, err := NewWalletCtrl(walletConn)
+	walletCtrl, err := NewWalletCtrl(walletConn, appCtrl)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	appCtrl.SetWallet(walletCtrl)
+	appCtrl.SetSetting(settingCtrl)
 
 	// Register types and use closure to bring in application variables
 	qml.RegisterTypes("OmbExtensions", 1, 0, []qml.TypeSpec{
@@ -87,18 +98,12 @@ func run() error {
 			},
 		},
 		{
+			Init: func(v *AppFactory, obj qml.Object) {
+				v.init(appCtrl)
+			},
+		},
+		{
 			Init: func(v *AppController, obj qml.Object) {
-				v.init(settingCtrl, walletCtrl)
-			},
-		},
-		{
-			Init: func(v *QmlWalletData, obj qml.Object) {
-			},
-		},
-		{
-			Init: func(v *WalletCtrl, obj qml.Object) {
-				v.Root = obj
-				v.Client = walletConn
 			},
 		},
 	})
@@ -118,10 +123,11 @@ func run() error {
 
 	window := component.CreateWindow(nil)
 
-	// Pass in wallet data to MainWindow.qml
-	window.Call("updateWallet", NewQmlWalletData())
+	go walletCtrl.Listen(window)
 
 	window.Show()
+	walletCtrl.Update()
+
 	window.Wait()
 	return nil
 }

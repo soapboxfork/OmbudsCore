@@ -23,7 +23,7 @@ TableView {
     TableViewColumn {
         role: "txid"
         title: "Transaction Id"
-        width: 250
+        width: 100
     }
 }
 

@@ -16,7 +16,7 @@ Window {
     property alias allModel: allModel
     property alias pendingModel: pendingModel
     property alias confirmedModel: confirmedModel
-    property alias availBalance: availBalance.text
+    property alias spendableBalance: spendableBalance.text
 
     ListModel{
         id: allModel
@@ -69,7 +69,7 @@ Window {
                     Image {
                         anchors.horizontalCenter: parent.horizontalCenter
                         id: qrcode
-                        source: appCtrl.addressQrPath()
+                        source: appFact.ctrl().addressQrPath()
                         height: 150
                         width: 150
                     }
@@ -100,35 +100,22 @@ Window {
                         font { bold: true; pixelSize: 16 }
                     }
 
-                    Rectangle { 
-                        anchors.horizontalCenter: parent.horizontalCenter    
-                        id: walletActionBox
-                        width: 300
-                        radius: 3
-                        height: 55
-                        color: "#C5E3BF"
-                        Text {
-                            id: walletStatus
-                            anchors.centerIn: parent
-                            text: "The wallet seems to be working!" 
-                        }
-                    }
-
+                
                     Item {
                         height: 40 
-                        width: availBalance.width + balanceUnit.width + balanceUnit.anchors.leftMargin
+                        width: spendableBalance.width + balanceUnit.width + balanceUnit.anchors.leftMargin
                         anchors.horizontalCenter: parent.horizontalCenter    
                         Text {
-                            id: availBalance
+                            id: spendableBalance
                             text: "0.000"
                             font { bold: true; pixelSize: 28 }
                         }
                         Text {
                             id: balanceUnit
                             anchors {
-                                left: availBalance.right
+                                left: spendableBalance.right
                                 leftMargin: 5
-                                bottom: availBalance.bottom
+                                bottom: spendableBalance.bottom
                             }
                             text: "mBTC"
                             color: "gray"
@@ -144,6 +131,21 @@ Window {
                         text: "That can create roughly:\nAround 3 Tweets or\nAround 20 paragraphs or\nAround 5000 characters"
                     
                     }
+
+                    Rectangle { 
+                    anchors.horizontalCenter: parent.horizontalCenter    
+                    id: walletActionBox
+                    width: 300
+                    radius: 3
+                    height: 55
+                    color: "#C5E3BF"
+                    Text {
+                        id: walletStatus
+                        anchors.centerIn: parent
+                        text: "The wallet seems to be working!" 
+                    }
+                }
+
 
                 }
             }

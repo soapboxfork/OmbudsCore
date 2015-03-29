@@ -1,5 +1,4 @@
 import QtQuick 2.4
-//import QtQuick.Controls 1.3
 
 Rectangle {
     id: addrBox
@@ -11,7 +10,7 @@ Rectangle {
     
     TextEdit {
         id: addrEdit
-        text: appCtrl.address()
+        text: appFact.ctrl().addressStr()
         anchors { 
             fill: parent   
             margins: 11
