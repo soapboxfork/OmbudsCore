@@ -90,6 +90,9 @@ func makeBltnElem(bltn *ombjson.JsonBltn, depth uint64) *BltnListElem {
 func (ctrl *WalletCtrl) getBulletinJson() (string, string, error) {
 
 	authorResp, err := ctrl.app.webcli.GetJsonAuthor(ctrl.app.Address())
+	if err != nil {
+		return "", "", err
+	}
 	pendingBltns := []*BltnListElem{}
 	confirmedBltns := []*BltnListElem{}
 

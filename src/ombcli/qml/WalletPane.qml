@@ -155,16 +155,23 @@ Window {
                             opacity: 0.3 
                         } 
                         Rectangle {
-                            anchors.centerIn: parent
+                            anchors {
+                                fill: parent
+                                margins: 8
+                            }
                             id: alertColor
                             radius: 5
-                            width: walletStatus.width + 15
-                            height: walletStatus.height + 7
                             visible:  walletStatus.text === "" ? false : true 
                             Text {
                                 id: walletStatus
-                                anchors.centerIn: parent
+                                anchors {
+                                    fill: parent
+                                    leftMargin: 5
+                                    topMargin: 3
+                                    rightMargin: 5
+                                }
                                 text: "" 
+                                wrapMode: Text.Wrap
                             }
                         }
                     }

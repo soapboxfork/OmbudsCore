@@ -4,7 +4,6 @@
 // role handlers.
 function updateWallet(walletData){
     console.log("Updating the wallet");
-    console.log(walletData.message);
     updateWalletAlert(walletData.message)
 
     // Empty content of listModels
@@ -40,7 +39,7 @@ function updateWalletAlert(msg) {
     var color
     switch(message.type) {
         case "WARN":
-            color = "#C5E3BF";
+            color = "#f39c12";
             break;
         case "INFO":
             color = "#3498db";

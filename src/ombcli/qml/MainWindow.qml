@@ -11,8 +11,10 @@ ApplicationWindow {
     id: root
     width: 1000
     height: 600
-    minimumWidth: 670
-    minimumHeight: 510
+    minimumWidth: width
+    minimumHeight: height
+    maximumWidth: width
+    maximumHeight: height
     title: "OmbudsCore Desktop Client"
 
 
