@@ -23,12 +23,11 @@ func main() {
 	}
 }
 
-func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig) {
+func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig, error) {
 
 	certs, err := ioutil.ReadFile(cfg.CAFile)
 	if err != nil {
-		log.Print(err)
-		return nil, nil
+		return nil, nil, err
 	}
 
 	rpcCfg := &btcrpcclient.ConnConfig{
@@ -42,19 +41,17 @@ func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig) 
 
 	rpcConn, err := btcrpcclient.New(rpcCfg, nil)
 	if err != nil {
-		log.Print(err)
-		return nil, nil
+		return nil, nil, err
 	}
 
 	// Make a few attempts at connecting to the websocket.
 	tries := 15
 	err = rpcConn.Connect(tries)
 	if err != nil {
-		log.Printf("Failed to connect after %d with err: %s\n", tries, err)
-		return nil, nil
+		return nil, nil, err
 	}
 
-	return rpcConn, rpcCfg
+	return rpcConn, rpcCfg, nil
 }
 
 func run() error {
@@ -64,9 +61,12 @@ func run() error {
 		log.Fatal(err)
 	}
 
-	// TODO handle case when rpcConn is nil
-	walletConn, rpcCfg := setupRpcConn(cfg)
+	walletConn, rpcCfg, err := setupRpcConn(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	// Initialize the settings controller
 	settingCtrl, err := NewSettingCtrl(guiHomeDir, walletConn)
 	if err != nil {
 		log.Fatal(err)
@@ -127,6 +127,7 @@ func run() error {
 
 	window.Show()
 	walletCtrl.Update()
+	walletCtrl.Message(WalletMessage{MInfo, "Everything started up ok!"})
 
 	window.Wait()
 	return nil

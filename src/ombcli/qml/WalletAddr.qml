@@ -27,6 +27,7 @@ Rectangle {
         onClicked: {
             if (!selected) {
                 addrEdit.selectAll();
+                addrEdit.copy();
             } else {
                 addrEdit.deselect();
             }

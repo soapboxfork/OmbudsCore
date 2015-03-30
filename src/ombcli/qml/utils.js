@@ -4,7 +4,13 @@
 // role handlers.
 function updateWallet(walletData){
     console.log("Updating the wallet");
+    console.log(walletData.message);
     updateWalletAlert(walletData.message)
+
+    // Empty content of listModels
+    walletPane.allModel.clear();
+    walletPane.pendingModel.clear();
+    walletPane.confirmedModel.clear();
 
     walletPane.spendableBalance = walletData.spendableBalance
     var bltnList = JSON.parse(walletData.pendingListJson)
@@ -25,8 +31,8 @@ function updateWallet(walletData){
 }
 
 function updateWalletAlert(msg) {
-    if (typeof msg == "undefined") {
-        return ""
+    if (typeof msg == "undefined" || msg == "" ) {
+        return 
     }
 
     var message = JSON.parse(msg)
@@ -63,7 +69,9 @@ function formatAddr(addr) {
 }
 
 function formatDate(d) {
-    var s = d.getHours() + ":" + d.getMinutes() + " " + d.toDateString().slice(4)
+    var hours = (d.getHours() < 10 ? '0' : '' ) + d.getHours();
+    var minutes = (d.getMinutes() < 10 ? '0' : '' ) + d.getMinutes();
+    var s = hours + ":" + minutes + " " + d.toDateString().slice(4);
     return s 
 }
 

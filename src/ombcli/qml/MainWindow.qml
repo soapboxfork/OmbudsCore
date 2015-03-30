@@ -22,6 +22,10 @@ ApplicationWindow {
         Utils.updateWallet(walletdata);
     }
 
+    function updateWalletAlert(msg) {
+        Utils.updateWalletAlert(msg);
+    }
+
     function sendWindow() {
         var component = Qt.createComponent("SendWindow.qml")    
         var window = component.createObject(root)

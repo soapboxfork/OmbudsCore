@@ -1,32 +1,70 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/btcsuite/btcd/btcjson"
+	"github.com/btcsuite/btcd/btcjson/btcws"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcrpcclient"
 	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/websocket"
 	"github.com/soapboxsys/ombudslib/ombjson"
 	"gopkg.in/qml.v1"
 )
 
 // Handles interaction with the rpc based wallet
 type WalletCtrl struct {
-	app    *AppController
-	Client *btcrpcclient.Client
-	Root   qml.Object
-	update chan struct{}
+	app       *AppController
+	Client    *btcrpcclient.Client
+	Root      qml.Object
+	webSocket *websocket.Conn
+	update    chan struct{}
+	message   chan WalletMessage
 }
 
 func NewWalletCtrl(client *btcrpcclient.Client, app *AppController) (*WalletCtrl, error) {
 	ctrl := &WalletCtrl{
-		Client: client,
-		app:    app,
-		update: make(chan struct{}, 100),
+		Client:  client,
+		app:     app,
+		update:  make(chan struct{}, 100),
+		message: make(chan WalletMessage, 20),
 	}
+
+	cert, err := ioutil.ReadFile(cfg.CAFile)
+	if err != nil {
+		return nil, err
+	}
+	pool := x509.NewCertPool()
+	pool.AppendCertsFromPEM(cert)
+
+	tlsCfg := &tls.Config{
+		RootCAs:    pool,
+		MinVersion: tls.VersionTLS12,
+	}
+
+	dialer := websocket.Dialer{TLSClientConfig: tlsCfg}
+
+	login := cfg.Username + ":" + cfg.Password
+	auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(login))
+	requestHeader := make(http.Header)
+	requestHeader.Add("Authorization", auth)
+
+	url := fmt.Sprintf("wss://%s/ws", cfg.RPCConnect)
+	ws, _, err := dialer.Dial(url, requestHeader)
+	if err != nil {
+		return nil, err
+	}
+
+	ctrl.webSocket = ws
 
 	return ctrl, nil
 }
@@ -55,7 +93,8 @@ func (ctrl *WalletCtrl) getBulletinJson() (string, string, error) {
 	pendingBltns := []*BltnListElem{}
 	confirmedBltns := []*BltnListElem{}
 
-	for _, bltn := range authorResp.Bulletins {
+	for i := len(authorResp.Bulletins) - 1; i > 0; i-- {
+		bltn := authorResp.Bulletins[i]
 		if bltn.Block == "" {
 			elem := makeBltnElem(bltn, 0)
 			pendingBltns = append(pendingBltns, elem)
@@ -72,13 +111,11 @@ func (ctrl *WalletCtrl) getBulletinJson() (string, string, error) {
 		}
 	}
 
-	//log.Println("Marshalling pendingJson")
 	pendB, err := json.Marshal(pendingBltns)
 	if err != nil {
 		return "", "", nil
 	}
 
-	//log.Println("Marshalling confirmedJson")
 	confdB, err := json.Marshal(confirmedBltns)
 	if err != nil {
 		return "", "", nil
@@ -110,9 +147,6 @@ func (ctrl *WalletCtrl) fetchWalletData() (*qmlWalletData, error) {
 		ConfirmedListJson: confirmedJson,
 	}
 
-	m := WalletMessage{MDang, "You cannot send any bulletins."}
-	qmlWalletData.Message = m.Json()
-
 	return qmlWalletData, err
 }
 
@@ -121,22 +155,89 @@ func (ctrl *WalletCtrl) Update() {
 	ctrl.update <- struct{}{}
 }
 
+func (ctrl *WalletCtrl) Message(msg WalletMessage) {
+	ctrl.message <- msg
+}
+
+// handleNtfnMsg deals with pushed notification sent by the wallet
+// about relevant events pertaining to the wallet and the gui.
+func (ctrl WalletCtrl) handleNtfnMsg(req btcjson.Cmd) {
+
+	switch cmd := req.(type) {
+	case *btcws.BlockConnectedNtfn:
+		log.Println("Relevant event was fired")
+		ctrl.Update()
+	case *btcws.BlockDisconnectedNtfn:
+		// Update gui and send message something funky is up
+		ctrl.Update()
+		m := WalletMessage{MWarn, "A block was disconnected. That is odd."}
+		ctrl.Message(m)
+
+	case *btcws.AccountBalanceNtfn:
+		if !cmd.Confirmed && cmd.Balance > 0 {
+			// Send a Wallet Message
+			txt := fmt.Sprintf("You have %.4f unconfirmed bitcoin", cmd.Balance)
+			m := WalletMessage{MInfo, txt}
+			ctrl.Message(m)
+
+		} else {
+			// if the confirmed balance has changed update the gui
+			if cmd.Confirmed {
+				ctrl.Update()
+			}
+			if cmd.Balance == 0 {
+				//m := WalletMessage{MWarn, "You cannot send any bulletins. Get more coin."}
+				//ctrl.Message(m)
+			}
+		}
+
+	case *btcws.TxNtfn:
+		// Maybe do nothing here.
+	default:
+		log.Printf("Ignoring wallet cmd: %s", cmd.Method())
+	}
+}
+
 // Listen live updates all of the data stored in the wallet. It must be run
 // in a seperate go routine for it to function properly.
 func (ctrl *WalletCtrl) Listen(window *qml.Window) {
-	for {
-		<-ctrl.update
 
-		walletData, err := ctrl.fetchWalletData()
-		if err != nil {
-			err = fmt.Errorf("Constructing wallet data threw: %s", err)
-			log.Println(err)
-			walletData.Message = WalletMessage{
-				Type: MWarn,
-				Body: err.Error(),
-			}.Json()
+	// Start the qml updater
+	go func() {
+		for {
+			select {
+			case <-ctrl.update:
+				walletData, err := ctrl.fetchWalletData()
+				if err != nil {
+					err = fmt.Errorf("Constructing wallet data threw: %s", err)
+					log.Println(err)
+					walletData.Message = WalletMessage{
+						Type: MWarn,
+						Body: err.Error(),
+					}.Json()
+				}
+				window.Call("updateWallet", walletData)
+			case msg := <-ctrl.message:
+				window.Call("updateWalletAlert", msg.Json())
+			}
 		}
-		window.Call("updateWallet", walletData)
+	}()
+
+	// Listen to the websocket forever and respond appropriately.
+	for {
+		_, msg, err := ctrl.webSocket.ReadMessage()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
+			if req.Id() != nil {
+				continue
+			}
+			fmt.Printf("%s : %v\n", req.Method(), req)
+			ctrl.handleNtfnMsg(req)
+		} else {
+			log.Printf(err.Error())
+		}
 	}
 }
 
