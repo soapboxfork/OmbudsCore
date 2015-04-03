@@ -62,6 +62,14 @@ ApplicationWindow {
             }
 
             Button {
+                id: reloadBrowsePane
+                text: "Reload"
+                onClicked: {
+                    browsePane.webView.reload();            
+                }
+            }
+
+            Button {
                 id: walletRevealBtn
                 text: "Account"
                 objectName: "setupWalletBtn"
@@ -105,5 +113,16 @@ ApplicationWindow {
             right: parent.right
         }
     }
+
+    Rectangle {
+        id: inactiveShadow
+        anchors.fill: parent
+        color: "white"
+        opacity: 0.5
+
+        visible: !Window.active
+
+    }
+
 }
 
