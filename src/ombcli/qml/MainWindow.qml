@@ -92,7 +92,7 @@ ApplicationWindow {
 
     WalletPane {
         id: walletPane
-        visible: true
+        visible: false
     }
 
     BrowsePane {

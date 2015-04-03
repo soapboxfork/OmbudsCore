@@ -12,7 +12,7 @@ function updateWallet(walletData){
     walletPane.confirmedModel.clear();
 
     walletPane.spendableBalance = walletData.spendableBalance
-    var bltnList = JSON.parse(walletData.pendingListJson)
+    var bltnList = tryParse(walletData.pendingListJson, [])
     for (var i = 0; i < bltnList.length; i ++) {
         var bltn = bltnList[i];
         bltn.time = formatDate(new Date(1000*bltn.unix))
@@ -20,7 +20,7 @@ function updateWallet(walletData){
         walletPane.pendingModel.append(bltn);
     }
     
-    bltnList = JSON.parse(walletData.confirmedListJson);
+    bltnList = tryParse(walletData.confirmedListJson, []);
     for (var i = 0; i < bltnList.length; i ++) {
         var bltn = bltnList[i];
         bltn.time = formatDate(new Date(1000*bltn.unix))
@@ -34,7 +34,7 @@ function updateWalletAlert(msg) {
         return 
     }
 
-    var message = JSON.parse(msg)
+    var message = tryParse(msg, "")
     
     var color
     switch(message.type) {
@@ -54,6 +54,16 @@ function updateWalletAlert(msg) {
     
     walletPane.alertColor = color
     walletPane.alertMessage = message.body
+}
+
+function tryParse(data, fallback) {
+    try {
+        var o = JSON.parse(data);
+        return o;
+    } catch (e) {
+        console.log(e);
+        return fallback;
+    }
 }
 
 function formatUnixDate(i){

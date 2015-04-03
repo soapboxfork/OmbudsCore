@@ -4,20 +4,17 @@ import QtQuick.Controls 1.0
 
 Rectangle {
     id: root
-    ScrollView {
+
+    WebView {
+        id: browseView
+        url: "http://localhost:1055"
         anchors.fill: parent
 
-        WebView {
-            id: browseView
-            url: "http://localhost:1055/api/status"
-            anchors.fill: parent
-
-            onLoadingChanged: {
-                if (loadRequest.status === WebView.LoadFailedStatus) {
-                    loadStatusTxt.text = "Load failed.";
-                } else {
-                    loadStatusTxt.text = "Load worked!";
-                }
+        onLoadingChanged: {
+            if (loadRequest.status === WebView.LoadFailedStatus) {
+                loadStatusTxt.text = "Load failed.";
+            } else {
+                loadStatusTxt.text = "Load worked!";
             }
         }
     }
