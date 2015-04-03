@@ -4,11 +4,15 @@ import QtQuick.Controls 1.0
 
 Rectangle {
     id: root
+    property alias webView: browseView
 
     WebView {
         id: browseView
-        url: "http://localhost:1055"
+        url: "http://localhost:1055" + "/"
         anchors.fill: parent
+
+        Component.onCompleted: {
+        }
 
         onLoadingChanged: {
             if (loadRequest.status === WebView.LoadFailedStatus) {
