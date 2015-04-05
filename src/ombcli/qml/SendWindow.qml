@@ -18,6 +18,8 @@ ApplicationWindow {
     minimumWidth: 350
     minimumHeight: 400
 
+    property alias boardStr: boardEdit.text
+
    
     function startupFunction() {
         lockState.running = true;        
@@ -113,7 +115,9 @@ ApplicationWindow {
         TextInput {
             id: boardEdit
             anchors.top: parent.top
-            text: "Ombudsman Development News"
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: ""
             font.bold: true
             font.pixelSize: 16 
             selectByMouse: true
@@ -123,17 +127,23 @@ ApplicationWindow {
                 id: disableEdit
                 visible: false
                 radius: 4
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left 
+                anchors.verticalCenter: parent.verticalCenter 
                 height: parent.height + 6
-                width: parent.width + 6
+                width: parent.contentWidth
                 color: "#C9C9C9"
                 opacity: 0.7
             }
 
             DSM.StateMachine {
                 id: lockState
-                initialState: normalBE
+                initialState: {
+                    if (boardStr !== "") {
+                        lockedBE
+                    } else {
+                        normalBE
+                    }
+                }
 
                 DSM.State {
                     id: normalBE
@@ -264,7 +274,7 @@ ApplicationWindow {
             topMargin: 10
         }
 
-        text: "Hello friends"
+        text: ""
         wrapMode: Text.Wrap
         font.family: "Monaco [monospace]"
         selectByMouse: true

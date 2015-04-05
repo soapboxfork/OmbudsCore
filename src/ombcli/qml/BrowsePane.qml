@@ -8,7 +8,7 @@ Rectangle {
 
     WebView {
         id: browseView
-        url: "http://localhost:1055" + "/"
+        url: "http://localhost:1055"
         anchors.fill: parent
 
         Component.onCompleted: {
@@ -19,6 +19,18 @@ Rectangle {
                 loadStatusTxt.text = "Load failed.";
             } else {
                 loadStatusTxt.text = "Load worked!";
+            }
+        }
+
+        onNavigationRequested: {
+            var url = request.url.toString();
+            var m = "http://localhost:1055/"
+            var l = m.length;
+            if (url.slice(0, l) === m) {
+                request.action = WebView.AcceptRequest;
+            } else {
+                request.action = WebView.IgnoreRequest;
+                Qt.openUrlExternally(request.url);
             }
         }
     }

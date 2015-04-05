@@ -73,15 +73,15 @@ function formatUnixDate(i){
 
 
 function formatAddr(addr) {
-    var s = addr.slice(1,8)
-    return s
+    var s = addr.slice(10);
+    return s;
 }
 
 function formatDate(d) {
     var hours = (d.getHours() < 10 ? '0' : '' ) + d.getHours();
     var minutes = (d.getMinutes() < 10 ? '0' : '' ) + d.getMinutes();
     var s = hours + ":" + minutes + " " + d.toDateString().slice(4);
-    return s 
+    return s;
 }
 
 function formatAttrib(addr, date) {

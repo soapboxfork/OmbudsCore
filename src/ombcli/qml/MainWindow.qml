@@ -28,10 +28,13 @@ ApplicationWindow {
         Utils.updateWalletAlert(msg);
     }
 
-    function sendWindow() {
-        var component = Qt.createComponent("SendWindow.qml")    
-        var window = component.createObject(root)
-        window.show()
+    function sendWindow(board) {
+        var component = Qt.createComponent("SendWindow.qml");
+        var window = component.createObject(root);
+        if (board !== "") {
+            window.boardStr = board;
+        }
+        window.show();
     }
 
     AppFactory{
@@ -84,15 +87,19 @@ ApplicationWindow {
                 id: sendWinBtn
                 text: "Reply"
                 objectName: "sendBulletin"
-                enabled: false // TODO use check unspent logic.
-                onClicked: sendWindow()
+                enabled: true // TODO use check unspent logic.
+                onClicked: { 
+                    var l = "http://localhost:1055/#/board/".length;
+                    var angUrl = browsePane.webView.url.toString().slice(l);
+                    sendWindow(angUrl);
+                }
             }
 
             Button {
                 id: newBtn
                 text: "New"
                 enabled: true
-                onClicked: sendWindow()
+                onClicked: sendWindow("");
             }
 
         }
