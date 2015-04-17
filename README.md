@@ -89,11 +89,13 @@ You should test to see each one works independently before trying to launch then
 
 ##### Check the configuration.
 
-These binaries depend on configuration that lives in `~/Library/Application Support/Ombudscore`. There are a few files that need to be there, but launcher.py should create them for you the first time you run it. My Application data dir looks like this (the files that should be created are highlighted in gray.)
+These binaries depend on configuration that lives in `~/Library/Application Support/Ombudscore`. There are a few files that need to be there, but launcher.py should create them for you the first time you run it. My Application data dir looks like this (the files that should be created are highlighted in gray).
 
 <img src="http://i.imgur.com/T1k2wVN.png" alt="Ombudscore directory" width="300px">
 
-**Sync the node to the Bitcoin network** Your ombfullnode will need to download the blockchain from its peers. This can a few hours. Start it with:
+##### Sync the node
+
+Your ombfullnode will need to download the blockchain from its Bitcoin peers. This can a few hours. Start it with:
 
 ```bash
 > ombfullnode
