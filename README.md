@@ -39,3 +39,61 @@ is a python script that launches all of these processes at once.
 When the project is build using make, the first process that really gets launched is launcher.py.
 It is responsible for cleanly starting all and stopping of the necessary processes that were described above.
 It serves as the entry point for the entire application.
+
+
+Building from source
+====================
+
+To build this application you need go, python, git, and patience since this is the first draft of these instructions. **Please read the instructions before you dive into this.** If you do run into problems please create issues in this repository. We will try to get to them as soon as possible.
+
+### Mac OS X
+
+Make sure that you have a functioning copy of [homebrew](http://brew.sh/).
+
+**Install the dependencies.** Follow the [official instructions](https://golang.org/doc/install) to install go. Make sure to configure a GOPATH environment variable.
+
+Next install the [dependencies for go-qml](https://github.com/go-qml/qml#requirements-on-mac-os-x). 
+This is the hardest part.
+
+**Download and build the dependent binaries.** With go and git installed this should just work.
+
+```bash
+> go get -v github.com/soapboxsys/ombfullnode/...
+> go get -v github.com/soapboxsys/ombwallet/...
+> go get -v github.com/NSkelsey/ahimsarest/ombwebapp
+```
+
+**Build OmbudsCore.** The go-qml bindings are required at this point. This will create the ombcli binary.
+
+```bash
+> go get -v github.com/soapboxsys/OmbudsCore/src/ombcli
+```
+
+**Test each binary.*** The binaries that you just downloaded rely on one another. 
+You should test to see each one works independently before trying to launch then all at once with launcher.py.
+
+```bash
+> ombfullnode
+> ombwallet
+> ombwebapp
+> ombcli
+```
+
+**Check the configuration.** These binaries depend on configuration that lives in `~/Library/Application Support/Ombudscore`. There are a few files that need to be there, but launcher.py should create them for you, the first time you run it.
+
+My Application data dir looks like this:
+![OmbudsCore dir](http://i.imgur.com/T1k2wVN.png)
+
+**Sync the node to the Bitcoin network** Your ombfullnode will need to download the blockchain from its peers. This can a few hours. Start it with:
+
+```bash
+> ombfullnode
+```
+
+**You made it!** Run launcher.py to run the whole system at once. Make sure to kill any other instances of subprocesses to prevent headaches.
+
+```bash
+> python /path/to/OmbudsCore/src/launcher.py
+```
+
+If you actually got this far for god sakes let us know or even read this far. Send me an email at `nskelsey@gmail.com` or hop on freenode and visit #lalalala. We want to help.
