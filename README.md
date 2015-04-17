@@ -79,10 +79,9 @@ You should test to see each one works independently before trying to launch then
 > ombcli
 ```
 
-**Check the configuration.** These binaries depend on configuration that lives in `~/Library/Application Support/Ombudscore`. There are a few files that need to be there, but launcher.py should create them for you, the first time you run it.
+**Check the configuration.** These binaries depend on configuration that lives in `~/Library/Application Support/Ombudscore`. There are a few files that need to be there, but launcher.py should create them for you the first time you run it. My Application data dir looks like this (the files that should be created are highlighted in gray.)
 
-My Application data dir looks like this:
-![OmbudsCore dir](http://i.imgur.com/T1k2wVN.png)
+<img src="http://i.imgur.com/T1k2wVN.png" alt="Ombudscore directory" style="height:200px;">
 
 **Sync the node to the Bitcoin network** Your ombfullnode will need to download the blockchain from its peers. This can a few hours. Start it with:
 
