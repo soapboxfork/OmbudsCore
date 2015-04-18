@@ -2,7 +2,7 @@
 This is a desktop client that provides a frontend to create and read bulletins that are stored in Bitcoin's blockchain. 
 At the moment, Bitcoin's testnet is used by default. An overview of how the various pieces interact is explained in the image below.
 
-![Imgur](http://i.imgur.com/p9NIa7R.jpg)
+![Overview](http://i.imgur.com/SrMVaYN.png?1)
 
 Components
 ============
