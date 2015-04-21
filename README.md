@@ -44,7 +44,7 @@ It serves as the entry point for the entire application.
 Build from source
 ====================
 
-To build this application you need go, python, git, and patience since this is the first draft of these instructions. **Please read the instructions before you dive into this.** If you do run into problems please create issues in this repository. We will try to get to them as soon as possible.
+To build this application you need go, godep, python, git, and patience since this is the first draft of these instructions. **Please read the instructions before you dive into this.** If you do run into problems please create issues in this repository. We will try to get to them as soon as possible.
 
 ### Mac OS X
 
@@ -54,16 +54,27 @@ Make sure that you have a functioning copy of [homebrew](http://brew.sh/).
 
 Follow the [official instructions](https://golang.org/doc/install) to install go. Make sure to configure a GOPATH environment variable.
 
+Install and build [godep](https://github.com/tools/godep) with the following command:
+
+```bash
+> go get -v github.com/tools/godep
+```
+
 Next install the [dependencies for go-qml](https://github.com/go-qml/qml#requirements-on-mac-os-x). 
 This is the hardest part.
 
 ##### Download and build the dependent binaries.
 
-With go and git installed this should just work.
+We are going to build each subproject on thier own to make sure everything works.
+
+
+First, **install ombfullnode** by following the instructions [here](https://github.com/soapboxsys/ombfullnode/blob/master/README.md#installation).
+
+Second, **install ombwallet** by following the instructions [here](https://github.com/soapboxsys/ombwallet/blob/master/README.md#linuxbsdposix---build-from-source).
+
+Finally, try to build ombwebapp cheekily.
 
 ```bash
-> go get -v github.com/soapboxsys/ombfullnode/...
-> go get -v github.com/soapboxsys/ombwallet/...
 > go get -v github.com/NSkelsey/ahimsarest/ombwebapp
 ```
 
