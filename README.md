@@ -67,12 +67,11 @@ This is the hardest part.
 
 We are going to build each subproject on thier own to make sure everything works.
 
+First, install ombfullnode by following the instructions [here](https://github.com/soapboxsys/ombfullnode/blob/master/README.md#installation).
 
-First, **install ombfullnode** by following the instructions [here](https://github.com/soapboxsys/ombfullnode/blob/master/README.md#installation).
+Second, install ombwallet by following the instructions [here](https://github.com/soapboxsys/ombwallet/blob/master/README.md#linuxbsdposix---build-from-source).
 
-Second, **install ombwallet** by following the instructions [here](https://github.com/soapboxsys/ombwallet/blob/master/README.md#linuxbsdposix---build-from-source).
-
-Finally, try to build ombwebapp cheekily.
+Third, try to build ombwebapp cheekily.
 
 ```bash
 > go get -v github.com/NSkelsey/ahimsarest/ombwebapp
