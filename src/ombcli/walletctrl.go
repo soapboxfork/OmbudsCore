@@ -23,12 +23,13 @@ import (
 
 // Handles interaction with the rpc based wallet
 type WalletCtrl struct {
-	app       *AppController
-	Client    *btcrpcclient.Client
-	Root      qml.Object
-	webSocket *websocket.Conn
-	update    chan struct{}
-	message   chan WalletMessage
+	app         *AppController
+	Client      *btcrpcclient.Client
+	Root        qml.Object
+	webSocket   *websocket.Conn
+	update      chan struct{}
+	message     chan WalletMessage
+	confBalance btcutil.Amount
 }
 
 func NewWalletCtrl(client *btcrpcclient.Client, app *AppController) (*WalletCtrl, error) {
@@ -153,6 +154,15 @@ func (ctrl *WalletCtrl) fetchWalletData() (*qmlWalletData, error) {
 	return qmlWalletData, err
 }
 
+// Returns the wallet's cached current confirmed balance
+func (ctrl *WalletCtrl) GetConfBalance() btcutil.Amount {
+	return ctrl.confBalance
+}
+
+func (ctrl *WalletCtrl) SetConfBalance(amnt btcutil.Amount) {
+	ctrl.confBalance = amnt
+}
+
 // Update prompts the wallet to update itself.
 func (ctrl *WalletCtrl) Update() {
 	ctrl.update <- struct{}{}
@@ -177,7 +187,13 @@ func (ctrl WalletCtrl) handleNtfnMsg(req btcjson.Cmd) {
 		ctrl.Message(m)
 
 	case *btcws.AccountBalanceNtfn:
-		if !cmd.Confirmed && cmd.Balance > 0 {
+		newBalance, err := btcutil.NewAmount(cmd.Balance)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		if !cmd.Confirmed && newBalance > 0 {
 			// Send a Wallet Message
 			txt := fmt.Sprintf("You have %.4f unconfirmed bitcoin", cmd.Balance)
 			m := WalletMessage{MInfo, txt}
@@ -185,13 +201,14 @@ func (ctrl WalletCtrl) handleNtfnMsg(req btcjson.Cmd) {
 
 		} else {
 			// if the confirmed balance has changed update the gui
-			if cmd.Confirmed {
+			if cmd.Confirmed && newBalance != ctrl.GetConfBalance() {
 				ctrl.Update()
 			}
 			if cmd.Balance == 0 {
-				//m := WalletMessage{MWarn, "You cannot send any bulletins. Get more coin."}
-				//ctrl.Message(m)
+				m := WalletMessage{MWarn, "You cannot send any bulletins. Get more coin."}
+				ctrl.Message(m)
 			}
+			ctrl.SetConfBalance(newBalance)
 		}
 
 	case *btcws.TxNtfn:
@@ -207,19 +224,25 @@ func (ctrl *WalletCtrl) Listen(window *qml.Window) {
 
 	// Start the qml updater
 	go func() {
+
+		started := false
+
 		for {
 			select {
+			// Rate limit the number of updates that we push through to the gui.
 			case <-ctrl.update:
-				walletData, err := ctrl.fetchWalletData()
-				if err != nil {
-					err = fmt.Errorf("Constructing wallet data threw: %s", err)
-					log.Println(err)
-					walletData.Message = WalletMessage{
-						Type: MWarn,
-						Body: err.Error(),
-					}.Json()
+
+				// if trigger has already fired, do nothing.
+				if started {
+					continue
+				} else {
+					// if no trigger start it.
+					started = true
+					time.AfterFunc(1*time.Second, func() {
+						ctrl.asyncPushWalletInfo(window)
+						started = false
+					})
 				}
-				window.Call("updateWallet", walletData)
 			case msg := <-ctrl.message:
 				window.Call("updateWalletAlert", msg.Json())
 			}
@@ -242,6 +265,21 @@ func (ctrl *WalletCtrl) Listen(window *qml.Window) {
 			log.Printf(err.Error())
 		}
 	}
+}
+
+// Pulls wallet information from the web api and the wallet and then pushes it
+// into the qml wallet.
+func (ctrl *WalletCtrl) asyncPushWalletInfo(window *qml.Window) {
+	walletData, err := ctrl.fetchWalletData()
+	if err != nil {
+		err = fmt.Errorf("Constructing wallet data threw: %s", err)
+		log.Println(err)
+		walletData.Message = WalletMessage{
+			Type: MWarn,
+			Body: err.Error(),
+		}.Json()
+	}
+	window.Call("updateWallet", walletData)
 }
 
 func (w WalletMessage) Json() string {
