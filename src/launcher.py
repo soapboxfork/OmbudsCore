@@ -85,7 +85,8 @@ def main():
 
     # Start ombuds client gui and block until process returns.
     # TODO change bin path
-    cmd = ["./ombcli/ombcli"]
+    os.chdir("./omblci")
+    cmd = ["./ombcli"]
     print cmd
     print "WARNING fix this path"
     subprocess.call(cmd, stdout=null)

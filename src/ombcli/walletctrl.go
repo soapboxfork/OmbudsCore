@@ -97,20 +97,24 @@ func (ctrl *WalletCtrl) getBulletinJson() (string, string, error) {
 	pendingBltns := []*BltnListElem{}
 	confirmedBltns := []*BltnListElem{}
 
+	tipHeight, err := ctrl.Client.GetBlockCount()
+	if err != nil {
+		return "", "", err
+	}
 	for i := len(authorResp.Bulletins) - 1; i > 0; i-- {
 		bltn := authorResp.Bulletins[i]
 		if bltn.Block == "" {
 			elem := makeBltnElem(bltn, 0)
 			pendingBltns = append(pendingBltns, elem)
 		} else {
-			// We must deduce the height of the given block
+			// We must deduce the depth of the given block
 			hash, _ := wire.NewShaHashFromStr(bltn.Block)
 			block, err := ctrl.app.webcli.GetJsonBlockHead(hash)
 			if err != nil {
 				return "", "", err
 			}
 			h := block.Height
-			elem := makeBltnElem(bltn, h)
+			elem := makeBltnElem(bltn, uint64(tipHeight)-h)
 			confirmedBltns = append(confirmedBltns, elem)
 		}
 	}
@@ -133,12 +137,20 @@ func (ctrl *WalletCtrl) getBulletinJson() (string, string, error) {
 // address.
 func (ctrl *WalletCtrl) fetchWalletData() (*qmlWalletData, error) {
 
-	balance, err := ctrl.Client.GetBalance("")
+	conf_bal, err := ctrl.Client.GetBalanceMinConf("", 1)
 	if err != nil {
 		return nil, err
 	}
 
-	mbtc := balance.ToUnit(btcutil.AmountMilliBTC)
+	total_bal, err := ctrl.Client.GetBalanceMinConf("", 0)
+	if err != nil {
+		return nil, err
+	}
+
+	unc_bal := total_bal - conf_bal
+
+	c_mbtc := conf_bal.ToUnit(btcutil.AmountMilliBTC)
+	unc_mbtc := unc_bal.ToUnit(btcutil.AmountMilliBTC)
 
 	pendingJson, confirmedJson, terr := ctrl.getBulletinJson()
 	if err == nil {
@@ -146,9 +158,10 @@ func (ctrl *WalletCtrl) fetchWalletData() (*qmlWalletData, error) {
 	}
 
 	qmlWalletData := &qmlWalletData{
-		SpendableBalance:  fmt.Sprintf("%6.2f", mbtc),
-		PendingListJson:   pendingJson,
-		ConfirmedListJson: confirmedJson,
+		SpendableBalance:   fmt.Sprintf("%6.2f", c_mbtc),
+		UnconfirmedBalance: fmt.Sprintf("%6.2f", unc_mbtc),
+		PendingListJson:    pendingJson,
+		ConfirmedListJson:  confirmedJson,
 	}
 
 	return qmlWalletData, err
@@ -303,7 +316,8 @@ type WalletMessage struct {
 
 // Handles passing all relevant and formatted data to the gui
 type qmlWalletData struct {
-	SpendableBalance string
+	SpendableBalance   string
+	UnconfirmedBalance string
 
 	// Information for the user that might be actionable.
 	Message string

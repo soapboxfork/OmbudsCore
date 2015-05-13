@@ -117,7 +117,7 @@ Window {
 
                 Timer {
                     id: waitTime
-                    interval: 5000;
+                    interval: 3000;
                     onTriggered: {
                        if (sendStatusWin.worked === true) {
                            closeBtn.visible = true 

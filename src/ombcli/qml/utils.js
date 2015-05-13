@@ -12,6 +12,8 @@ function updateWallet(walletData){
     walletPane.confirmedModel.clear();
 
     walletPane.spendableBalance = walletData.spendableBalance
+    walletPane.unconfirmedBalance = walletData.unconfirmedBalance
+
     var bltnList = tryParse(walletData.pendingListJson, [])
     for (var i = 0; i < bltnList.length; i ++) {
         var bltn = bltnList[i];
@@ -73,7 +75,7 @@ function formatUnixDate(i){
 
 
 function formatAddr(addr) {
-    var s = addr.slice(10);
+    var s = addr.slice(0, 10);
     return s;
 }
 

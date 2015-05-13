@@ -17,6 +17,7 @@ Window {
     property alias pendingModel: pendingModel
     property alias confirmedModel: confirmedModel
     property alias spendableBalance: spendableBalance.text
+    property alias unconfirmedBalance: unconfirmedBalance.text
     property alias alertColor: alertColor.color
     property alias alertMessage: walletStatus.text
 
@@ -61,7 +62,7 @@ Window {
                     spacing: 10
 
                     Text {
-                        text: "Sending Address"
+                        text: "Publishing Address"
                         anchors.horizontalCenter: parent.horizontalCenter
                         font { bold: true; pixelSize: 16 }
                     }
@@ -92,7 +93,7 @@ Window {
 
                 
                 Column {
-                    spacing: 10
+                    spacing: 14
                     anchors.horizontalCenter: parent.horizontalCenter    
 
                     Text { 
@@ -101,27 +102,18 @@ Window {
                         text: "Wallet Info"
                         font { bold: true; pixelSize: 16 }
                     }
-
                 
                     Item {
-                        height: 40 
-                        width: spendableBalance.width + balanceUnit.width + balanceUnit.anchors.leftMargin
-                        anchors.horizontalCenter: parent.horizontalCenter    
-                        Text {
+                        height: 40
+                        width: spendableBalance.width + unconfirmedBalance.width
+                        BtcUnit {
                             id: spendableBalance
-                            text: "0.000"
-                            font { bold: true; pixelSize: 28 }
+                            lbl: "Spendable"
                         }
-                        Text {
-                            id: balanceUnit
-                            anchors {
-                                left: spendableBalance.right
-                                leftMargin: 5
-                                bottom: spendableBalance.bottom
-                            }
-                            text: "mBTC"
-                            color: "gray"
-                            font { bold: true; pixelSize: 19 }
+                        BtcUnit {
+                            id: unconfirmedBalance
+                            anchors { left: spendableBalance.right; }
+                            lbl: "Unconfirmed"
                         }
                     }
 

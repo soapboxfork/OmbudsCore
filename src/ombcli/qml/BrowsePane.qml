@@ -16,9 +16,9 @@ Rectangle {
 
         onLoadingChanged: {
             if (loadRequest.status === WebView.LoadFailedStatus) {
-                loadStatusTxt.text = "Load failed.";
+                //loadStatusTxt.text = "Load failed.";
             } else {
-                loadStatusTxt.text = "Load worked!";
+                //loadStatusTxt.text = "Load worked!";
             }
         }
 
@@ -37,7 +37,7 @@ Rectangle {
 
     Text { 
         id: loadStatusTxt 
-        text: "Starting up..."
+        //text: "Starting up..."
         anchors.bottom: parent.bottom
     }
 }
