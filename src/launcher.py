@@ -26,7 +26,6 @@ def appDataDir(appname):
 APP_PATH = abspath(os.path.join(__file__, "./../../.."))
 BIN = os.path.join(APP_PATH, "Contents", "MacOS")
 RES = os.path.join(APP_PATH, "Contents", "Resources")
-#BIN = os.path.join(GO_PATH, "bin")
 
 GO_PATH = os.environ.get("GOPATH")
 APP_DIR = appDataDir("ombudscore")
@@ -44,21 +43,28 @@ def run_webapp(stdout):
     static_path = os.path.join(RES, "webapp")
     opts = ["-staticpath=" + static_path]
     cmd = [os.path.join(BIN, "ombwebapp")] + opts
+
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
     
 def run_ombwallet(stdout):
-    opts = []
+    opts = ["--debuglevel=warn"]
     cmd = [os.path.join(BIN, "ombwallet")] + opts
+
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
 def run_ombfullnode(stdout):
-    opts = []
+    opts = ["--debuglevel=warn"]
     cmd = [os.path.join(BIN, "ombfullnode")] + opts
+
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
+def run_ombcli(stdout):
+    cmd = [os.path.join(BIN, "ombcli")]
+
+    subprocess.call(cmd, stdout=stdout)
 
 
 def main():
@@ -74,29 +80,26 @@ def main():
 
     time.sleep(3)
 
-    # Start ombwallet
-    walletproc = run_ombwallet(null)
+    # Start ahimsarest
+    webservproc = run_webapp(null)
 
     time.sleep(3)
 
-    # Start ahimsarest
-    webservproc = run_webapp(null)
+    # Start ombwallet
+    walletproc = run_ombwallet(null)
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
     # Start ombuds client gui and block until process returns.
-    cmd = [os.path.join(BIN, "ombcli")]
-    print cmd
-    print "WARNING fix this path"
-    subprocess.call(cmd, stdout=null)
+    run_ombcli(null)
 
     webservproc.kill()
     walletproc.kill()
     nodeproc.kill()
 
     null.close()
-    syslog(LOG_ERR, "All subprocesses successfully started. Bailing out.")
+    syslog(LOG_ERR, "All subprocesses successfully stopped. Bailing out.")
 
 def try_mkdir(path):
     if not os.path.isdir(path): os.mkdir(path)
@@ -124,7 +127,6 @@ def make_conf():
     NODE_CFG, WAL_CFG
     '''
     uname, pw = generate_secrets(70)
-    print "Running make_conf"
 
     # Configure the wallet
     if not os.path.exists(WAL_CFG): 
