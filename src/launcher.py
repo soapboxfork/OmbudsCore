@@ -23,11 +23,12 @@ def appDataDir(appname):
     
 
 
-# APP_PATH = abspath(os.path.join(__file__, "./../../.."))
-# BIN = os.path.join(APP_PATH, "Contents/MacOS")
+APP_PATH = abspath(os.path.join(__file__, "./../../.."))
+BIN = os.path.join(APP_PATH, "Contents", "MacOS")
+RES = os.path.join(APP_PATH, "Contents", "Resources")
+#BIN = os.path.join(GO_PATH, "bin")
 
 GO_PATH = os.environ.get("GOPATH")
-BIN = os.path.join(GO_PATH, "bin")
 APP_DIR = appDataDir("ombudscore")
 NODE_DIR = os.path.join(APP_DIR, "node")
 NODE_CFG = os.path.join(NODE_DIR, "node.conf")
@@ -39,21 +40,22 @@ CTL_DIR = os.path.join(APP_DIR, "ctl")
 CTL_CFG = os.path.join(CTL_DIR, "ctl.conf")
 
 def run_webapp(stdout):
-    static_path = os.path.join(GO_PATH, "src","github.com","NSkelsey","ahimsarest","ombwebapp")
+    #static_path = os.path.join(GO_PATH, "src","github.com","NSkelsey","ahimsarest","ombwebapp")
+    static_path = os.path.join(RES, "webapp")
     opts = ["-staticpath=" + static_path]
-    cmd = [BIN+"/ombwebapp"] + opts
+    cmd = [os.path.join(BIN, "ombwebapp")] + opts
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
     
 def run_ombwallet(stdout):
     opts = []
-    cmd = [BIN+"/ombwallet"] + opts
+    cmd = [os.path.join(BIN, "ombwallet")] + opts
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
 def run_ombfullnode(stdout):
     opts = []
-    cmd = [BIN+"/ombfullnode"] + opts
+    cmd = [os.path.join(BIN, "ombfullnode")] + opts
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
@@ -84,9 +86,7 @@ def main():
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
     # Start ombuds client gui and block until process returns.
-    # TODO change bin path
-    os.chdir("./omblci")
-    cmd = ["./ombcli"]
+    cmd = [os.path.join(BIN, "ombcli")]
     print cmd
     print "WARNING fix this path"
     subprocess.call(cmd, stdout=null)

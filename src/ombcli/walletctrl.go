@@ -23,12 +23,13 @@ import (
 
 // Handles interaction with the rpc based wallet
 type WalletCtrl struct {
-	app         *AppController
-	Client      *btcrpcclient.Client
-	Root        qml.Object
-	webSocket   *websocket.Conn
-	update      chan struct{}
-	message     chan WalletMessage
+	app       *AppController
+	Client    *btcrpcclient.Client
+	Root      qml.Object
+	webSocket *websocket.Conn
+	update    chan struct{}
+	message   chan WalletMessage
+	// TODO
 	confBalance btcutil.Amount
 }
 
@@ -206,22 +207,14 @@ func (ctrl WalletCtrl) handleNtfnMsg(req btcjson.Cmd) {
 			break
 		}
 
-		if !cmd.Confirmed && newBalance > 0 {
-			// Send a Wallet Message
-			txt := fmt.Sprintf("You have %.4f unconfirmed bitcoin", cmd.Balance)
-			m := WalletMessage{MInfo, txt}
-			ctrl.Message(m)
-
-		} else {
-			// if the confirmed balance has changed update the gui
-			if cmd.Confirmed && newBalance != ctrl.GetConfBalance() {
-				ctrl.Update()
-			}
-			if cmd.Balance == 0 {
-				m := WalletMessage{MWarn, "You cannot send any bulletins. Get more coin."}
-				ctrl.Message(m)
-			}
+		// if the confirmed balance has changed update the gui
+		if cmd.Confirmed && newBalance != ctrl.GetConfBalance() {
 			ctrl.SetConfBalance(newBalance)
+			ctrl.Update()
+		}
+		if cmd.Balance == 0 {
+			m := WalletMessage{MWarn, "You cannot send any bulletins. Get more coin."}
+			ctrl.Message(m)
 		}
 
 	case *btcws.TxNtfn:

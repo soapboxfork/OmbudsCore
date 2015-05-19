@@ -13,4 +13,4 @@ Since this was developed on QtQuick 5.4 and Ubuntu 14.04 support only reaches Qt
 
 ## Note
 
-When building for distrobution remember to reset the qrc:// urls and use go generate.
+When building for distribution remember to reset the qrc:// urls and use go generate.

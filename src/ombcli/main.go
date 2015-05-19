@@ -112,8 +112,8 @@ func run() error {
 
 	engine.On("quit", func() { os.Exit(0) })
 
-	//component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
-	component, err := engine.LoadFile("qml/MainWindow.qml")
+	component, err := engine.LoadFile("qrc:///qml/MainWindow.qml")
+	//component, err := engine.LoadFile("qml/MainWindow.qml")
 	if err != nil {
 		return err
 	}
