@@ -7,7 +7,7 @@ At the moment, Bitcoin's testnet is used by default. An overview of how the vari
 Components
 ============
 There are several components of this project that need individual explanation. They are ombcli, ombfullnode, ombwallet, ahimsarest, and launcher.py. 
-These are all subcomponents of what makes up OmbudsCore.
+These are all subcomponents of what composes OmbudsCore.
 
 ### ombcli
 [ombcli](https://github.com/soapboxsys/OmbudsCore/tree/master/src/ombcli)
@@ -36,9 +36,9 @@ It can also be used as a standalone website.
 ### launcher.py
 [launcher.py](https://github.com/soapboxsys/OmbudsCore/blob/master/src/launcher.py) 
 is a python script that launches all of these processes at once. 
-When the project is build using make, the first process that really gets launched is launcher.py.
-It is responsible for cleanly starting all and stopping of the necessary processes that were described above.
-It serves as the entry point for the entire application.
+When the project is build using make, the first binary that is executed is launcher.py.
+It is responsible for cleanly starting all the other processes and stopping the processes described above.
+It serves as a single entry point for the entire application.
 
 
 Build from source
