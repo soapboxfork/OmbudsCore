@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" ng-app="ombWebApp">
+    <head>
+        <meta charset="utf-8">
+        <title>OmbWebApp</title>
+        <link rel="stylesheet" href="static/main.css"/>
+        <link rel="stylesheet" href="static/toggle.css"/>
+    </head>
+    <body>
+        <div id="container">
+            <div id="BrowsePane" ng-controller="browseCtrl">
+                <div class="browseBoard" ng-repeat="board in boards | orderBy:'-lastActive'"></div>
+            </div>
+
+            <div id="ContentPane">
+                    <ng-view></ng-view>
+            </div>
+        </div>
+
+        <!-- In production use: 
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+        -->
+        <script>
+        window.onerror = function(error, line, url) {
+            document.write("<h3>Error!</h3>")
+            document.write("<p><code>", error, "</code></p>")
+            document.write("<p><code>", line, "</code></p>")
+            document.write("<p><code>", url, "</code></p>")
+        };
+        </script>
+        <script src="/vendor/angular/angular.js"></script>
+        <script src="/vendor/angular/angular-route.js"></script>
+        <script src="/static/lib/angular-sanitize.js"></script>
+        <script src="/static/lib/showdown.js"></script>
+        <script src="/static/lib/markdown.js"></script>
+        <script src="/static/lib/md5.js"></script>
+        <script src="/factory.js"></script>
+        <script src="/controller.js"></script>
+        <script src="/filter.js"></script>
+        <script src="/app.js"></script>
+    </body>
+</html>
