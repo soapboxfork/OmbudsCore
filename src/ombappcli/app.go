@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -9,7 +8,6 @@ import (
 	"github.com/NSkelsey/ahimsarest"
 	"github.com/btcsuite/go-flags"
 	"github.com/soapboxsys/ombudslib/pubrecdb"
-	"golang.org/x/net/websocket"
 )
 
 func Log(handler http.Handler) http.Handler {
@@ -19,19 +17,16 @@ func Log(handler http.Handler) http.Handler {
 	})
 }
 
-// Echo the data received on the WebSocket.
-func EchoServer(ws *websocket.Conn) {
-	io.Copy(ws, ws)
-}
-
 func main() {
 
 	var err error
 	cfg, _, err := loadConfig()
 	if err != nil {
+		// If the err has to do with bad command line flags just exit
 		if e, ok := err.(*flags.Error); ok &&
 			(e.Type == flags.ErrHelp || e.Type == flags.ErrUnknownFlag) {
 			os.Exit(1)
+			// Otherwise kill the program
 		} else {
 			log.Fatal(err)
 		}
@@ -47,22 +42,29 @@ func main() {
 		log.Fatal(err)
 	}
 
+	server, err := newServer(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	server.Start()
+
 	prefix := "/api/"
 	api := ahimsarest.Handler(prefix, db)
 	mux := http.NewServeMux()
-	ws := websocket.Handler(EchoServer)
 
 	mux.Handle(prefix, api)
 	mux.Handle("/", http.FileServer(http.Dir(cfg.StaticPath)))
-	mux.Handle("/ws/", ws)
+	mux.Handle("/ws/", server.frontend)
 
 	log.Printf("Webserver listening at %s.\n", cfg.WebAppHost)
 	log.Printf("Serving files at: %s\n", cfg.StaticPath)
 
 	if cfg.Verbose {
 		logger := Log(mux)
-		log.Fatal(http.ListenAndServe(cfg.WebAppHost, logger))
+		log.Println(http.ListenAndServe(cfg.WebAppHost, logger))
 	} else {
-		log.Fatal(http.ListenAndServe(cfg.WebAppHost, mux))
+		log.Println(http.ListenAndServe(cfg.WebAppHost, mux))
 	}
+	log.Println("Stopping Server...")
+	server.Stop()
 }
