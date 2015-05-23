@@ -8,6 +8,7 @@ import (
 	"github.com/NSkelsey/ahimsarest"
 	"github.com/btcsuite/go-flags"
 	"github.com/soapboxsys/ombudslib/pubrecdb"
+	_ "github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 func Log(handler http.Handler) http.Handler {

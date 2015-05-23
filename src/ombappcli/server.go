@@ -193,11 +193,13 @@ func (fs *frontendServer) readMessages() {
 			_, msg, err := fs.conn.ReadMessage()
 			if err != nil {
 				fs.releaseHandle <- true
+				println("Read failed")
 				return
 			}
 			if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
-				if req.Id() != nil {
+				if err != nil {
 					fs.releaseHandle <- true
+					fmt.Printf("Marshal failed %s, %v", err, req)
 					return
 				}
 				fmt.Printf("%s : %v\n", req.Method(), req)
