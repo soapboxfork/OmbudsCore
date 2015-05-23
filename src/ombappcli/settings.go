@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -78,38 +80,112 @@ type SingleFav struct {
 	Val  string `json:val`
 }
 
-func (setc *settingCtrl) addFavorite() func(http.ResponseWriter, *http.Request) {
+func (setc *settingCtrl) handleFavorite() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, request *http.Request) {
-		if request.Method != "POST" {
-			http.Error(w, "Only Post allowed", http.StatusMethodNotAllowed)
-			return
-		}
-		var sf SingleFav
-		// TODO handle decode
-		err := json.Decoder(&sf)
-		if err != nil {
-			http.Error(w, err, http.StatusInternalServerError)
-			return
-		}
+		switch {
+		case request.Method == "POST" || request.Method == "DELETE":
+			var sf SingleFav
+			// Decode the request
+			decoder := json.NewDecoder(request.Body)
+			err := decoder.Decode(&sf)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 
-		// Store the single favorite
-		err := setc.saveFavorite(sf)
-		if err != nil {
-			http.Error(w, err, http.StatusInternalServerError)
-			log.Println(err)
+			if request.Method == "POST" {
+				// Store the single favorite
+				err = setc.saveFavorite(sf)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Println(err)
+					return
+				}
+			}
+			if request.Method == "DELETE" {
+				// Delete the favorite
+				err = setc.delFavorite(sf)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Println(err)
+					return
+				}
+			}
+
+		default:
+			http.Error(w, "Invalid HTTP Method", http.StatusMethodNotAllowed)
 			return
 		}
 	}
 }
 
+func (setc *settingCtrl) delFavorite(sf SingleFav) error {
+	var found bool = false
+	var i int
+	switch {
+	case sf.Type == "board":
+		var s []string = setc.settings.Favorites.Boards
+		found, i = listContains(s, sf.Val)
+		if found {
+			s = append(s[:i], s[i+1:]...)
+			setc.settings.Favorites.Boards = s
+		}
+	case sf.Type == "bltn":
+		// functions the same way as the case above
+		var s []string = setc.settings.Favorites.Bulletins
+		found, i = listContains(s, sf.Val)
+		if found {
+			s = append(s[:i], s[i+1:]...)
+			setc.settings.Favorites.Bulletins = s
+		}
+	default:
+		return errors.New(fmt.Sprintf("No favorite type of: %s", sf.Type))
+	}
+	if !found {
+		return errors.New("Value not found in favorites")
+	}
+
+	if err := setc.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func listContains(lst []string, val string) (bool, int) {
+	for i, elm := range lst {
+		if elm == val {
+			return true, i
+		}
+	}
+	return false, -1
+}
+
 func (setc *settingCtrl) saveFavorite(sf SingleFav) error {
 	switch {
 	case sf.Type == "board":
-		setc.settings.Favorites.Boards = append(setc.settings.Favorites.Boards, sf.Val)
+		var s []string = setc.settings.Favorites.Boards
+		inList, _ := listContains(s, sf.Val)
+		// Do nothing if the entry is already in the list
+		if inList {
+			return nil
+		}
+		s = append(s, sf.Val)
+		setc.settings.Favorites.Boards = s
+
 	case sf.Type == "bltn":
-		setc.settings.Favorites.bulletins = append(setc.settings.Favorites.Bulletins, sf.Val)
+		// functions the same way as the case above
+		var s []string = setc.settings.Favorites.Bulletins
+		inList, _ := listContains(s, sf.Val)
+		if inList {
+			return nil
+		}
+		s = append(s, sf.Val)
+		setc.settings.Favorites.Bulletins = s
+
 	default:
-		return fmt.Error("No favorite type of: %s", sf.Type)
+		return errors.New(fmt.Sprintf("No favorite type of: %s", sf.Type))
 	}
 	if err := setc.Commit(); err != nil {
 		return err
@@ -121,7 +197,7 @@ func (setc *settingCtrl) Handler(prefix string) http.Handler {
 	p := prefix
 	router := mux.NewRouter()
 	router.HandleFunc(p+"all/", setc.allSettingsHandler())
-	//router.HandleFunc(p+"favorite/", setc.addFavorite())
+	router.HandleFunc(p+"favorite/", setc.handleFavorite())
 	//router.HandleFunc(p+"twitter/", setc.registerUser())
 	//router.HandleFunc(p+"prefs/", setc.setPreferences())
 	return router
