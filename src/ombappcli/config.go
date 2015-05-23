@@ -33,7 +33,6 @@ const (
 	// NOTE change tool tips if any of these are modified.
 	defaultCAFilename     = "rpc.cert"
 	defaultConfigFilename = "gui.conf"
-	defaultDataDirname    = "data"
 	// NOTE HTTP not https!
 	defaultWebAppHost = "localhost:1055"
 	defaultStaticPath = "../frontend"
@@ -42,10 +41,10 @@ const (
 var (
 	ombudsHomeDir     = btcutil.AppDataDir("ombudscore", false)
 	guiHomeDir        = filepath.Join(ombudsHomeDir, "gui")
+	defaultDataDir    = guiHomeDir
 	btcwalletDir      = filepath.Join(ombudsHomeDir, "wallet")
 	defaultCAFile     = filepath.Join(ombudsHomeDir, defaultCAFilename)
 	defaultConfigFile = filepath.Join(guiHomeDir, defaultConfigFilename)
-	defaultDataDir    = filepath.Join(guiHomeDir, defaultDataDirname)
 	nodedir           = filepath.Join(ombudsHomeDir, "node")
 	defaultDBPath     = filepath.Join(nodedir, "pubrecord.db")
 )
@@ -60,6 +59,7 @@ type config struct {
 	MainNet     bool   `long:"mainnet" description:"Use the main Bitcoin network (default testnet3)"`
 	WebAppHost  string `long:"host" description:"The hostname of the backend supplying data to use (default localhost:1055)"`
 	StaticPath  string `long:"staticpath" description:"The path to the static files for the web app to host (default ../frontend)"`
+	DataDirPath string `long:"datadir" description:"The path to the data directory to use"`
 	Verbose     bool   `long:"verbose" description:"Log every request as they come in."`
 	DBPath      string `long:"dbpath" description:"The path to the DB."`
 }
@@ -232,6 +232,14 @@ func loadConfig() (*config, []string, error) {
 
 	if !fileExists(cfg.StaticPath) {
 		return nil, nil, fmt.Errorf("The static file [%s] path does not exist", cfg.StaticPath)
+	}
+
+	if cfg.DataDirPath == "" {
+		cfg.DataDirPath = defaultDataDir
+	}
+
+	if !fileExists(cfg.DataDirPath) {
+		return nil, nil, fmt.Errorf("The data dir [%s] does not exist", cfg.DataDirPath)
 	}
 
 	if cfg.DBPath == "" {

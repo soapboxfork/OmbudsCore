@@ -21,7 +21,7 @@ type walletCtrl struct {
 	ws *websocket.Conn
 }
 
-func newWalletCtrl(cfg *config, s *server) (*walletCtrl, error) {
+func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 	cert, err := ioutil.ReadFile(cfg.CAFile)
 	if err != nil {
 		return nil, err
@@ -89,9 +89,10 @@ func (wc *walletCtrl) notificationListener() {
 }
 
 type server struct {
-	frontend   *frontendServer
-	walletCtrl *walletCtrl
-	quit       chan struct{}
+	frontend    *frontendServer
+	walletCtrl  *walletCtrl
+	settingCtrl *settingCtrl
+	quit        chan struct{}
 
 	// Event Channels
 	sendBulletinChan chan btcjson.Cmd
@@ -108,13 +109,19 @@ func newServer(cfg *config) (*server, error) {
 		quit: make(chan struct{}),
 	}
 
-	wc, err := newWalletCtrl(cfg, s)
+	wc, err := newWalletCtrl(s, cfg)
 	if err != nil {
 		return nil, err
 	}
 	s.walletCtrl = wc
 
-	s.frontend = newFrontendServer(cfg, s)
+	setc, err := newSettingCtrl(s, cfg.DataDirPath)
+	if err != nil {
+		return nil, err
+	}
+	s.settingCtrl = setc
+
+	s.frontend = newFrontendServer(s, cfg)
 
 	return s, nil
 }
@@ -163,7 +170,7 @@ type frontendServer struct {
 	closeNotif    chan bool
 }
 
-func newFrontendServer(cfg *config, s *server) *frontendServer {
+func newFrontendServer(s *server, cfg *config) *frontendServer {
 
 	login := cfg.Username + ":" + cfg.Password
 	auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(login))

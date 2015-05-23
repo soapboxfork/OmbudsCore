@@ -49,13 +49,17 @@ func main() {
 	}
 	server.Start()
 
-	prefix := "/api/"
-	api := ahimsarest.Handler(prefix, db)
-	mux := http.NewServeMux()
+	apiPrefix := "/api/"
+	api := ahimsarest.Handler(apiPrefix, db)
 
-	mux.Handle(prefix, api)
-	mux.Handle("/", http.FileServer(http.Dir(cfg.StaticPath)))
+	shPrefix := "/settings/"
+	settingH := server.settingCtrl.Handler(shPrefix)
+
+	mux := http.NewServeMux()
+	mux.Handle(apiPrefix, api)
+	mux.Handle(shPrefix, settingH)
 	mux.Handle("/ws/", server.frontend)
+	mux.Handle("/", http.FileServer(http.Dir(cfg.StaticPath)))
 
 	log.Printf("Webserver listening at %s.\n", cfg.WebAppHost)
 	log.Printf("Serving files at: %s\n", cfg.StaticPath)
