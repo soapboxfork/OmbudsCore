@@ -157,6 +157,10 @@ type frontendServer struct {
 	inUse       bool
 	conn        *websocket.Conn
 	allMessages chan []byte
+
+	takeHandle    chan bool
+	releaseHandle chan bool
+	closeNotif    chan bool
 }
 
 func newFrontendServer(cfg *config, s *server) *frontendServer {
@@ -168,33 +172,44 @@ func newFrontendServer(cfg *config, s *server) *frontendServer {
 		s:           s,
 		authsha:     sha256.Sum256([]byte(auth)),
 		upgrader:    websocket.Upgrader{},
-		allMessages: make(chan []byte, 200),
+		allMessages: make(chan []byte, 20),
+
+		takeHandle:    make(chan bool),
+		releaseHandle: make(chan bool),
+		closeNotif:    make(chan bool),
 	}
 	// TODO create message drainer.
+	go fs.connMonitor()
 	return fs
 }
 
 func (fs *frontendServer) readMessages() {
 	for {
-		// TODO handle authentication
-		_, msg, err := fs.conn.ReadMessage()
-		if err != nil {
-			break
-		}
-		if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
-			if req.Id() != nil {
-				break
+		select {
+		case <-fs.closeNotif:
+			return
+		default:
+			// TODO handle authentication
+			_, msg, err := fs.conn.ReadMessage()
+			if err != nil {
+				fs.releaseHandle <- true
+				return
 			}
-			fmt.Printf("%s : %v\n", req.Method(), req)
+			if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
+				if req.Id() != nil {
+					fs.releaseHandle <- true
+					return
+				}
+				fmt.Printf("%s : %v\n", req.Method(), req)
 
-			if req.Method() == "sendbulletin" {
-				fs.s.sendBulletinChan <- req
+				if req.Method() == "sendbulletin" {
+					fs.s.sendBulletinChan <- req
+				}
+			} else {
+				log.Printf(err.Error())
 			}
-		} else {
-			log.Printf(err.Error())
 		}
 	}
-	// TODO properly close connection to websocket
 }
 
 // Writes all messages to the attached frontend websocket if it is exists.
@@ -204,13 +219,54 @@ func (fs *frontendServer) writeMessages() {
 		select {
 		case b := <-fs.allMessages:
 			if err := fs.conn.WriteMessage(websocket.TextMessage, b); err != nil {
+				fs.releaseHandle <- true
 				return
 			}
-
-			// TODO close channel and break out of loop
+		case <-fs.closeNotif:
+			return
 		}
 	}
-	// TODO properly close channel
+}
+
+// Closes the connection if any signal is thrown. Ensures that a new connection
+// can be made. connMonitor also drains the allMessages channel when nothing is
+// there to deal with messages to the websocket.
+func (fs *frontendServer) connMonitor() {
+
+	go func() {
+		for {
+			if !fs.inUse {
+				// drains the channel if the socket is not in use.
+				<-fs.allMessages
+			} else {
+				// wait for the channel to close again.
+				<-fs.closeNotif
+			}
+		}
+	}()
+
+	for {
+		select {
+		case <-fs.takeHandle:
+			// Take the conn's handle
+			fs.inUse = true
+			fs.closeNotif = make(chan bool)
+		case <-fs.s.quit:
+			fs.closeConn()
+		case <-fs.releaseHandle:
+			fs.closeConn()
+		}
+	}
+}
+
+// closeConn ensures that the frontendServer is ready to shutdown or accept
+// a new connection.
+func (fs *frontendServer) closeConn() {
+	fmt.Println("Conn released")
+	// Close the read pipes
+	close(fs.closeNotif)
+	fs.conn.Close()
+	fs.inUse = false
 }
 
 // The frontend server will register and authenticate a single websocket connection
@@ -221,17 +277,15 @@ func (fs *frontendServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Websocket already in use."))
 		return
 	}
-	fs.inUse = true
+	fs.takeHandle <- true
 
 	conn, err := fs.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-
 	fs.conn = conn
 
 	go fs.readMessages()
 	go fs.writeMessages()
-
 }
