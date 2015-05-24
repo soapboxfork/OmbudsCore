@@ -200,7 +200,6 @@ func (fs *frontendServer) readMessages() {
 			_, msg, err := fs.conn.ReadMessage()
 			if err != nil {
 				fs.releaseHandle <- true
-				println("Read failed")
 				return
 			}
 			if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
@@ -271,7 +270,6 @@ func (fs *frontendServer) connMonitor() {
 // closeConn ensures that the frontendServer is ready to shutdown or accept
 // a new connection.
 func (fs *frontendServer) closeConn() {
-	fmt.Println("Conn released")
 	// Close the read pipes
 	close(fs.closeNotif)
 	fs.conn.Close()
@@ -295,6 +293,7 @@ func (fs *frontendServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	fs.conn = conn
 
+	log.Println("New frontend socket connected.")
 	go fs.readMessages()
 	go fs.writeMessages()
 }
