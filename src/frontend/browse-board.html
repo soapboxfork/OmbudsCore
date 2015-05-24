@@ -1,0 +1,10 @@
+<div class="full-wrap" >
+    <div class="content" ng-click="openBoard( board.name )" >
+        <img ng-if="board.favorite" class="favorite" src="/static/images/star-active.png" />
+        <div class="title board">{{ board.name | limitTo:26 }}</div>
+        <div class="date">{{ board.lastActive | nicedate }}</div>
+        <div class="numline">{{ board.numBltns | plural:'Bulletins' }}</div>
+    </div>
+    <div class="side-bar" ng-class="{'active': isOpen(board.name)}">
+    </div>
+</div>

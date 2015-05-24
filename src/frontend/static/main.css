@@ -1,0 +1,257 @@
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+#container {
+    display: flex;
+    width: 1000px;
+    height: 565px;
+    overflow: hidden;
+}
+
+#BrowsePane {
+    overflow-y: scroll;
+    width: 375px;
+    height: 100%;
+    float: left;
+}
+
+#ContentPane {
+    width: 625px;
+    height: 100%;
+    float: left;
+    overflow-y: scroll;
+    background-color: #EEEEEE;
+}
+
+#welc {
+    height: 800px;
+}
+
+/*********************** Global Styles ***********************/
+
+.board {
+    font-family: "Helvetica Neue";
+    font-weight: bold;
+    font-size: 1.15em;
+}
+
+
+/*********************** Board Browse Styles ***********************/
+
+.browseBoard {
+    height: 115px;
+}
+
+.browseBoard .full-wrap {
+    position: relative;
+}
+
+
+.browseBaord .side-bar {
+    display: None;
+}
+
+.browseBoard .side-bar.active {
+    background-color: #2A8DEA;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    display: inline;
+    top: 0;
+    right: 0;
+}
+
+.browseBoard .content {
+    margin: 0 10px 0 30px;
+    padding: 10px 0px 10px 0;
+    border-bottom: 1px solid #AAAAAA;
+    height: 95px;
+}
+
+.browseBoard .active .content {
+    border-bottom-color: #116CD6;
+}
+
+.browseBoard .favorite {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 5px;
+    display: inline-block;
+}
+
+.browseBoard .active .content {
+    color: #E0E0E0;
+}
+
+.browseBoard .active .content .title {
+    color: #FFFFFF;
+}
+
+
+.browseBoard .content .title {
+    display: inline-block;
+    width: 255px;
+}
+
+.browseBoard .content .date {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
+.browseBoard .content .numline {
+    margin: 8px 0 13px 0;
+}
+
+.browseBoard .content .text {
+
+}
+
+/********************** Bulletin List View Styles ***************************/
+
+div.boardDisplay {
+    margin: 20px 20px 0 30px;
+}
+
+
+div.card {
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
+    background-color: white;
+    padding: 15px 15px 20px 15px; 
+}
+
+/******** Top Board Card **********/
+
+div.boardDisplay div.boardline {
+    margin-bottom: 30px
+}
+
+div.boardline .name {
+    font-size: 1.3em;
+    display: inline-block;
+    margin-bottom: 7px;
+
+}
+
+div.boardline .favorite {
+    height: 20px;
+    width: 20px;
+    margin-top: 2px;
+    float: right;
+    content:url("/static/images/star-inactive.png");
+}
+
+div.boardline .favorite.active {
+    content:url("/static/images/star-active.png");
+}
+
+div.boardline .setting {
+    float: right;
+    margin-right: 2px;
+    height: 25px;
+}
+
+div.boardline .meta .mine {
+    float: right;
+}
+
+/*************** Bulletin Card Styles **********************/
+
+div.pinnedBulletin {
+    min-height: 100px;
+    margin-bottom: 25px;
+}
+
+.pinnedBulletin .markdown {
+   word-wrap: break-word;
+}
+
+.pinnedBulletin .topline {
+    width: 100%;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #AAAAAA;
+    margin-bottom: 15px;
+    height: 25px;
+    position: relative;
+}
+
+.pinnedBulletin .topline div {
+    display: inline-block;
+}
+
+.pinnedBulletin .authorbox {
+    width: 33%;
+    position: relative;
+}
+
+.authorbox .author-icon {
+    top: 2px;
+    position: absolute;
+}
+
+.authorbox .text {
+    margin-left: 23px;
+}
+
+.authorbox .author {
+    font-family: "Monaco", Monaco, monospace, sans-serif;
+}
+
+
+.pinnedBulletin .timestamp {
+    width: 33%;
+    text-align: center;
+}
+
+.pinnedBulletin .interact {
+    width: 32%;
+}
+
+.pinnedBulletin .setting {
+    height: 25px;
+    position:absolute; 
+    bottom: 6px;
+    right: 60px;
+}
+.pinnedBulletin .slider {
+    height: 25px;
+    position:absolute; 
+    bottom: 5px;
+    right: 30px;
+}
+.pinnedBulletin .confs {
+    height: 22px;
+    position:absolute; 
+    bottom: 6px;
+    right: 3px;
+}
+
+.pinnedBulletin .markdown * {
+    max-width: 536px;
+}
+
+/***************** Scrollbars ****************/
+::-webkit-scrollbar {
+    width:9px;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius:5px;
+    border-radius:5px;
+    background:rgba(0,0,0,0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:rgba(0,0,0,0.3);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background:rgba(0,0,0,0.05);
+}

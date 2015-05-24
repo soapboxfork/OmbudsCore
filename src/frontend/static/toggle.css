@@ -1,0 +1,62 @@
+/* CSS toggle button adopted from https://proto.io/freebies/onoff/*/
+
+.toggle-wrap {
+    height: 25px;
+    position: absolute;
+    bottom: 2px;
+    right: 35px; 
+}
+
+.onoffswitch {
+    position: relative; width: 25px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    margin-top: 2px;
+    border-radius: 10px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 4px; padding: 0; line-height: 5px;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "";
+    padding-left: 10px;
+    background-color: #2694FC; 
+    color: #2694FC;
+}
+.onoffswitch-inner:after {
+    content: "";
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #EEEEEE;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; 
+    width: 10px; 
+    height: 10px;
+    margin: -6.5px;
+    background: #DDDDDD;
+    border: 1px solid #B6B6B6; 
+    border-radius: 10px;
+    position: absolute; top: 4.5px; bottom: 0; right: 26px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 3px; 
+    background-color: #2694FC;
+}
+

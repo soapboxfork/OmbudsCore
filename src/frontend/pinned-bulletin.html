@@ -1,0 +1,50 @@
+<div class="pinnedBulletin card">
+    <div class="topline">
+        <div class="authorbox">
+            <svg class="author-icon" 
+                width="15"
+                height="15"
+                >
+                <rect x="0" y="0" 
+                    rx="2" ry="2" 
+                    width="15" height="15" 
+                    fill="{{ bltn.author | authColor }}"
+                    >
+                </rect>
+            </svg>
+            <div class="text">
+                From 
+                <div class="author">
+                    {{ bltn.author | limitTo:10 }}
+                </div>
+            </div>
+        </div> 
+        <div class="timestamp">{{ bltn.timestamp | nicedatetime  }}</div>
+        <div class="interact">
+
+        <div class=toggle-wrap>
+            <div class="onoffswitch">
+                <input type="checkbox" 
+                       id="{{ id('switch', bltn) }}"
+                       name="onoffswitch" 
+                       class="onoffswitch-checkbox" 
+                       ng-model="switcheroo"
+                >
+                <label class="onoffswitch-label" for="{{ id('switch', bltn) }}">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+            </div>
+        </div>
+
+            <img class="confs" ng-src="{{ depthImg(bltn) }}" />
+        </div>
+    </div>
+    <div class="msg" ng-hide="switcheroo">
+        {{ bltn.msg }} 
+    </div>
+
+    <div class="markdown" ng-hide="!switcheroo" btf-markdown="bltn.msg">
+        {{ bltn.output }}
+    </div>
+</div>
