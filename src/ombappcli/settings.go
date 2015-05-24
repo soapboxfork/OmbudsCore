@@ -21,16 +21,20 @@ type settingCtrl struct {
 }
 
 type Favorites struct {
-	Boards    []string `json:boards`
-	Bulletins []string `json:bulletins`
+	Boards    []string `json:"boards"`
+	Bulletins []string `json:"bulletins"`
+}
+
+type Preferences struct {
+	RenderAllMd bool `json:"renderMd"` // Flag to render all markdown in every board
 }
 
 type settings struct {
-	Address       string    `json:"address"`
-	Favorites     Favorites `json:"favorites"`
-	TwitAppToken  string    `json:"appToken"`
-	TwitUserToken string    `json:"userToken"`
-	RenderAllMd   bool      `json:"renderAllMd"`
+	Address       string      `json:"address"`
+	Favorites     Favorites   `json:"favorites"`
+	TwitAppToken  string      `json:"appToken"`
+	TwitUserToken string      `json:"userToken"`
+	Preferences   Preferences `json:"preferences"`
 }
 
 func (h *settingCtrl) Commit() error {
@@ -40,7 +44,12 @@ func (h *settingCtrl) Commit() error {
 func newSettingCtrl(s *server, dirpath string) (*settingCtrl, error) {
 	fpath := filepath.Join(dirpath, "settings.json")
 	if !fileExists(fpath) {
-		s := &settings{}
+		s := &settings{
+			Favorites: Favorites{
+				Boards:    []string{},
+				Bulletins: []string{},
+			},
+		}
 		err := writefile(fpath, *s)
 		if err != nil {
 			return nil, err
@@ -76,8 +85,9 @@ func (setc *settingCtrl) allSettingsHandler() func(http.ResponseWriter, *http.Re
 }
 
 type SingleFav struct {
-	Type string `json:type`
-	Val  string `json:val`
+	Type   string `json:"type"`
+	Val    string `json:"val"`
+	Method string `json:"method"`
 }
 
 func (setc *settingCtrl) handleFavorite() func(http.ResponseWriter, *http.Request) {
@@ -93,7 +103,7 @@ func (setc *settingCtrl) handleFavorite() func(http.ResponseWriter, *http.Reques
 				return
 			}
 
-			if request.Method == "POST" {
+			if sf.Method != "delete" {
 				// Store the single favorite
 				err = setc.saveFavorite(sf)
 				if err != nil {
@@ -101,8 +111,7 @@ func (setc *settingCtrl) handleFavorite() func(http.ResponseWriter, *http.Reques
 					log.Println(err)
 					return
 				}
-			}
-			if request.Method == "DELETE" {
+			} else {
 				// Delete the favorite
 				err = setc.delFavorite(sf)
 				if err != nil {
@@ -196,10 +205,10 @@ func (setc *settingCtrl) saveFavorite(sf SingleFav) error {
 func (setc *settingCtrl) Handler(prefix string) http.Handler {
 	p := prefix
 	router := mux.NewRouter()
-	router.HandleFunc(p+"all/", setc.allSettingsHandler())
 	router.HandleFunc(p+"favorite/", setc.handleFavorite())
 	//router.HandleFunc(p+"twitter/", setc.registerUser())
 	//router.HandleFunc(p+"prefs/", setc.setPreferences())
+	router.HandleFunc(p, setc.allSettingsHandler())
 	return router
 }
 
