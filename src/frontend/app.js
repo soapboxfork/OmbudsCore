@@ -1,18 +1,18 @@
 'use strict';
 
-angular.module('exceptionOverride', []).factory('$exceptionHandler', function() {
+/*angular.module('exceptionOverride', []).factory('$exceptionHandler', function() {
     return function(exception, cause) {
         exception.message += ' (caused by "' + cause + '")';
 //        throw exception;
     };
-})
+})*/
 
 
 var ombWebApp = angular.module("ombWebApp", [
     'ombWebAppControllers',
     'ombWebAppFilters',
     'ombWebAppFactory',
-    'exceptionOverride',
+   // 'exceptionOverride',
     'ngRoute',
     ])
     .config(["$routeProvider", function($routeProvider) {

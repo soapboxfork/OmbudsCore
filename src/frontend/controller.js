@@ -1,22 +1,17 @@
 var ctrls = angular.module('ombWebAppControllers', ['btford.markdown']);
 
-ctrls.controller('board', function($scope, $routeParams, ahimsaRestService, ombWebSocket, ombSettingService) {
-    ahimsaRestService.getBoard($routeParams.board).then(function(result) {
-        var board = result.data;
-        board.summary.favorite = ombSettingService.isFavoriteBoard(board.summary.name);
-        $scope.board = board;
-        
-    });
+ctrls.controller('board', function($scope, $routeParams, pubRecordService, ombWebSocket, ombSettingService, ahimsaRestService) {
+    $scope.board = pubRecordService.activeBoard;
 
     $scope.reply = ombWebSocket.sendBulletin;
 
-    $scope.handleFavorite = function(sum) {
-        if (!sum.favorite) {
-            ombSettingService.addFavoriteBoard(sum.name);
-            sum.favorite = true;
+    $scope.handleFavorite = function(board) {
+        if (!board.favorite) {
+            board.favorite = true
+            ombSettingService.addFavoriteBoard(board.name);
         } else {
-            ombSettingService.delFavoriteBoard(sum.name);
-            sum.favorite = false;
+            board.favorite = false
+            ombSettingService.delFavoriteBoard(board.name);
         }
     }
 
@@ -29,7 +24,7 @@ ctrls.controller('board', function($scope, $routeParams, ahimsaRestService, ombW
     var base = "/static/images/"
     $scope.depthImg = function(bltn) {
         var curHeight = ahimsaRestService.getBlockCount();
-        
+
         if (!angular.isDefined(bltn.blk)) {
             // The bltn is not mined
             return base + "0conf.png"       
@@ -48,54 +43,37 @@ ctrls.controller('board', function($scope, $routeParams, ahimsaRestService, ombW
 });
 
 ctrls.controller('nilboard', function($scope, ahimsaRestService) {
-      ahimsaRestService.getNilBoard().then(function(result) {
-          $scope.board = result.data;
-  });
+    ahimsaRestService.getNilBoard().then(function(result) {
+        $scope.board = result.data;
+    });
 })
-  
+
 ctrls.controller('welcome', function($scope) {
-    
+
 });
 
-ctrls.controller('browseCtrl', function($scope, $location, $routeParams, ahimsaRestService, ombSettingService) {
-    ahimsaRestService.getAllBoards().then(function(result) {
-        var favs = ombSettingService.getFavoriteBoards()
+ctrls.controller('browseCtrl', function($scope, $location, $routeParams, pubRecordService) {
 
-        // Takes in a board and adds processed fields
-        function initBoardSum(board) {
-            board.urlName = encodeURIComponent(board.name);
-            if (favs.indexOf(board.name) > 0) {
-                board.favorite = true;
-            }
-            return board;
-        }
+    $scope.boards = pubRecordService.boardList;
+    $scope.activeBoard = pubRecordService.activeBoard;
+    console.log("ran ctrl")
 
-        $scope.boards = angular.forEach(result.data, initBoardSum);
-        var gex = /^\/board\/(.*)/
+    var gex = /^\/board\/(.*)/
 
-        var viewing = null;
-        
-        var nameL = $location.path().match(gex)
-        if (nameL != null  && nameL.length > 1) {
-            viewing = nameL[1];
+    var nameL = $location.path().match(gex)
+    if (nameL != null  && nameL.length > 1) {
+        var urlName = nameL[1];
+        pubRecordService.setActiveBoard(urlName);
+    }
+
+    $scope.openBoard = function(urlName) {
+        pubRecordService.setActiveBoard(urlName)
+        if (urlName === "") {
+            $location.path("/nilboard");
+        } else {
+            $location.path("/board/" + urlName);
         }
-        $scope.openBoard = function(name) {
-            viewing = name;
-            if (name === "") {
-                $location.path("/nilboard");
-            } else {
-                console.log("This is my path:", $location)
-                $location.path("/board/" + name);
-            }
-        }
-        $scope.isOpen = function(name) {
-            if (viewing === name) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    });
+    }
 })
 
 
