@@ -1,4 +1,18 @@
-<div>
-    <h2>Send Bulletins</h2>
+<div id="sendPane">
+    <h1>Send Bulletins</h1>
+
+    <div id="sendBox">
+        <div>
+            <h3>Board</h3>
+            <textarea class="board" ng-model="draftBltn.board"></textarea>
+        </div>
+        <div>
+            <h3>Content</h3>
+            <textarea class="content" ng-model="draftBltn.msg"></textarea>
+        </div>
+        <button id="sendBtn" name="Send" ng-click="handleSendBltn()">
+            Send
+        </button>
+    </div>
 
 </div>

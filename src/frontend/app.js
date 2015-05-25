@@ -12,6 +12,7 @@ var ombWebApp = angular.module("ombWebApp", [
     'ombWebAppFactory',
     'browseModule',
     'sendModule',
+    'settingsModule',
    // 'exceptionOverride',
     'ngRoute',
     'ngWebSocket',
@@ -52,7 +53,7 @@ var ombWebApp = angular.module("ombWebApp", [
 
     service.activePane = service.panes[0]
     service.selectPane = function(pane) {
-        for (cp in service.panes) {
+        for (var cp in service.panes) {
             if (pane.name === cp.name) {
                 pane.active = true; 
             } else {

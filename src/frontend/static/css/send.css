@@ -1,0 +1,23 @@
+#sendPane {
+    padding: 20px;
+}
+
+#sendPane #sendBox {
+    width: 300px;
+    margin-left: 20px;
+}
+
+#sendPane textarea.board {
+    width: 100%;
+    height: 25px;
+}
+
+#sendPane textarea.content {
+    width: 100%;
+    height: 200px;
+}
+
+button#sendBtn {
+    width: 100px;
+    height: 20px;
+}

@@ -45,12 +45,12 @@ singleton.factory('ombWebSocket', function($websocket) {
         collection.push(message.data);
     });
 
-    function sendBulletin() {
+    function sendBulletin(draft) {
        console.log("trying to send bulletin");
        var msg = { jsonrpc : "1.0", 
                    id: "bitcoin-rpc", 
                    method: "sendbulletin",
-                   params: ["asdf", "asdf", "asdf"]
+                   params: ["myAddress", draft.board, draft.msg]
        };
        dataStream.send(JSON.stringify(msg));
     }
