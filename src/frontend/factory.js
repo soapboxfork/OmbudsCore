@@ -93,7 +93,7 @@ singleton.factory('ombWebSocket', function($websocket) {
     var collection = [];
 
     dataStream.onMessage(function(message) {
-        console.log(message);
+        //console.log(message);
         collection.push(message.data);
     });
 
