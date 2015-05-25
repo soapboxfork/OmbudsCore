@@ -7,29 +7,12 @@
         <link rel="stylesheet" href="static/toggle.css"/>
     </head>
     <body>
-        <div id="globalWrap">
+        <div id="globalWrap" ng-controller="paneCtrl">
             <div id="paneSelect">
                 <h2>Select</h2> 
-
-                <div class="pane-btn">
-                    <img src="static/images/evans.png" /> 
-                </div>
-                <div class="pane-btn">
-                    <img src="static/images/evans.png" /> 
-                </div>
-                <div class="pane-btn">
-                    <img src="static/images/evans.png" /> 
-                </div>
+                <div class="pane-btn" ng-repeat="pane in panes"></div>
             </div>
-            <div id="browseWrap" ng-controller="browseCtrl">
-                <h2>Browse</h2>
-                <div id="browsePane">
-                    <div class="browseBoard" ng-repeat="board in boards | orderBy:'-lastActive'">
-                    </div>
-                </div>
-            </div>
-
-            <div id="contentPane">
+            <div id="paneWrap">
                 <ng-view></ng-view>
             </div>
         </div>
@@ -53,8 +36,13 @@
         <script src="/static/lib/md5.js"></script>
         <script src="/static/lib/websocket.js"></script>
         <script src="/factory.js"></script>
-        <script src="/controller.js"></script>
         <script src="/filter.js"></script>
+        <script src="/browse/mod.js"></script>
+        <script src="/browse/controllers.js"></script>
+        <script src="/browse/services.js"></script>
+        <script src="/browse/directives.js"></script>
+        <script src="/send/mod.js"></script>
+        <script src="/settings/mod.js"></script>
         <script src="/app.js"></script>
     </body>
 </html>

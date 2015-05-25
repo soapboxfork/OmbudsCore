@@ -1,0 +1,11 @@
+<div id="browseWrap" ng-controller="browseCtrl">
+    <h2>Browse</h2>
+    <div id="browsePane">
+        <div class="browseBoard" ng-repeat="board in boards | orderBy:'-lastActive'">
+        </div>
+    </div>
+</div>
+
+<div id="contentPane">
+    <div ng-controller="boardCtrl"></div>
+</div>

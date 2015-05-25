@@ -19,6 +19,13 @@ body {
     float: left;
 }
 
+#paneWrap {
+    width: 906px;
+    height: 100%;
+    float: left;
+    border: 1px solid green;
+}
+
 #browseWrap {
     width: 375px;
     height: 100%;
@@ -57,12 +64,12 @@ body {
 #paneSelect .pane-btn img {
     width: 55px;
     height: 55px;
-    margin-left: 20px;
-    margin-bottom: 20px;
+    margin-left: 30px;
+    margin-bottom: 30px;
 }
 
 #paneSelect .pane-btn img:hover {
-    margin-left: 40px;
+    margin-left: 15px;
 }
 
 /*********************** Browse Styles ***********************/
