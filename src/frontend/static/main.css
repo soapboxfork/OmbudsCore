@@ -14,15 +14,8 @@ body {
 
 #paneSelect {
     height: 100%;
-    width: 150px;
+    width: 200px;
     border: 1px solid red;
-    float: left;
-}
-
-#actionDrawer {
-    height: 100%;
-    border: 1px solid red;
-    width: 150px;
     float: left;
 }
 
