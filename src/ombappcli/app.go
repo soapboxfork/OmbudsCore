@@ -33,11 +33,6 @@ func main() {
 		}
 	}
 
-	_, _, err = setupRpcConn(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	db, err := pubrecdb.LoadDB(cfg.DBPath)
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +47,7 @@ func main() {
 	apiPrefix := "/api/"
 	api := ahimsarest.Handler(apiPrefix, db)
 
-	shPrefix := "/settings/"
+	shPrefix := "/api/settings/"
 	settingH := server.settingCtrl.Handler(shPrefix)
 
 	mux := http.NewServeMux()

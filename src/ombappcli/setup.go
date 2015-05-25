@@ -16,12 +16,7 @@
 
 package main
 
-import (
-	"io/ioutil"
-
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcrpcclient"
-)
+import "github.com/btcsuite/btcd/chaincfg"
 
 var activeNet = testNet3Params
 
@@ -47,35 +42,4 @@ var testNet3Params = params{
 	Params:  &chaincfg.TestNet3Params,
 	connect: "localhost:18332",
 	port:    "18332",
-}
-
-func setupRpcConn(cfg *config) (*btcrpcclient.Client, *btcrpcclient.ConnConfig, error) {
-
-	certs, err := ioutil.ReadFile(cfg.CAFile)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	rpcCfg := &btcrpcclient.ConnConfig{
-		Host:                cfg.RPCConnect,
-		User:                cfg.Username,
-		Pass:                cfg.Password,
-		Certificates:        certs,
-		Endpoint:            "ws",
-		DisableConnectOnNew: true,
-	}
-
-	rpcConn, err := btcrpcclient.New(rpcCfg, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Make a few attempts at connecting to the websocket.
-	tries := 15
-	err = rpcConn.Connect(tries)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return rpcConn, rpcCfg, nil
 }
