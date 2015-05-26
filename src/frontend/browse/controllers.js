@@ -69,18 +69,7 @@ angular.module('browseModule')
         }
     });
 
-    var gex = /^\/b\/board\/(.*)/
-
-    var nameL = $location.path().match(gex)
-    if (nameL != null  && nameL.length > 1) {
-        var urlName = nameL[1];
-        pubRecordService.setActiveBoardByUrl(urlName);
-    }
-
-    $scope.boards = pubRecordService.boardList;
-    $scope.activeBoard = pubRecordService.activeBoard;
-
-    $scope.openBoard = function(board) {
+    var openBoard = function(board) {
         pubRecordService.setActiveBoard(board)
         $scope.$broadcast('boardChanged', pubRecordService.activeBoard)
         if (board.urlName === "") {
@@ -89,6 +78,20 @@ angular.module('browseModule')
             $location.path("/b/board/" + board.urlName);
         }
     }
+    $scope.openBoard = openBoard;
+
+    var gex = /^\/b\/board\/(.*)/
+
+    var nameL = $location.path().match(gex)
+    if (nameL != null  && nameL.length > 1) {
+        var urlName = nameL[1];
+        var board = pubRecordService.getBoardByUrlName(urlName);
+        openBoard(board);
+    }
+
+    $scope.boards = pubRecordService.boardList;
+    $scope.activeBoard = pubRecordService.activeBoard;
+
 });
 
 

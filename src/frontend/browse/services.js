@@ -53,9 +53,9 @@ singleton.factory('pubRecordService', function($http, $interval) {
         });
     }
 
-    service.setActiveBoardByUrl = function(urlName) {
+    service.getBoardByUrlName = function(urlName) {
         var board = service.boards[urlName];
-        service.setActiveBoard(board);
+        return board;
     }
 
     return service;
