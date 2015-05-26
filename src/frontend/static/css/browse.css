@@ -1,14 +1,20 @@
 /*********************** Browse Styles ***********************/
 
-#browseWrap h2 {
+#browsePane{
+    height: 625px;
+}
+
+#browsePane > h4 {
     border-bottom: 1px solid black;
     margin: 0px;
     height: 10%;
 }
 
-.browseBoard {
-    height: 115px;
+#listView {
+    height: 90%;
+
 }
+
 
 .browseBoard .full-wrap {
     position: relative;
@@ -33,7 +39,6 @@
     margin: 0 10px 0 30px;
     padding: 10px 0px 10px 0;
     border-bottom: 1px solid #AAAAAA;
-    height: 95px;
 }
 
 .browseBoard .active .content {
@@ -69,7 +74,7 @@
 }
 
 .browseBoard .content .numline {
-    margin: 8px 0 13px 0;
+    margin: 8px 0 0 0;
 }
 
 .browseBoard .content .text {
@@ -128,8 +133,12 @@ div.boardline .meta .mine {
 /*************** Bulletin Card Styles **********************/
 
 div.pinnedBulletin {
-    min-height: 100px;
-    margin-bottom: 25px;
+    border-top: 1px solid #AAAAAA;
+    max-height: 250px;
+}
+
+.pinnedBulletin.detail {
+    background-color: rgba(255, 244, 220, 0.6);
 }
 
 .pinnedBulletin .markdown {
@@ -139,8 +148,6 @@ div.pinnedBulletin {
 .pinnedBulletin .topline {
     width: 100%;
     padding-bottom: 3px;
-    border-bottom: 1px solid #AAAAAA;
-    margin-bottom: 15px;
     height: 25px;
     position: relative;
 }
@@ -198,10 +205,6 @@ div.pinnedBulletin {
 
 .pinnedBulletin .markdown * {
     max-width: 436px;
-}
-
-.pinnedBulletin.detail {
-    background-color: rgba(255, 244, 220, 0.6);
 }
 
 .pinnedBulletin td {
