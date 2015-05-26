@@ -1,0 +1,9 @@
+<h4>Confirmed Balance</h4>
+<p>{{ wallet.balance.confirmed }}</p>
+<h4>Pending Balance</h4>
+<p>{{ wallet.balance.pending }}</p>
+
+<p><code>{{ wallet.address }}</code></p>
+<qrcode size="150" data="{{ wallet.address }}"></qrcode>
+<div class="addrBox">
+</div>

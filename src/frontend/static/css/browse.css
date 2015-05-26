@@ -1,0 +1,225 @@
+/*********************** Browse Styles ***********************/
+
+#browseWrap h2 {
+    border-bottom: 1px solid black;
+    margin: 0px;
+    height: 10%;
+}
+
+.browseBoard {
+    height: 115px;
+}
+
+.browseBoard .full-wrap {
+    position: relative;
+}
+
+
+.browseBaord .side-bar {
+    display: None;
+}
+
+.browseBoard .side-bar.active {
+    background-color: #2A8DEA;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    display: inline;
+    top: 0;
+    right: 0;
+}
+
+.browseBoard .content {
+    margin: 0 10px 0 30px;
+    padding: 10px 0px 10px 0;
+    border-bottom: 1px solid #AAAAAA;
+    height: 95px;
+}
+
+.browseBoard .active .content {
+    border-bottom-color: #116CD6;
+}
+
+.browseBoard .favorite {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 5px;
+    display: inline-block;
+}
+
+.browseBoard .active .content {
+    color: #E0E0E0;
+}
+
+.browseBoard .active .content .title {
+    color: #FFFFFF;
+}
+
+
+.browseBoard .content .title {
+    display: inline-block;
+    width: 255px;
+}
+
+.browseBoard .content .date {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
+.browseBoard .content .numline {
+    margin: 8px 0 13px 0;
+}
+
+.browseBoard .content .text {
+
+}
+
+
+/********************** Bulletin List View Styles ***************************/
+
+div.boardDisplay {
+    margin: 20px 20px 0 30px;
+}
+
+
+div.card {
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
+    background-color: white;
+    padding: 15px 15px 20px 15px; 
+}
+
+/******** Top Board Card **********/
+
+div.boardDisplay div.boardline {
+    margin-bottom: 30px
+}
+
+div.boardline .name {
+    font-size: 1.3em;
+    display: inline-block;
+    margin-bottom: 7px;
+
+}
+
+div.boardline .favorite {
+    height: 20px;
+    width: 20px;
+    margin-top: 2px;
+    float: right;
+    content:url("/static/images/star-inactive.png");
+}
+
+div.boardline .favorite.active {
+    content:url("/static/images/star-active.png");
+}
+
+div.boardline .setting {
+    float: right;
+    margin-right: 2px;
+    height: 25px;
+}
+
+div.boardline .meta .mine {
+    float: right;
+}
+
+/*************** Bulletin Card Styles **********************/
+
+div.pinnedBulletin {
+    min-height: 100px;
+    margin-bottom: 25px;
+}
+
+.pinnedBulletin .markdown {
+   word-wrap: break-word;
+}
+
+.pinnedBulletin .topline {
+    width: 100%;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #AAAAAA;
+    margin-bottom: 15px;
+    height: 25px;
+    position: relative;
+}
+
+.pinnedBulletin .topline div {
+    display: inline-block;
+}
+
+.pinnedBulletin .authorbox {
+    width: 33%;
+    position: relative;
+}
+
+.authorbox .author-icon {
+    top: 2px;
+    position: absolute;
+}
+
+.authorbox .text {
+    margin-left: 23px;
+}
+
+.authorbox .author {
+    font-family: "Monaco", Monaco, monospace, sans-serif;
+}
+
+
+.pinnedBulletin .timestamp {
+    width: 33%;
+    text-align: center;
+}
+
+.pinnedBulletin .interact {
+    width: 32%;
+}
+
+.pinnedBulletin .setting {
+    height: 25px;
+    position:absolute; 
+    bottom: 6px;
+    right: 60px;
+}
+.pinnedBulletin .slider {
+    height: 25px;
+    position:absolute; 
+    bottom: 5px;
+    right: 30px;
+}
+.pinnedBulletin .confs {
+    height: 22px;
+    position:absolute; 
+    bottom: 6px;
+    right: 3px;
+}
+
+.pinnedBulletin .markdown * {
+    max-width: 436px;
+}
+
+.pinnedBulletin.detail {
+    background-color: rgba(255, 244, 220, 0.6);
+}
+
+.pinnedBulletin td {
+    border-bottom: 1px solid #AAAAAA;
+    padding: 4px;
+}
+
+.pinnedBulletin table {
+    border-spacing: 0px;
+}
+
+
+.pinnedBulletin table tr {
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.pinnedBulletin table tr td:first-child {
+    border-right: 1px solid #AAAAAA;
+    font-weight: bold;
+}
+

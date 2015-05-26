@@ -14,7 +14,7 @@ body {
 
 #paneSelect {
     height: 100%;
-    width: 200px;
+    width: 150px;
     border: 1px solid red;
     float: left;
 }
@@ -59,220 +59,82 @@ body {
     font-size: 1.15em;
 }
 
-/*********************** Control Styles ***********************/
-
-#paneSelect .pane-btn img {
-    width: 55px;
-    height: 55px;
-    margin-left: 30px;
-    margin-bottom: 30px;
+.halfPane {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    float: left;
 }
 
-#paneSelect .pane-btn img:hover {
-    margin-left: 15px;
+.quartPane {
+    display: inline-block;
+    width: 25%;
+    height: inherit;
+    float: left;
 }
 
-/*********************** Browse Styles ***********************/
+/*********************** Pane Styles ***********************/
 
-#browseWrap h2 {
-    border-bottom: 1px solid black;
-    margin: 0px;
-    height: 10%;
+.pane {
 }
 
-.browseBoard {
-    height: 115px;
+.pane.ng-animate {
+    transition:300ms linear all;
 }
 
-.browseBoard .full-wrap {
-    position: relative;
-}
-
-
-.browseBaord .side-bar {
+.pane.ng-leave.ng-leave-active,
+.pane.ng-leave {
     display: None;
 }
 
-.browseBoard .side-bar.active {
-    background-color: #2A8DEA;
-    width: 10px;
-    height: 100%;
-    position: absolute;
-    display: inline;
-    top: 0;
-    right: 0;
+.pane.ng-enter {
+    opacity:0;
 }
 
-.browseBoard .content {
-    margin: 0 10px 0 30px;
-    padding: 10px 0px 10px 0;
-    border-bottom: 1px solid #AAAAAA;
-    height: 95px;
-}
-
-.browseBoard .active .content {
-    border-bottom-color: #116CD6;
-}
-
-.browseBoard .favorite {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    left: 5px;
-    display: inline-block;
-}
-
-.browseBoard .active .content {
-    color: #E0E0E0;
-}
-
-.browseBoard .active .content .title {
-    color: #FFFFFF;
+.pane.ng-enter.ng-enter-active {
+    opacity:1;
 }
 
 
-.browseBoard .content .title {
-    display: inline-block;
-    width: 255px;
-}
+/*********************** Pane Select Styles ***********************/
 
-.browseBoard .content .date {
-    float: right;
-    margin-top: 4px;
-    margin-right: 4px;
-}
-
-.browseBoard .content .numline {
-    margin: 8px 0 13px 0;
-}
-
-.browseBoard .content .text {
-
-}
-
-/********************** Bulletin List View Styles ***************************/
-
-div.boardDisplay {
-    margin: 20px 20px 0 30px;
+#paneSelect .pane-btn img {
+    width: 55px;
+    height: auto;
+    margin-bottom: 20px;
 }
 
 
-div.card {
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
-    background-color: white;
-    padding: 15px 15px 20px 15px; 
+#paneSelect .pane-btn img,
+#paneSelect .pane-btn h4 {
+    transition: all 200ms ease-out;
 }
 
-/******** Top Board Card **********/
 
-div.boardDisplay div.boardline {
-    margin-bottom: 30px
-}
-
-div.boardline .name {
-    font-size: 1.3em;
-    display: inline-block;
-    margin-bottom: 7px;
-
-}
-
-div.boardline .favorite {
-    height: 20px;
-    width: 20px;
-    margin-top: 2px;
-    float: right;
-    content:url("/static/images/star-inactive.png");
-}
-
-div.boardline .favorite.active {
-    content:url("/static/images/star-active.png");
-}
-
-div.boardline .setting {
-    float: right;
-    margin-right: 2px;
-    height: 25px;
-}
-
-div.boardline .meta .mine {
-    float: right;
-}
-
-/*************** Bulletin Card Styles **********************/
-
-div.pinnedBulletin {
-    min-height: 100px;
-    margin-bottom: 25px;
-}
-
-.pinnedBulletin .markdown {
-   word-wrap: break-word;
-}
-
-.pinnedBulletin .topline {
-    width: 100%;
-    padding-bottom: 3px;
-    border-bottom: 1px solid #AAAAAA;
-    margin-bottom: 15px;
-    height: 25px;
+div.pane-btn-wrap {
     position: relative;
 }
 
-.pinnedBulletin .topline div {
-    display: inline-block;
+#paneSelect .pane-btn-wrap a:hover > img,
+#paneSelect .pane-btn-wrap.active a img
+{
+    margin-left: 15px;
 }
 
-.pinnedBulletin .authorbox {
-    width: 33%;
-    position: relative;
+#paneSelect .pane-btn-wrap a:hover > h4,
+#paneSelect .pane-btn-wrap.active h4
+{
+    color: #444444;
 }
 
-.authorbox .author-icon {
-    top: 2px;
+#paneSelect h4 {
     position: absolute;
+    left: 80px;
+    text-decoration: underline;
+    text-transform: capitalize;
+    display: inline-block;
+    color: #DDDDDD;
 }
-
-.authorbox .text {
-    margin-left: 23px;
-}
-
-.authorbox .author {
-    font-family: "Monaco", Monaco, monospace, sans-serif;
-}
-
-
-.pinnedBulletin .timestamp {
-    width: 33%;
-    text-align: center;
-}
-
-.pinnedBulletin .interact {
-    width: 32%;
-}
-
-.pinnedBulletin .setting {
-    height: 25px;
-    position:absolute; 
-    bottom: 6px;
-    right: 60px;
-}
-.pinnedBulletin .slider {
-    height: 25px;
-    position:absolute; 
-    bottom: 5px;
-    right: 30px;
-}
-.pinnedBulletin .confs {
-    height: 22px;
-    position:absolute; 
-    bottom: 6px;
-    right: 3px;
-}
-
-.pinnedBulletin .markdown * {
-    max-width: 436px;
-}
-
 
 /***************** Scrollbars ****************/
 ::-webkit-scrollbar {

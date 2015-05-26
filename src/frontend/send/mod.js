@@ -1,13 +1,14 @@
 'use strict';
 
-angular.module('sendModule', ['ombWebAppFactory'])
-.controller('sendPaneCtrl', function($scope, ombWebSocket) {
+angular.module('sendModule', ['ombWebAppFactory', 'walletModule'])
+.controller('sendPaneCtrl', function($scope, ombWebSocket, walletService) {
     var draftBltn = {
         board: '', 
         msg: ''
     };
 
     $scope.draftBltn = draftBltn;
+    $scope.wallet = walletService;
 
     ombWebSocket.sendBulletin
 

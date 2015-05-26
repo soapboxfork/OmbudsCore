@@ -1,18 +1,40 @@
 <div id="sendPane">
-    <h1>Send Bulletins</h1>
+    <div class="quartPane">
+        <h1>Send</h1>
+        <h3>Cost Estimate</h3> 
+        <wallet-widget info="wallet"></wallet-widget>
+    </div>
+    <div class="quartPane">
+        <h3>Control</h3>
+        <button id="renderBtn" name="render" ng-click="">
+            Render
+        </button>
+        <button id="tweetBtn" name="tweet" ng-click="">
+            Tweet
+        </button>
+        <button id="checkBtn" name="check" ng-click="">
+            Check
+        </button>
+        <button id="sendBtn" name="send" ng-click="handleSendBltn()">
+            Send
+        </button>
+    </div>
 
-    <div id="sendBox">
+    <div class="halfPane">
         <div>
             <h3>Board</h3>
-            <textarea class="board" ng-model="draftBltn.board"></textarea>
+            <input 
+                type="text" 
+                class="board" 
+                ng-model="draftBltn.board"
+                maxlength="30"
+                >
+            </input>
         </div>
         <div>
             <h3>Content</h3>
             <textarea class="content" ng-model="draftBltn.msg"></textarea>
         </div>
-        <button id="sendBtn" name="Send" ng-click="handleSendBltn()">
-            Send
-        </button>
     </div>
 
 </div>

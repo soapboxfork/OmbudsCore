@@ -45,6 +45,10 @@ angular.module('browseModule')
             return base + (diff + 1) + "conf.png"
         }
     }
+
+    $scope.moreDetail = function(bltn) {
+        bltn.detail = !bltn.detail;
+    }
 })
 .controller('nilboardCtrl', function($scope, ahimsaRestService) {
     ahimsaRestService.getNilBoard().then(function(result) {

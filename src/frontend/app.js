@@ -1,32 +1,37 @@
 'use strict';
 
 /*angular.module('exceptionOverride', []).factory('$exceptionHandler', function() {
-    return function(exception, cause) {
-        exception.message += ' (caused by "' + cause + '")';
+return function(exception, cause) {
+exception.message += ' (caused by "' + cause + '")';
 //        throw exception;
-    };
+};
 })*/
 
 var ombWebApp = angular.module("ombWebApp", [
+    'ngAnimate',
+    'ngRoute',
+    'ngWebSocket',
     'ombWebAppFilters',
     'ombWebAppFactory',
     'browseModule',
     'sendModule',
     'settingsModule',
-   // 'exceptionOverride',
-    'ngRoute',
-    'ngWebSocket',
-    ])
+    'walletModule',
+])
 .config(["$routeProvider", function($routeProvider) {
-  $routeProvider.when('/send', {
-    controller: 'sendPaneCtrl',
-    templateUrl: 'send/pane.html'
-  })
-  $routeProvider.when('/settings', {
-    controller: 'settingsPaneCtrl',
-    templateUrl: 'settings/pane.html'
-  })
-  .otherwise({redirectTo: '/browse'})
+    $routeProvider.when('/send', {
+        controller: 'sendPaneCtrl',
+        templateUrl: 'send/pane.html'
+    })
+    $routeProvider.when('/settings', {
+        controller: 'settingsPaneCtrl',
+        templateUrl: 'settings/pane.html'
+    })
+    $routeProvider.when('/wallet', {
+        controller: 'walletPaneCtrl',
+        templateUrl: 'wallet/pane.html'
+    })
+    .otherwise({redirectTo: '/browse'})
 }])
 .controller('paneCtrl', function($scope, locationService) {
     $scope.panes = locationService.getAllPanes();
@@ -39,10 +44,11 @@ var ombWebApp = angular.module("ombWebApp", [
     // Documents the panes we have in the application
     var service = {
         panes : [
-            {name: 'browse', ready: true},  
-            {name: 'send', ready: true},  
-            {name: 'settings', ready: true},  
-            {name: 'twitter', ready: false}
+            {name: 'browse', active: true},  
+            {name: 'send', active: false},  
+            {name: 'wallet', active: false},  
+            {name: 'settings', active: false},
+            {name: 'twitter', active: false},
         ]
     };
 
@@ -53,11 +59,12 @@ var ombWebApp = angular.module("ombWebApp", [
 
     service.activePane = service.panes[0]
     service.selectPane = function(pane) {
-        for (var cp in service.panes) {
+        for (var i = 0; i < service.panes.length; i++) {
+            var cp = service.panes[i];
             if (pane.name === cp.name) {
-                pane.active = true; 
+                cp.active = true; 
             } else {
-                pane.active = false;
+                cp.active = false;
             }
         }
     }
@@ -69,4 +76,4 @@ var ombWebApp = angular.module("ombWebApp", [
         templateUrl: 'pane-btn.html',
         restrict: 'C'
     }
-})
+});

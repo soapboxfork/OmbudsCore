@@ -1,5 +1,5 @@
 #sendPane {
-    padding: 20px;
+    position: relative;
 }
 
 #sendPane #sendBox {
@@ -7,13 +7,17 @@
     margin-left: 20px;
 }
 
-#sendPane textarea.board {
-    width: 100%;
+#sendPane textarea {
+    resize: none;
+}
+
+#sendPane input.board {
+    width: 90%;
     height: 25px;
 }
 
 #sendPane textarea.content {
-    width: 100%;
+    width: 90%;
     height: 200px;
 }
 
