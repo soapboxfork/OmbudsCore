@@ -1,7 +1,18 @@
 /*********************** Browse Styles ***********************/
 
-#browsePane{
+#browseWrap {
+    width: 375px;
     height: 625px;
+    border: 1px solid red;
+    float: left;
+}
+
+#contentPane {
+    width: 525px;
+    height: 625px;
+    float: left;
+    overflow-y: scroll;
+    border: 1px solid red;
 }
 
 #browsePane > h4 {
@@ -11,8 +22,9 @@
 }
 
 #listView {
+    overflow-y: scroll;
+    width: 100%;
     height: 90%;
-
 }
 
 
@@ -85,7 +97,7 @@
 /********************** Bulletin List View Styles ***************************/
 
 div.boardDisplay {
-    margin: 20px 20px 0 30px;
+    margin: 0 20px 0 30px;
 }
 
 
@@ -133,8 +145,7 @@ div.boardline .meta .mine {
 /*************** Bulletin Card Styles **********************/
 
 div.pinnedBulletin {
-    border-top: 1px solid #AAAAAA;
-    max-height: 250px;
+    border-bottom: 1px solid #AAAAAA;
 }
 
 .pinnedBulletin.detail {
@@ -205,6 +216,11 @@ div.pinnedBulletin {
 
 .pinnedBulletin .markdown * {
     max-width: 436px;
+    max-height: 436px;
+}
+.pinnedBulletin .markdown img {
+   margin: 0 auto; 
+   display: block;
 }
 
 .pinnedBulletin td {
@@ -216,6 +232,9 @@ div.pinnedBulletin {
     border-spacing: 0px;
 }
 
+.pinnedBulletin table {
+    border-top: 1px solid #AAAAAA;
+}
 
 .pinnedBulletin table tr {
     border-bottom: 1px solid #AAAAAA;

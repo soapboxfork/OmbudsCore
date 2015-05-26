@@ -31,7 +31,6 @@ var ombWebApp = angular.module("ombWebApp", [
         controller: 'walletPaneCtrl',
         templateUrl: 'wallet/pane.html'
     })
-    .otherwise({redirectTo: '/browse'})
 }])
 .controller('paneCtrl', function($scope, locationService) {
     $scope.panes = locationService.getAllPanes();

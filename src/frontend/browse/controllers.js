@@ -1,12 +1,9 @@
 'use strict'; 
 
 angular.module('browseModule')
-.controller('browsePaneCtrl', function($scope) {
-
-
-})
 .controller('boardCtrl', function($scope, $routeParams, pubRecordService, ombWebSocket, ombSettingService, ahimsaRestService) {
     $scope.board = pubRecordService.activeBoard;
+    $scope.$on('boardChanged', function(e, board) { $scope.board = board; });
 
     $scope.reply = ombWebSocket.sendBulletin;
 
@@ -59,26 +56,37 @@ angular.module('browseModule')
 .controller('welcomeCtrl', function($scope) {
 
 })
-.controller('browseCtrl', function($scope, $location, $routeParams, pubRecordService) {
+.controller('browseCtrl', function($scope, $location, $route, $routeParams, pubRecordService) {
 
-    $scope.boards = pubRecordService.boardList;
-    $scope.activeBoard = pubRecordService.activeBoard;
     console.log("ran ctrl")
+
+    // NOTE this affects the global scope
+    var lastRoute = $route.current;
+    $scope.$on('$locationChangeSuccess', function(event, d) {
+        var re = new RegExp(/^\/b\//);
+        if (re.test($location.path())) {
+            $route.current = lastRoute;
+        }
+    });
 
     var gex = /^\/b\/board\/(.*)/
 
     var nameL = $location.path().match(gex)
     if (nameL != null  && nameL.length > 1) {
         var urlName = nameL[1];
-        pubRecordService.setActiveBoard(urlName);
+        pubRecordService.setActiveBoardByUrl(urlName);
     }
 
-    $scope.openBoard = function(urlName) {
-        pubRecordService.setActiveBoard(urlName)
-        if (urlName === "") {
+    $scope.boards = pubRecordService.boardList;
+    $scope.activeBoard = pubRecordService.activeBoard;
+
+    $scope.openBoard = function(board) {
+        pubRecordService.setActiveBoard(board)
+        $scope.$broadcast('boardChanged', pubRecordService.activeBoard)
+        if (board.urlName === "") {
             $location.path("/b/nilboard");
         } else {
-            $location.path("/b/board/" + urlName);
+            $location.path("/b/board/" + board.urlName);
         }
     }
 });

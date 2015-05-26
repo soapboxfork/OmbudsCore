@@ -1,5 +1,5 @@
 <div class="full-wrap" >
-    <div class="content" ng-click="openBoard( board.urlName )" >
+    <div class="content" ng-click="openBoard( board )" >
         <img ng-if="board.favorite" class="favorite" src="/static/images/star-active.png" />
         <div class="title board">{{ board.name | limitTo:26 }}</div>
         <div class="date">{{ board.lastActive | nicedate }}</div>

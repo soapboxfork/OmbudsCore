@@ -23,35 +23,41 @@ singleton.factory('pubRecordService', function($http, $interval) {
     });
 
     // Initialize the current Board
-    service.activeBoard = null;
+    service.activeBoard = {};
 
     // TODO mix favorite data into board data
-    service.setActiveBoard = function(urlName) {
+    service.setActiveBoard = function(board) {
         // TODO learn how promises work and implement them.
         if (service.boardList.length == 0) {
             console.log("empty");
             return
         }
 
-        if (service.activeBoard != null) {
+        // if active board is empty
+        if (Object.keys(service.activeBoard).length > 0) {
             service.activeBoard.active = false;
         }
 
-        var board = service.boards[urlName];
+        // Change the active board
         board.active = true;
         service.activeBoard = board;
         service.activeBoard.summary = board;
-
-
-        $http.get("/api/board/"+urlName).then(function(result){
+        var url = "/api/board/"+board.urlName;
+        if (board.urlName === "") {
+            url = "/api/nilboard"
+        }
+        $http.get(url).then(function(result){
             // mix more of the board data into the existing model
             board.summary = result.data.summary;
             board.bltns = result.data.bltns;
         });
-
-        
     }
 
-    return service
+    service.setActiveBoardByUrl = function(urlName) {
+        var board = service.boards[urlName];
+        service.setActiveBoard(board);
+    }
+
+    return service;
 });
 
