@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('sendModule', ['ombWebAppFactory', 'walletModule'])
-.controller('sendPaneCtrl', function($scope, ombWebSocket, walletService) {
-    var draftBltn = {
-        board: '', 
-        msg: ''
-    };
+.controller('sendPaneCtrl', function($scope, ombWebSocket, walletService, draftService) {
 
-    $scope.draftBltn = draftBltn;
+    $scope.draftBltn = draftService;
     $scope.wallet = walletService;
 
     function prec(i) {
@@ -15,15 +11,17 @@ angular.module('sendModule', ['ombWebAppFactory', 'walletModule'])
     }
 
     var txFee = 50000;
-    var estimate = { 'val': prec(txFee*walletService.unitPerSat), 'len': 0 };
+    var estimate = { 'val': '0.000', 'len': 0 };
     $scope.estimate = estimate;
 
     $scope.updateEst = function() {
-        estimate.len = draftBltn.board.length + draftBltn.msg.length;
+        estimate.len = draftService.board.length + draftService.msg.length;
         estimate.rawval = (txFee + Math.ceil(estimate.len/20)*567)*walletService.unitPerSat;
         console.log(estimate.rawval);
         estimate.val = estimate.rawval.toFixed(4);
     };
+
+    $scope.updateEst();
 
 
     $scope.handleSendBltn = function() {
@@ -34,3 +32,11 @@ angular.module('sendModule', ['ombWebAppFactory', 'walletModule'])
         draftBltn.board = '';
     }
 })
+.factory('draftService', function() {
+// Intended to save a copy of the current draft for future use
+    var draftBltn = {
+        board: '', 
+        msg: ''
+    };
+    return draftBltn;
+});
