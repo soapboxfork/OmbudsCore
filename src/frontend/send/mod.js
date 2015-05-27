@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('sendModule', ['ombWebAppFactory', 'walletModule'])
+angular.module('sendModule', ['backendHooks', 'walletModule'])
 .controller('sendPaneCtrl', function($scope, ombWebSocket, walletService, draftService) {
 
     $scope.draftBltn = draftService;

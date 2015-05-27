@@ -1,6 +1,6 @@
 <div class="pane-btn-wrap" ng-class="{ 'active': pane.active }">
     <a ng-click="selectPane(pane)" href="{{ paneUrl(pane.name) }}">
-        <img src="static/images/{{ pane.name }}.png" />
+        <img ng-src="static/images/{{ pane.name }}.png" />
     <h4>{{ pane.name }}</h4>
     </a>
 </div>

@@ -1,6 +1,6 @@
 'use strict';
 
-var singleton = angular.module('ombWebAppFactory', ['ngWebSocket']);
+var singleton = angular.module('backendHooks', ['ngWebSocket']);
 
 
 singleton.factory('ahimsaRestService', function($http, $interval) {
@@ -29,6 +29,9 @@ singleton.factory('ahimsaRestService', function($http, $interval) {
     },
     'getNilBoard': function() {
       return $http.get('/api/nilboard')
+    },
+    'getBulletin': function(txid) {
+        return $http.get('/api/bulletin/'+txid)
     },
     'getBlockCount': function() {
         return serverInfo.blkCount;
