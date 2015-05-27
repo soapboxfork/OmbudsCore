@@ -1,6 +1,51 @@
 'use strict'; 
 
 angular.module('browseModule')
+.controller('browseCtrl', function($scope, $location, $route, $routeParams, pubRecordService) {
+
+    console.log("ran ctrl");
+
+    // NOTE this affects the global scope
+    var lastRoute = $route.current;
+    $scope.$on('$locationChangeSuccess', function(event, d) {
+        var re = new RegExp(/^\/b\//);
+        if (re.test($location.path())) {
+            $route.current = lastRoute;
+        }
+    });
+
+
+    var openBoard = function(board) {
+        pubRecordService.setActiveBoard(board).then(function() {
+            $scope.$broadcast('boardChanged', pubRecordService.activeBoard)
+            if (board.urlName === "") {
+                $location.path("/b/nilboard");
+            } else {
+                $location.path("/b/board/" + board.urlName);
+            }
+        });
+    }
+    $scope.openBoard = openBoard;
+
+
+    pubRecordService.initPromise.then(function() {
+        var gex = /^\/b\/board\/(.*)/;
+        var path = $location.path();
+        if (path === "/b/nilboard") {
+            var board = pubRecordService.getBoardByUrlName("");
+            openBoard(board);
+        }
+        var nameL = path.match(gex);
+        if (nameL != null  && nameL.length > 1) {
+            var urlName = nameL[1];
+            var board = pubRecordService.getBoardByUrlName(urlName);
+            openBoard(board);
+        }
+
+        $scope.boards = pubRecordService.boardList;
+        $scope.activeBoard = pubRecordService.activeBoard;
+    });
+})
 .controller('boardCtrl', function($scope, $routeParams, pubRecordService, ombWebSocket, ombSettingService, ahimsaRestService) {
     $scope.board = pubRecordService.activeBoard;
     $scope.$on('boardChanged', function(e, board) { $scope.board = board; });
@@ -47,51 +92,8 @@ angular.module('browseModule')
         bltn.detail = !bltn.detail;
     }
 })
-.controller('nilboardCtrl', function($scope, ahimsaRestService) {
-    ahimsaRestService.getNilBoard().then(function(result) {
-        $scope.board = result.data;
-    });
-})
 // TODO convert into no content blank pane.
 .controller('welcomeCtrl', function($scope) {
 
-})
-.controller('browseCtrl', function($scope, $location, $route, $routeParams, pubRecordService) {
-
-    console.log("ran ctrl")
-
-    // NOTE this affects the global scope
-    var lastRoute = $route.current;
-    $scope.$on('$locationChangeSuccess', function(event, d) {
-        var re = new RegExp(/^\/b\//);
-        if (re.test($location.path())) {
-            $route.current = lastRoute;
-        }
-    });
-
-    var openBoard = function(board) {
-        pubRecordService.setActiveBoard(board)
-        $scope.$broadcast('boardChanged', pubRecordService.activeBoard)
-        if (board.urlName === "") {
-            $location.path("/b/nilboard");
-        } else {
-            $location.path("/b/board/" + board.urlName);
-        }
-    }
-    $scope.openBoard = openBoard;
-
-    var gex = /^\/b\/board\/(.*)/
-
-    var nameL = $location.path().match(gex)
-    if (nameL != null  && nameL.length > 1) {
-        var urlName = nameL[1];
-        var board = pubRecordService.getBoardByUrlName(urlName);
-        openBoard(board);
-    }
-
-    $scope.boards = pubRecordService.boardList;
-    $scope.activeBoard = pubRecordService.activeBoard;
-
 });
-
 

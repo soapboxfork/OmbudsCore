@@ -11,7 +11,7 @@ angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'btford.markdown'])
         templateUrl: 'browse/pane.html'
     })
     .when('/b/nilboard', {
-        controller: 'nilboardCtrl',
+        controller: 'browseCtrl',
         templateUrl: 'browse/pane.html'
     })
 
