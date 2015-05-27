@@ -1,7 +1,12 @@
 <div class="full-wrap" >
     <div class="content" ng-click="openBoard( board )" >
         <img ng-if="board.favorite" class="favorite" src="/static/images/star-active.png" />
-        <div class="title board">{{ board.name | limitTo:26 }}</div>
+        <div class="title board nil" ng-if="board.name === ''">
+            The Nil Board
+        </div>
+        <div class="title board" ng-if="board.name !== ''">
+            {{ board.name | limitTo:26 }}
+        </div>
         <div class="date">{{ board.lastActive | nicedate }}</div>
         <div class="numline">{{ board.numBltns | plural:'Bulletins' }}</div>
     </div>

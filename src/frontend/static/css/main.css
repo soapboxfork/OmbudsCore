@@ -8,14 +8,15 @@ body {
 }
 
 #globalWrap {
+    margin: 20px;
     width: 1300px;
     height: 625px;
 }
 
 #paneSelect {
+    padding-top: 10px;
     height: 100%;
     width: 150px;
-    border: 1px solid red;
     float: left;
 }
 
@@ -23,12 +24,15 @@ body {
     width: 906px;
     height: 100%;
     float: left;
-    border: 1px solid green;
 }
 
 
 #welc {
     height: 800px;
+}
+
+.meta-info {
+    color: #828282;
 }
 
 /*********************** Global Styles ***********************/

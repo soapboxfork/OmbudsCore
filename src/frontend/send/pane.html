@@ -2,6 +2,7 @@
     <div class="quartPane">
         <h1>Send</h1>
         <h3>Cost Estimate</h3> 
+        <coin-amnt amount="estimate.val" unit="wallet.unit"></coin-amnt>
         <wallet-widget info="wallet"></wallet-widget>
     </div>
     <div class="quartPane">
@@ -28,12 +29,13 @@
                 class="board" 
                 ng-model="draftBltn.board"
                 maxlength="30"
+                ng-change="updateEst()"
                 >
             </input>
         </div>
         <div>
             <h3>Content</h3>
-            <textarea class="content" ng-model="draftBltn.msg"></textarea>
+            <textarea class="content" ng-model="draftBltn.msg" ng-change="updateEst()"></textarea>
         </div>
     </div>
 

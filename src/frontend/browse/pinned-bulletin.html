@@ -1,18 +1,8 @@
 <div class="pinnedBulletin card" ng-class="{ 'detail': bltn.detail }">
     <div class="topline">
         <div class="authorbox">
-            <svg class="author-icon" 
-            width="15"
-            height="15"
-            >
-            <rect x="0" y="0" 
-            rx="2" ry="2" 
-            width="15" height="15" 
-            fill="{{ bltn.author | authColor }}"
-            >
-            </rect>
-            </svg>
-            <div class="text">
+            <author-icon addr="bltn.author"></author-icon>
+                        <div class="text">
                 From 
                 <div class="author">
                     {{ bltn.author | limitTo:10 }}
@@ -53,10 +43,10 @@
     <div class="detail" ng-show="bltn.detail">
         <table class="">
             <tr><td>Author:</td><td>{{ bltn.author }}</td></tr>
-            <tr><td>Timestamp:</td><td>{{ bltn.timestamp }}</td></tr>
-            <tr><td>Bulletin Depth:</td><td>{{ bltn.blkHeight }}</td></tr>
+            <tr><td>Tx Timestamp:</td><td>{{ bltn.timestamp }}</td></tr>
             <tr><td>Block Timestamp:</td><td>{{ bltn.blkTimestamp }}</td></tr>
-            <tr><td>Version:</td><td>0.0.3</td></tr>
+            <tr><td>Tx Hash:</td><td class="tiny">{{ bltn.txid }}</td></tr>
+            <tr><td>Block Hash:</td><td class="tiny">{{ bltn.blk }}</td></tr>
         </table>
     </div>
 </div>

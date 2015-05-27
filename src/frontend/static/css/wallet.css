@@ -1,0 +1,52 @@
+/***************** Wallet Widget Styles ******************/
+
+.bal {
+    font-size: 1.4em;
+}
+
+.bal small {
+    color: #95a5a6;
+}
+
+.wallet-widget .bal.pend {
+    margin-bottom: 20px;
+}
+
+.wallet-widget .addressWrap {
+    background-color: #EEEEEE;
+    position: relative;
+    padding: 2px;
+    width: 200px;
+    margin: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.wallet-widget .addressBox {
+    width: 148px;
+    margin: 0 0 0 35px;
+}
+
+.wallet-widget .address {
+    font-family: monospace;
+    word-break: break-all;
+}
+
+.wallet-widget .addressWrap svg {
+    position: absolute;
+    top: 22px;
+    left: 12px;
+}
+
+.wallet-widget .qrcode {
+    margin: 15px auto;
+    display: block
+}
+
+.biggerWrap {
+    border: 2px solid #EEEEEE;
+    border-radius: 13px;
+    display: inline-block;
+    margin-top: 15px;
+}
+

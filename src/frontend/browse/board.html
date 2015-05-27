@@ -1,7 +1,8 @@
 <div class="boardDisplay">
     <div class="boardline card">
         <div class="topline">
-            <div class="name board">{{ board.summary.name }}</div> 
+            <div class="name board" ng-if="board.summary.name !== ''">{{ board.summary.name }}</div> 
+            <div class="name board nil" ng-if="board.summary.name === ''">The Nil Board</div> 
             <img class="setting" src="/static/images/totalconf.png" ng-click="reply()" />
             <img class="favorite" 
             ng-class="{'active': board.favorite}" 

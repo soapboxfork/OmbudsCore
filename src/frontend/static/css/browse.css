@@ -3,7 +3,6 @@
 #browseWrap {
     width: 375px;
     height: 625px;
-    border: 1px solid red;
     float: left;
 }
 
@@ -12,7 +11,6 @@
     height: 625px;
     float: left;
     overflow-y: scroll;
-    border: 1px solid red;
 }
 
 #browsePane > h4 {
@@ -27,6 +25,41 @@
     height: 90%;
 }
 
+.nil {
+    font-style: italic;
+    color: #95a5a6;
+}
+
+
+/*********************** Control Widget Styles ************************/
+
+.control-widget {
+}
+
+.control-widget div.top > div {
+    display: inline-block;
+}
+
+.control-widget .label {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.control-widget .bottom.line {
+    margin-top: 10px;
+}
+
+.control-widget .btn {
+    float: right;
+    width: 40px;
+    margin-top: 5px;
+    background-color: #F6F6F6;
+    text-align: center;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+
+/*********************** Board List Elem Styles ***********************/
 
 .browseBoard .full-wrap {
     position: relative;
@@ -40,10 +73,10 @@
 .browseBoard .side-bar.active {
     background-color: #2A8DEA;
     width: 10px;
-    height: 100%;
+    height: 65px;
     position: absolute;
     display: inline;
-    top: 0;
+    top: -1px;
     right: 0;
 }
 
@@ -88,11 +121,6 @@
 .browseBoard .content .numline {
     margin: 8px 0 0 0;
 }
-
-.browseBoard .content .text {
-
-}
-
 
 /********************** Bulletin List View Styles ***************************/
 
@@ -228,6 +256,7 @@ div.pinnedBulletin {
     padding: 4px;
 }
 
+
 .pinnedBulletin table {
     border-spacing: 0px;
 }
@@ -244,4 +273,13 @@ div.pinnedBulletin {
     border-right: 1px solid #AAAAAA;
     font-weight: bold;
 }
+
+.pinnedBulletin table tr td:last-child {
+    font-family: monospace;
+}
+
+.pinnedBulletin td.tiny {
+    font-size: 0.55em;
+}
+
 

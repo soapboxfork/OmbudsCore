@@ -23,14 +23,15 @@ var ombWebApp = angular.module("ombWebApp", [
         controller: 'sendPaneCtrl',
         templateUrl: 'send/pane.html'
     })
-    $routeProvider.when('/settings', {
+    .when('/settings', {
         controller: 'settingsPaneCtrl',
         templateUrl: 'settings/pane.html'
     })
-    $routeProvider.when('/wallet', {
+    .when('/wallet', {
         controller: 'walletPaneCtrl',
         templateUrl: 'wallet/pane.html'
     })
+    .otherwise('/settings');
 }])
 .controller('paneCtrl', function($scope, locationService) {
     $scope.panes = locationService.getAllPanes();
@@ -39,17 +40,40 @@ var ombWebApp = angular.module("ombWebApp", [
     $scope.paneUrl = function(name){ return "/#/"+name; };
 
 })
-.factory('locationService', function() {
+.factory('locationService', function($location) {
     // Documents the panes we have in the application
     var service = {
         panes : [
-            {name: 'browse', active: true},  
+            {name: 'browse', active: false},  
             {name: 'send', active: false},  
             {name: 'wallet', active: false},  
             {name: 'settings', active: false},
             {name: 'twitter', active: false},
         ]
     };
+
+    service.getPane = function(name) {
+        for (var i = 0; i < service.panes.length; i++) {
+            var pane = service.panes[i];
+            if (name === pane.name) {
+                return pane;
+            }
+        }
+        return null;
+    }
+
+    var gex = /^\/([a-z]+)/
+    var m = $location.path().match(gex)
+    if (m != null) {
+        var curPane = service.getPane(m[1]);
+        if (curPane != null) {
+            curPane.active = true;
+        } else {
+            service.panes[0].active = true;
+        }
+    }
+
+
 
     // NOTE! This must come first
     service.getAllPanes = function() {
@@ -74,5 +98,14 @@ var ombWebApp = angular.module("ombWebApp", [
     return {
         templateUrl: 'pane-btn.html',
         restrict: 'C'
+    }
+})
+.directive('authorIcon', function() {
+    return {
+        scope : {
+            addr: '='
+        },
+        templateUrl: 'author-icon.html',
+        restrict: 'E'
     }
 });

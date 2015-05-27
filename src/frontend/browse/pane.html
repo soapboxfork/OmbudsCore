@@ -1,6 +1,14 @@
 <div id="browsePane" ng-controller="browseCtrl">
     <div id="browseWrap">
-        <h4>Browse Top</h4>
+        <div class="control-widget card">
+            <div class="top line">
+                <div class="label">Most Active Boards</div>
+                <div class="btn">\/</div>
+            </div>
+            <div class="bottom line">
+                <div class="meta-info">67 of 67</div> 
+            </div>
+        </div>
         <div id="listView">
             <div class="browseBoard" ng-repeat="board in boards | orderBy:'-lastActive'">
             </div>
