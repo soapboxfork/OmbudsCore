@@ -3,17 +3,32 @@ angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'btford.markdown'])
 .config(['$routeProvider', function($routeProvider) {
 
     $routeProvider.when('/browse', {
-        controller: 'browseCtrl',
+        controller: 'boardCtrl',
         templateUrl: 'browse/pane.html'
     })
     .when('/b/board/:board*', {
-        controller: 'browseCtrl',
+        controller: 'boardCtrl',
         templateUrl: 'browse/pane.html'
     })
     .when('/b/nilboard', {
-        controller: 'browseCtrl',
+        controller: 'boardCtrl',
         templateUrl: 'browse/pane.html'
     })
-
+    .when('/b/bltn/:txid*', {
+        controller: 'boardCtrl',
+        templateUrl: 'browse/pane.html'
+    })
+    .when('/b/authors', {
+        controller: 'authorCtrl',
+        templateUrl: 'browse/pane.html'
+    })
+    .when('/b/author/:addr*', {
+        controller: 'authorCtrl',
+        templateUrl: 'browse/pane.html'
+    })
+    .when('/b/a/bltn/:txid*', {
+        controller: 'authorCtrl',
+        templateUrl: 'browse/pane.html'
+    })
 }])
 

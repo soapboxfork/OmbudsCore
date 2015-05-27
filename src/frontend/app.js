@@ -12,7 +12,7 @@ var ombWebApp = angular.module("ombWebApp", [
     'ngRoute',
     'ngWebSocket',
     'ombWebAppFilters',
-    'ombWebAppFactory',
+    'backendHooks',
     'browseModule',
     'sendModule',
     'settingsModule',
