@@ -1,14 +1,14 @@
 <div class="full-wrap" >
     <div class="content" ng-click="openBoard( board )" >
         <img ng-if="board.favorite" class="favorite" src="/static/images/star-active.png" />
-        <div class="title board nil" ng-if="board.name === ''">
+        <div class="title board nil" ng-if="board.summary.name === ''">
             The Nil Board
         </div>
-        <div class="title board" ng-if="board.name !== ''">
-            {{ board.name | limitTo:26 }}
+        <div class="title board" ng-if="board.summary.name !== ''">
+            {{ board.summary.name | limitTo:26 }}
         </div>
-        <div class="date">{{ board.lastActive | nicedate }}</div>
-        <div class="numline">{{ board.numBltns | plural:'Bulletins' }}</div>
+        <div class="date">{{ board.summary.lastActive | nicedate }}</div>
+        <div class="numline">{{ board.summary.numBltns | plural:'Bulletins' }}</div>
     </div>
     <div class="side-bar" ng-class="{'active': board.active}">
     </div>

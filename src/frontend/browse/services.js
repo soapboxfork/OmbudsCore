@@ -27,14 +27,14 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
     service.bulletins = {};
 
     // Fill out the service from API calls with promises
-    var boardPromise = $http.get('/api/boards').then(function(result) {
+    var boardsPromise = $http.get('/api/boards').then(function(result) {
         angular.forEach(result.data, function(summary){
             var board = {
                 'summary': summary,
                 'bltns': [],
                 'active': false
             }
-            board.summary.urlName = encodeURIComponent(board.name);
+            board.summary.urlName = encodeURIComponent(board.summary.name);
             service.boards[board.summary.urlName] = board;
             service.boardList.push(board);
         });
@@ -69,8 +69,11 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
             
             // Update the board summary, 
             board.summary = result.data.summary;
+            board.summary.urlName = encodeURIComponent(board.summary.name);
+            board.bltns = [];
             
             angular.forEach(result.data.bltns, function(bltn) {
+                bltn.boardUrl = encodeURIComponent(bltn.board);
                 service.bulletins[bltn.txid] = bltn;
                 board.bltns.push(bltn);
             });
@@ -95,12 +98,27 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
 
         });
         return promise;
-    }
+    };
 
+    service.retreiveBulletin = function(txid) {
+        // NOTE retreive doesn't load the bulletin into the data sources.
+        var promise = $http.get('/api/bulletin/'+txid)
+        .then(function(result) {
+            var bltn = result.data
+            bltn.boardUrl = encodeURIComponent(bltn.board);
+            service.bulletins[txid] = bltn;
+        });
+        return promise;
+    };
 
     service.getBoardByUrlName = function(urlName) {
         var board = service.boards[urlName];
         return board;
+    }
+
+    service.getBulletin = function(txid) {
+        var bltn = service.bulletins[txid];
+        return bltn;
     }
 
     return service;

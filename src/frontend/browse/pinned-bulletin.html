@@ -1,4 +1,4 @@
-<div class="pinnedBulletin card" ng-class="{ 'detail': bltn.detail }">
+<div class="pinnedBulletin card" ng-class="{ 'detail': bltn.detail, 'linked' : bltn.linked }">
     <div class="topline">
         <div class="authorbox">
             <author-icon addr="bltn.author"></author-icon>
@@ -45,7 +45,7 @@
             <tr><td>Author:</td><td>{{ bltn.author }}</td></tr>
             <tr><td>Tx Timestamp:</td><td>{{ bltn.timestamp }}</td></tr>
             <tr><td>Block Timestamp:</td><td>{{ bltn.blkTimestamp }}</td></tr>
-            <tr><td>Tx Hash:</td><td class="tiny">{{ bltn.txid }}</td></tr>
+            <tr><td>Tx Hash:</td><td class="tiny"><a href="/#/b/bltn/{{ bltn.txid }}">{{ bltn.txid }}</a></td></tr>
             <tr><td>Block Hash:</td><td class="tiny">{{ bltn.blk }}</td></tr>
         </table>
     </div>

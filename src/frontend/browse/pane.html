@@ -1,4 +1,4 @@
-<div id="browsePane" ng-controller="browseCtrl">
+<div id="browsePane" ng-controller="boardCtrl">
     <div id="browseWrap">
         <div class="control-widget card">
             <div class="top line">
@@ -15,8 +15,8 @@
         </div>
     </div>
     <div id="contentPane" class="halfPane">
-        <div ng-controller="boardCtrl">
-            <ng-include src="'/browse/board.html'"></ng-include>
+        <div class="boardDisplay">
+            <div ng-repeat="bltn in activeBoard.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
         </div>
     </div>
 </div>
