@@ -26,7 +26,9 @@ type Favorites struct {
 }
 
 type Preferences struct {
-	RenderAllMd bool `json:"renderMd"` // Flag to render all markdown in every board
+	RenderAllMd     bool `json:"renderMd"`  // Flag to render all markdown in every board.
+	LastActive      int  `json:"lastLogin"` // The last time the user browsed content.
+	DisplayTooltips bool `json:"tooltips"`  // Flag that toggles tooltips in the gui.
 }
 
 type settings struct {
