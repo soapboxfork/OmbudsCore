@@ -34,6 +34,7 @@
 /*********************** Control Widget Styles ************************/
 
 .control-widget {
+    border: 1px solid black;
 }
 
 .control-widget div.top > div {
@@ -55,19 +56,32 @@
     text-align: center;
 }
 
+.bltnPane .head {
+    border: 1px solid black;
+}
+
+.bltnPane .head img,
+.bltnPane input.renderBox {
+    float: right;
+}
+
+.bltnPane .head img {
+    
+}
 
 /*********************** Board List Elem Styles ***********************/
 
-.browseBoard .full-wrap {
+.list-elem.full-wrap
+{
     position: relative;
 }
 
 
-.browseBaord .side-bar {
+.list-elem .side-bar {
     display: None;
 }
 
-.browseBoard .side-bar.active {
+.list-elem .side-bar.active {
     background-color: #2A8DEA;
     width: 10px;
     height: 65px;
@@ -77,17 +91,13 @@
     right: 0;
 }
 
-.browseBoard .content {
+.list-elem .content {
     margin: 0 10px 0 30px;
     padding: 10px 0px 10px 0;
     border-bottom: 1px solid #AAAAAA;
 }
 
-.browseBoard .active .content {
-    border-bottom-color: #116CD6;
-}
-
-.browseBoard .favorite {
+.list-elem .favorite {
     width: 20px;
     height: 20px;
     position: absolute;
@@ -95,27 +105,18 @@
     display: inline-block;
 }
 
-.browseBoard .active .content {
-    color: #E0E0E0;
-}
-
-.browseBoard .active .content .title {
-    color: #FFFFFF;
-}
-
-
-.browseBoard .content .title {
+.list-elem .content .title {
     display: inline-block;
     width: 255px;
 }
 
-.browseBoard .content .date {
+.list-elem .content .date {
     float: right;
     margin-top: 4px;
     margin-right: 4px;
 }
 
-.browseBoard .content .numline {
+.list-elem .content .numline {
     margin: 8px 0 0 0;
 }
 
@@ -145,7 +146,7 @@ div.boardline .name {
 
 }
 
-div.boardline .favorite {
+.favorite {
     height: 20px;
     width: 20px;
     margin-top: 2px;
@@ -153,7 +154,7 @@ div.boardline .favorite {
     content:url("/static/images/star-inactive.png");
 }
 
-div.boardline .favorite.active {
+.favorite.active {
     content:url("/static/images/star-active.png");
 }
 
@@ -196,10 +197,12 @@ div.pinnedBulletin.linked {
     display: inline-block;
 }
 
-.pinnedBulletin .authorbox {
+.pinnedBulletin .authorbox,
+.pinnedBulletin .boardBox {
     width: 33%;
     position: relative;
 }
+
 
 .authorbox .author-icon {
     top: 2px;
@@ -210,8 +213,18 @@ div.pinnedBulletin.linked {
     margin-left: 23px;
 }
 
-.authorbox .author {
+.topline a {
     font-family: "Monaco", Monaco, monospace, sans-serif;
+    text-decoration: underline;
+    color: black;
+}
+
+.topline .author a {
+    text-decoration: none;
+}
+
+.topline a:hover {
+    text-decoration: underline;
 }
 
 
@@ -245,6 +258,8 @@ div.pinnedBulletin.linked {
 
 .pinnedBulletin .msg {
     word-wrap: break-word;
+    margin-top: 14px;
+    margin-bottom: 14px;
 }
 
 .pinnedBulletin .markdown * {
@@ -287,4 +302,20 @@ div.pinnedBulletin.linked {
     font-size: 0.55em;
 }
 
+
+/*************** Author List view Styles *************/
+
+.browseAuthor .active {
+    font-weight: bold;
+}
+
+.browseAuthor .title.author {
+    font-family: monospace;
+    font-size: 1.15em;
+    font-weight: bold;
+}
+
+.browseAuthor .side-bar.active {
+    height: 63px;
+}
 

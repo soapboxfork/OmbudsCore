@@ -1,4 +1,4 @@
-angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'btford.markdown'])
+angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'markdownModule'])
 // TODO handle nested routing properly by reworking controllers
 .config(['$routeProvider', function($routeProvider) {
 
@@ -31,4 +31,16 @@ angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'btford.markdown'])
         templateUrl: 'browse/pane.html'
     })
 }])
+
+/************* A small markdown rendering service **************/
+angular.module('markdownModule', ['ngSanitize'])
+.factory('markdownService', function($sanitize) {
+    var conv = new Showdown.converter({}); 
+    return {
+        'makeHtml': function(unsafeInp) {
+            var safe = $sanitize(conv.makeHtml(unsafeInp)); 
+            return safe;
+        }
+    }
+});
 

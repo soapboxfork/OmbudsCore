@@ -1,0 +1,12 @@
+<div class="list-elem full-wrap" >
+    <div class="content" ng-click="openAuthor( author )" >
+        <img ng-if="author.favorite" class="favorite" src="/static/images/star-active.png" />
+        <div class="title author">
+            {{ author.summary.addr | limitTo:15 }}
+        </div>
+        <div class="date">{{ author.summary.firstBlkTs | nicedate }}</div>
+        <div class="numline">{{ author.summary.numBltns | plural:'Bulletins' }}</div>
+    </div>
+    <div class="side-bar" ng-class="{'active': author.active}">
+    </div>
+</div>

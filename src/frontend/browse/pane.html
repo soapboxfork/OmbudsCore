@@ -1,22 +1,42 @@
-<div id="browsePane" ng-controller="boardCtrl">
+<div id="browsePane">
     <div id="browseWrap">
-        <div class="control-widget card">
+        <div class="control-widget">
             <div class="top line">
-                <div class="label">Boards</div>
-                <div class="btn"><small>Authors</small> | <small>Favorites</small></div>
+                <div class="label"><a href="/#/browse">Boards</a></div>
+                <div class="btn"><small><a href="/#/b/authors">Authors</a></small> | <small>Favorites</small></div>
             </div>
             <div class="bottom line">
                 <div class="meta-info">67 of 67</div> 
             </div>
         </div>
         <div id="listView">
-            <div class="browseBoard" ng-repeat="board in boards | orderBy:'-lastActive'">
+
+            <div ng-if="inBoard">
+                <div class="browseBoard" ng-repeat="board in boards | orderBy:'-summary.lastActive'"></div>
+            </div>
+            <div ng-if="inAuthor">
+                <div class="browseAuthor" ng-repeat="author in authors | orderBy:'-summary.numBltns'"></div>
             </div>
         </div>
     </div>
-    <div id="contentPane" class="halfPane">
-        <div class="boardDisplay">
-            <div ng-repeat="bltn in activeBoard.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
+    <div class="halfPane bltnPane">
+        <div class="head">
+            <div ng-if="inBoard">
+                <div class="topline">
+                    <div class="title board">{{ activeBoard.summary.name }}</div>
+                    <input type="checkbox" class="renderBox" />
+                    <img class="favorite active" />
+                </div>
+                <div class="bottomline"><small>{{ activeBoard.summary.numBltns | plural:'Bulletins' }} 
+                        last seen at {{ activeBoard.summary.lastActive | nicedate }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div id="contentPane" class="boardDisplay">
+
+            <div ng-if="inBoard" ng-repeat="bltn in activeBoard.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
+            <div ng-if="inAuthor" ng-repeat="bltn in activeAuthor.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
         </div>
     </div>
 </div>

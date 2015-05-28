@@ -46,9 +46,9 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
                 'summary': author,
                 'bltns': [],
                 'active': false
-            }
-            service.authors[author.summary.addr]
-            service.authorList.push(author)
+            };
+            service.authors[author.summary.addr] = author;
+            service.authorList.push(author);
         });
     });
 
@@ -59,7 +59,6 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
     // Gets additional data for a specific board. Places all retreived bulletins
     // in the service bltn object. Returns an $http promise on completion.
     service.retreiveBoard = function(board) {
-        
         var url = "/api/board/"+board.summary.urlName;
         if (board.summary.urlName === "") {
             url = "/api/nilboard";
@@ -73,7 +72,7 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
             board.bltns = [];
             
             angular.forEach(result.data.bltns, function(bltn) {
-                bltn.boardUrl = encodeURIComponent(bltn.board);
+                bltn = addBoardUrl(bltn);
                 service.bulletins[bltn.txid] = bltn;
                 board.bltns.push(bltn);
             });
@@ -90,8 +89,10 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
 
             // Update the author's summary (note the fields name.)
             author.summary = result.data.author;
-           
+            author.bltns = [];
+
             angular.forEach(result.data.bltns, function(bltn) {
+                bltn = addBoardUrl(bltn);
                 service.bulletins[bltn.txid] = bltn;
                 author.bltns.push(bltn);
             });
@@ -104,8 +105,7 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
         // NOTE retreive doesn't load the bulletin into the data sources.
         var promise = $http.get('/api/bulletin/'+txid)
         .then(function(result) {
-            var bltn = result.data
-            bltn.boardUrl = encodeURIComponent(bltn.board);
+            var bltn = addBoardUrl(result.data);
             service.bulletins[txid] = bltn;
         });
         return promise;
@@ -116,6 +116,27 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
         return board;
     }
 
+    service.getAuthor = function(addr) {
+        if (service.authors.hasOwnProperty(addr)) {
+            return service.authors[addr];
+        } else {
+            return service.newAuthor(addr)
+        }
+
+    }
+
+    service.newAuthor = function(addr) {
+        var author = {
+            summary: {
+                addr: addr,
+                numBltns: 0
+            },
+            bltns: []
+        }
+        service.authors[addr] = author;
+        return author;
+    }
+
     service.getBulletin = function(txid) {
         var bltn = service.bulletins[txid];
         return bltn;
@@ -123,4 +144,14 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
 
     return service;
 });
+
+function addBoardUrl(bltn) {
+    if (bltn.hasOwnProperty('board')) {
+        bltn.boardUrl = encodeURIComponent(bltn.board);
+    } else {
+        bltn.board = '';
+        bltn.boardUrl = '';
+    }
+    return bltn
+}
 
