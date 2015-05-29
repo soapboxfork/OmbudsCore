@@ -8,16 +8,17 @@ body {
 }
 
 #globalWrap {
-    margin: 20px;
     width: 1300px;
     height: 625px;
 }
 
 #paneSelect {
-    padding-top: 10px;
     height: 100%;
     width: 150px;
     float: left;
+}
+
+#paneSelect .banner {
 }
 
 #paneWrap {
@@ -31,7 +32,8 @@ body {
     height: 800px;
 }
 
-.meta-info {
+.meta-info,
+.extra {
     color: #828282;
 }
 
@@ -41,6 +43,11 @@ body {
     font-family: "Helvetica Neue";
     font-weight: bold;
     font-size: 1.15em;
+}
+
+.layoutPane {
+    display: inline-block;
+    float: left;
 }
 
 .halfPane {
@@ -57,10 +64,35 @@ body {
     float: left;
 }
 
+.threeQPane {
+    width: 57%;
+}
+
+.banner {
+    height: 55px;
+    border-bottom: 2px solid #BBBBBB;
+    border-right: 2px solid #BBBBBB;
+    border-radius: 2px;
+    margin-bottom: 15px;
+}
+
+.banner h2 {
+    margin-left: 15px;
+    padding-top: 15px; 
+}
+
+.banner h1, h2 {
+    margin-top: 0px;
+}
+
+div.sub-banner {
+    margin-left: 15px;
+}
+
+
+
 /*********************** Pane Styles ***********************/
 
-.pane {
-}
 
 .pane.ng-animate {
     transition:300ms linear all;
@@ -82,8 +114,24 @@ body {
 
 /*********************** Pane Select Styles ***********************/
 
+#paneSelect {
+    position: relative;
+}
+
+#paneSelect .banner .words {
+    font-weight: bold;
+    font-size: 1.75em;
+    margin: 0 0 0 15px;
+    padding-top: 10px;
+    text-transform: capitalize;
+}
+
+#paneSelect div.pane-btn-container {
+    margin-left: 10px;
+}
+
 #paneSelect .pane-btn img {
-    width: 55px;
+    width: 40px;
     height: auto;
     margin-bottom: 20px;
 }
@@ -102,7 +150,7 @@ div.pane-btn-wrap {
 #paneSelect .pane-btn-wrap a:hover > img,
 #paneSelect .pane-btn-wrap.active a img
 {
-    margin-left: 15px;
+    margin-left: 11px;
 }
 
 #paneSelect .pane-btn-wrap a:hover > h4,
@@ -113,11 +161,17 @@ div.pane-btn-wrap {
 
 #paneSelect h4 {
     position: absolute;
-    left: 80px;
-    text-decoration: underline;
+    left: 58px;
+    top: -7px;
     text-transform: capitalize;
     display: inline-block;
     color: #DDDDDD;
+}
+
+div.meta {
+    position: absolute;
+    bottom: 0;
+    margin-left: 12px;
 }
 
 /***************** Scrollbars ****************/

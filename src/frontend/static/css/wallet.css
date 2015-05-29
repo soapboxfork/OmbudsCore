@@ -15,8 +15,8 @@
 .wallet-widget .addressWrap {
     background-color: #EEEEEE;
     position: relative;
-    padding: 2px;
-    width: 200px;
+    padding: 10px 5px;
+    width: 190px;
     margin: 0;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -24,18 +24,19 @@
 
 .wallet-widget .addressBox {
     width: 148px;
-    margin: 0 0 0 35px;
+    margin: 0 0 0 28px;
 }
 
 .wallet-widget .address {
     font-family: monospace;
     word-break: break-all;
+    text-decoration: None;
 }
 
 .wallet-widget .addressWrap svg {
     position: absolute;
-    top: 22px;
-    left: 12px;
+    top: 18px;
+    left: 10px;
 }
 
 .wallet-widget .qrcode {

@@ -36,7 +36,10 @@ var ombWebApp = angular.module("ombWebApp", [
 .controller('paneCtrl', function($scope, locationService) {
     $scope.panes = locationService.getAllPanes();
     $scope.activePane = locationService.activePane;
-    $scope.selectPane = locationService.selectPane;
+    $scope.selectPane = function(pane) {
+        locationService.selectPane(pane);
+        $scope.activePane = pane;
+    };
     $scope.paneUrl = function(name){ return "/#/"+name; };
 
 })

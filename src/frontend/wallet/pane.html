@@ -1,38 +1,46 @@
 <div id="WalletPane">
     <div class="halfPane">
-        <h1>Wallet</h1>
-        <wallet-widget info="wallet"></wallet-widget>
+        <div class="banner">
+            <h2>Balance</h2>
+        </div>
+        <div class="sub-banner">
+            <wallet-widget info="wallet"></wallet-widget>
+        </div>
     </div>
     <div class="halfPane">
-        <h2>Recent Transactions</h2>
-        <select name="listView">
-            <option value="txs">Confirmed</option>
-            <option value="txs">Pending</option>
-            <option value="txs">All</option>
-        </select>
-        <table> 
-            <thead>
+        <div class="banner">
+            <h2>Recent Transactions</h2>
+        </div>
+        <div class="sub-banner">
+            <select name="listView">
+                <option value="txs">Confirmed</option>
+                <option value="txs">Pending</option>
+                <option value="txs">All</option>
+            </select>
+            <table> 
+                <thead>
+                    <tr>
+                        <th>Txid</th>
+                        <th>Depth</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
                 <tr>
-                    <th>Txid</th>
-                    <th>Depth</th>
-                    <th>Amount</th>
+                    <td>debe323a590e</td>
+                    <td>323</td>
+                    <td>0.05</td>
                 </tr>
-            </thead>
-            <tr>
-                <td>debe323a590e</td>
-                <td>323</td>
-                <td>0.05</td>
-            </tr>
-            <tr>
-                <td>debe323a590e</td>
-                <td>323</td>
-                <td>0.05</td>
-            </tr>
-            <tr>
-                <td>debe323a590e</td>
-                <td>323</td>
-                <td>0.05</td>
-            </tr>
-        </table>
+                <tr>
+                    <td>debe323a590e</td>
+                    <td>323</td>
+                    <td>0.05</td>
+                </tr>
+                <tr>
+                    <td>debe323a590e</td>
+                    <td>323</td>
+                    <td>0.05</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
