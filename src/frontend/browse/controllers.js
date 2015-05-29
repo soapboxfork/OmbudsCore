@@ -254,14 +254,14 @@ angular.module('browseModule')
     }
 });*/
 
-function addCommonFunctions($scope, markdownService) {
+function addCommonFunctions(scope, markdownService) {
     // Functions to bind into the current scope:
-    $scope.moreDetail = function(bltn) {
+    scope.moreDetail = function(bltn) {
         bltn.detail = !bltn.detail;
     }
 
     var base = "/static/images/"
-    $scope.depthImg = function(bltn) {
+    scope.depthImg = function(bltn) {
         var curHeight = 444400;
 
         if (!angular.isDefined(bltn.blk)) {
@@ -280,8 +280,9 @@ function addCommonFunctions($scope, markdownService) {
         }
     }
 
-    $scope.renderMd = function(bltn) {
+    scope.renderMd = function(bltn) {
         var html = markdownService.makeHtml(bltn.msg);
+        console.log("Produced this html:", html);
         bltn.markdown = html;
     }
 }

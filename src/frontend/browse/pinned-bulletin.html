@@ -16,7 +16,7 @@
 
         <div class="timestamp">{{ bltn.timestamp | nicedatetime  }}</div>
         <div class="interact">
-            <input type="checkbox" ng-model="bltn.renderMd" ng-click="renderMd(bltn)" />
+            <input class="render" type="checkbox" ng-model="bltn.renderMd" ng-click="renderMd(bltn)" />
             <img class="confs" ng-src="{{ depthImg(bltn) }}" ng-click="moreDetail(bltn)" />
         </div>
     </div>

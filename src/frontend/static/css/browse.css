@@ -34,7 +34,6 @@
 /*********************** Control Widget Styles ************************/
 
 .control-widget {
-    border: 1px solid black;
 }
 
 .control-widget div.top > div {
@@ -57,7 +56,6 @@
 }
 
 .bltnPane .head {
-    border: 1px solid black;
 }
 
 .bltnPane .head img,
@@ -243,6 +241,13 @@ div.pinnedBulletin.linked {
     bottom: 6px;
     right: 60px;
 }
+
+.pinnedBulletin input.render {
+    position: absolute;
+    top: 2px;
+    right: 30px;
+}
+
 .pinnedBulletin .slider {
     height: 25px;
     position:absolute; 
