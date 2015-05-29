@@ -1,42 +1,56 @@
 <div id="sendPane">
     <div class="quartPane">
-        <h1>Send</h1>
-        <h3>Cost Estimate</h3> 
-        <coin-amnt amount="estimate.val" unit="wallet.unit"></coin-amnt>
-        <wallet-widget info="wallet"></wallet-widget>
+        <div class="banner">
+            <h2>Balance</h2>
+        </div>
+        <div class="sub-banner">
+            <h3>Cost Estimate</h3> 
+            <coin-amnt amount="state.estimate.val" unit="wallet.unit"></coin-amnt>
+            <wallet-widget info="wallet"></wallet-widget>
+        </div>
     </div>
     <div class="quartPane">
-        <h3>Control</h3>
-        <button id="renderBtn" name="render" ng-click="">
-            Render
+        <div class="banner">
+            <h2>Controls</h2>
+        </div>
+        <button id="sendBtn" name="send" class="btn green" ng-click="handleSendBltn()">
+            Send
         </button>
-        <button id="tweetBtn" name="tweet" ng-click="">
+        <button id="tweetBtn" name="tweet" class="btn blue" ng-click="">
             Tweet
         </button>
-        <button id="checkBtn" name="check" ng-click="">
-            Check
+        <button id="renderBtn" name="render" class="btn" ng-class="{'active': state.renderTog}" ng-click="toggleRender()">
+            Render
         </button>
-        <button id="sendBtn" name="send" ng-click="handleSendBltn()">
-            Send
+        <button id="checkBtn" name="check" class="btn" ng-click="">
+            Check
         </button>
     </div>
 
     <div class="halfPane">
         <div>
-            <h3>Board</h3>
-            <input 
-                type="text" 
-                class="board" 
-                ng-model="draftBltn.board"
-                maxlength="30"
-                ng-change="updateEst()"
-                >
-            </input>
-        </div>
-        <div>
-            <h3>Content</h3>
-            <textarea class="content" ng-model="draftBltn.msg" ng-change="updateEst()"></textarea>
+            <div class="banner">
+                <h2 ng-hide="state.renderTog">Draft Bulletin</h2>
+                <h2 ng-show="state.renderTog">Preview Bulletin</h2>
+            </div>
+            <div class="sub-banner">
+                <div class="contentAdd" ng-hide="state.renderTog">
+                    <h3>Board</h3>
+                    <input 
+                    type="text" 
+                    class="board" 
+                    ng-model="draftBltn.board"
+                    maxlength="30"
+                    ng-change="updateEst(state.estimate)"
+                    >
+                    </input>
+                    <h3>Content</h3>
+                    <textarea class="content" ng-model="draftBltn.msg" ng-change="updateEst(state.estimate)"></textarea>
+                </div>
+                <div class="bltnPreview" ng-show="state.renderTog">
+                    <div bltn="state.testBltn" author="true" class="testBulletin"></div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>

@@ -12,7 +12,13 @@
     <body>
         <div id="globalWrap" ng-controller="paneCtrl">
             <div id="paneSelect">
-                <div class="pane-btn" ng-repeat="pane in panes"></div>
+                <div class="banner"><div class="words" ng-bind="activePane.name">Send</div></div>
+                <div class="pane-btn-container">
+                    <div class="pane-btn" ng-repeat="pane in panes"></div>
+                </div>
+                <div class="meta">
+                    <p class="extra">This is open-source software. Please report all bugs, typos and errors <a href="https://github.com/soapboxsys/OmbudsCore/issues">here</a>.</p>
+                </div>
             </div>
             <div id="paneWrap">
                 <div class="pane" ng-view ></div>
