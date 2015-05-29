@@ -42,7 +42,6 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule'])
                 author: walletService.address
             };
             paneState.testBltn = testBltn;
-            updateEstimate(paneState.estimate);
         } 
     }
 

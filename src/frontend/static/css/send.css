@@ -2,6 +2,10 @@
     position: relative;
 }
 
+#sendPane .sub-banner {
+    margin-right: 15px
+}
+
 #sendPane #sendBox {
     width: 300px;
     margin-left: 20px;
@@ -12,13 +16,16 @@
 }
 
 #sendPane input.board {
-    width: 90%;
+    width: 100%;
     height: 25px;
+    padding-left: 6px;
 }
 
 #sendPane textarea.content {
-    width: 90%;
-    height: 200px;
+    width: 100%;
+    height: 400px;
+    font-size: 1em;
+    padding: 6px;
 }
 
 /******************* Button Styles *******************/
