@@ -1,0 +1,12 @@
+<div class="modal-background">
+</div>
+<div class="modal-content card"> 
+    <label>Enter wallet passphrase:<input type="password" ng-model="passphrase" /></label>
+    <div class="notif" ng-class="status" ng-bind="modalMsg"></div>
+    <button class="btn green" ng-disabled="!actionEnabled" ng-click="actionEnabled && handleComposeBltn(passphrase)"> 
+        Compose
+    </button>
+    <button class="btn gray" ng-click="closeModal()">
+        Close
+    </button>
+</div>

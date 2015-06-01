@@ -39,27 +39,129 @@ singleton.factory('ahimsaRestService', function($http, $interval) {
  }
 });
 
-singleton.factory('ombWebSocket', function($websocket) {
-    var dataStream = $websocket('ws://localhost:1055/ws/');
+singleton.factory('ombWebSocket', function($websocket, $q) {
+    var msgStream = $websocket('ws://localhost:1055/ws/');
     var collection = [];
 
-    dataStream.onMessage(function(message) {
-        //console.log(message);
-        collection.push(message.data);
+    var uniqueId = function() {
+        var ctr = 0;
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+        }
+        return function() {
+            ctr += 1;
+            return "frontend-" + ctr + "-" + s4();
+        }
+    }();
+
+    // Handles the promise api for commands pushed into the websocket.
+    var errorDiscrim = function(deferred) {
+        var responded = false;
+        var timeoutSecs = 5;
+        setTimeout(timeoutSecs*1000, function() {
+            if (!responded) {
+                msg = {
+                    error: {
+                        message: "The request timed out",
+                    },
+                };
+                deferred.reject(msg);
+            }
+        });
+        return function(msg) {
+            if (msg.error !== null) {
+                deferred.reject(msg);
+            } else {
+                responded = true;
+                deferred.resolve(msg);
+            }
+        };
+    };
+
+    // The response controller holds an id that maps to a list of callback
+    // functions that will be evaluated when the cmd returns.
+    function ResponseCtrl() {
+        this.ids = {};
+        this.register = function(id, callback) {
+            if (this.ids.hasOwnProperty(id)) {
+                this.ids[id].push(callback);
+            } else {
+                this.ids[id] = [callback];
+            }
+        };
+    };
+    var responseCtrl = new ResponseCtrl();
+
+
+    msgStream.onMessage(function(event) {
+        var msg = {};
+        try {
+            msg = JSON.parse(event.data);
+        } catch (e) {
+            return;
+        }
+
+        if (responseCtrl.ids.hasOwnProperty(msg.id)) {
+            var callbacks = responseCtrl.ids[msg.id];
+            angular.forEach(callbacks, function(callback) {
+                callback(msg);
+            });
+            delete responseCtrl.ids[msg.id];
+        }
     });
 
+    function BtcMsg(method) {
+        var id = uniqueId();
+        var msg = { 
+            id: id,
+            jsonrpc: "1.0",
+            method: method,
+        };
+        return msg;
+    };
+
     function sendBulletin(draft) {
-       console.log("trying to send bulletin");
-       var msg = { jsonrpc : "1.0", 
-                   id: "bitcoin-rpc", 
-                   method: "sendbulletin",
-                   params: ["myAddress", draft.board, draft.msg]
-       };
-       dataStream.send(JSON.stringify(msg));
+       var msg = BtcMsg("sendbulletin");
+       msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
+
+       var deferred = $q.defer();
+       var callback = errorDiscrim(deferred);
+       responseCtrl.register(msg.id, callback);
+       msgStream.send(JSON.stringify(msg));
+
+       return deferred.promise;
+   }
+
+    function composeBulletin(draft){ 
+       var msg = BtcMsg("composebulletin");
+       msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
+
+       var deferred = $q.defer();
+       var callback = errorDiscrim(deferred);
+       responseCtrl.register(msg.id, callback);
+       msgStream.send(JSON.stringify(msg));
+
+       return deferred.promise;    
+    }
+
+    function unlockWallet(passphrase) {
+        var msg = BtcMsg("walletpassphrase");
+        msg.params = [passphrase, 5];
+
+        var deferred = $q.defer();
+        var callback = errorDiscrim(deferred);
+        responseCtrl.register(msg.id, callback);
+        msgStream.send(JSON.stringify(msg));
+
+        return deferred.promise;
     }
 
     return {
         'sendBulletin': sendBulletin,
+        'composeBulletin': composeBulletin,
+        'unlockWallet': unlockWallet,
         'collection': collection 
     }
 });
