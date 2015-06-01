@@ -2,20 +2,25 @@
     <div id="browseWrap">
         <div class="control-widget banner">
             <div class="top line">
-                <div class="label"><a href="/#/browse">Boards</a></div>
-                <div class=""><small><a href="/#/b/authors">Authors</a></small> | <small>Favorites</small></div>
+                <div class="label" ng-if="inBoard"><a href="/#/browse">Boards</a></div>
+                <div class="label" ng-if="inAuthor"><a href="/#/b/authors">Authors</a></div>
+                <div class="selector">
+                        <small ng-if="inBoard"><a href="/#/b/authors">Authors</a></small> 
+                        <small ng-if="inAuthor"><a href="/#/browse">Boards</a></small>
+                    | <input ng-model="favTog" type="checkbox">Favorites</small></div>
             </div>
             <div class="bottom line">
-                <div class="meta-info">67 of 67</div> 
+                <div ng-if="inBoard" class="meta-info" ng-bind="boards.length + ' of ' + boards.length"></div> 
+                <div ng-if="inAuthor" class="meta-info" ng-bind="authors.length + ' of ' + authors.length"></div> 
             </div>
         </div>
         <div id="listView">
 
             <div ng-if="inBoard">
-                <div class="browseBoard" ng-repeat="board in boards | orderBy:'-summary.lastActive'"></div>
+                <div class="browseBoard" ng-repeat="board in boards | filter: isFavorite  | orderBy:'-summary.lastActive'"></div>
             </div>
             <div ng-if="inAuthor">
-                <div class="browseAuthor" ng-repeat="author in authors | orderBy:'-summary.numBltns'"></div>
+                <div class="browseAuthor" ng-repeat="author in authors | filter: isFavorite | orderBy:'-summary.numBltns'"></div>
             </div>
         </div>
     </div>

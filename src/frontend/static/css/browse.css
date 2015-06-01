@@ -9,6 +9,7 @@
 #contentPane {
     width: 525px;
     height: 625px;
+    padding: 10px 1px 0 1px;
     float: left;
     overflow-y: scroll;
 }
@@ -33,7 +34,8 @@
 
 /*********************** Control Widget Styles ************************/
 
-.control-widget {
+.control-widget .line {
+    margin: 0 15px;
 }
 
 .control-widget div.top > div {
@@ -43,28 +45,25 @@
 .control-widget .label {
     font-size: 1.5em;
     font-weight: bold;
+    margin-top: 15px;
 }
 
-.control-widget .bottom.line {
-    margin-top: 10px;
+.control-widget .label a {
+    text-decoration: none;
+    color: black;
+}
+.control-widget .label a:hover {
+    text-decoration: underline;
 }
 
-.control-widget .btn {
+.control-widget .selector {
     float: right;
-    margin-top: 8px;
+    margin-top: 21px;
     text-align: center;
 }
 
-.bltnPane .head {
-}
-
-.bltnPane .head img,
-.bltnPane input.renderBox {
-    float: right;
-}
-
-.bltnPane .head img {
-    
+.control-widget .bottom .meta-info {
+    font-size: .8em;
 }
 
 /*********************** Board List Elem Styles ***********************/
@@ -117,6 +116,22 @@
 .list-elem .content .numline {
     margin: 8px 0 0 0;
 }
+
+/********************* Bltn Banner Styles **********************/
+
+.bltnPane .head {
+}
+
+.bltnPane .head img,
+.bltnPane input.renderBox {
+    float: right;
+}
+
+.bltnPane .head img {
+    
+}
+
+
 
 /********************** Bulletin List View Styles ***************************/
 

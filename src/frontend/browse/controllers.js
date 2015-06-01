@@ -4,6 +4,17 @@ angular.module('browseModule')
 .controller('boardCtrl', function($scope, $location, $route, $routeParams, pubRecordService, markdownService) {
     // captures /b/bltn /b/board /browse
     $scope.inBoard = true;
+    $scope.favTog = false;
+    $scope.isFavorite = function(val, i) {
+        if ($scope.favTog) {
+            if (val.favorite) {
+                return true;
+            } else {
+                return false;
+            }
+        } 
+        return true;
+    }
 
     var lastRoute = $route.current;
     $scope.$on('$locationChangeSuccess', function(event, d) {
@@ -87,6 +98,18 @@ angular.module('browseModule')
 .controller('authorCtrl', function($scope, $location, $route, $routeParams, pubRecordService, markdownService) {
     // captures /b/authors/ /b/author/<addr> /b/a/bltn/<txid>
     $scope.inAuthor = true;
+    $scope.favTog = false;
+    $scope.isFavorite = function(val, i) {
+        if ($scope.favTog) {
+            if (val.favorite) {
+                return true;
+            } else {
+                return false;
+            }
+        } 
+        return true;
+    }
+
 
     var lastRoute = $route.current;
     $scope.$on('$locationChangeSuccess', function(event, d) {
@@ -169,14 +192,17 @@ angular.module('browseModule')
 
     var base = "/static/images/"
     $scope.depthImg = function(bltn) {
-        var curHeight = 444400;
+        var curHeight = 446000;
 
         if (!angular.isDefined(bltn.blk)) {
             // The bltn is not mined
             return base + "0conf.png"       
         } else {
             // The bltn is in some block
-            var diff = curHeight - bltn.blkHeight;
+            var diff = 9001;
+            if (bltn.hasOwnProperty('blkHeight')) {
+                diff = curHeight - bltn.blkHeight;
+            }
 
             if (diff > 3) {
                 // The bltn is somewhere in the chain
