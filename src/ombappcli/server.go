@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/websocket"
-	"github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 type server struct {
@@ -20,7 +20,7 @@ type server struct {
 	quit        chan struct{}
 
 	// Event Channels
-	sendBulletinChan chan btcjson.Cmd
+	fsRPCCmdChan     chan btcjson.Cmd // Recieves all rpc commands from the frontend.
 	updateWalletChan chan struct{}
 }
 
@@ -28,7 +28,7 @@ func newServer(cfg *config) (*server, error) {
 
 	s := &server{
 
-		sendBulletinChan: make(chan btcjson.Cmd),
+		fsRPCCmdChan:     make(chan btcjson.Cmd),
 		updateWalletChan: make(chan struct{}),
 
 		quit: make(chan struct{}),
@@ -67,23 +67,17 @@ func (s *server) eventHandler() {
 
 	for {
 		select {
-		case msg := <-s.sendBulletinChan:
-
-			switch cmd := msg.(type) {
-			case rpcexten.SendBulletinCmd:
-				log.Printf("%v", msg)
-				board, body := cmd.Board, cmd.Message
-				ok, txid := s.walletCtrl.SendBulletin(board, body)
-				log.Println("Message was %s, [%s]", ok, txid)
-			default:
-				log.Println("switch failed")
+		case cmd := <-s.fsRPCCmdChan:
+			err := s.walletCtrl.forwardCmd(cmd)
+			if err != nil {
+				err = fmt.Errorf("Forwarding cmd: [%s], [%s] failed with: %s", cmd.Method(), cmd.Id(), err)
+				sendErr := s.frontend.sendError(cmd, err)
+				if sendErr != nil {
+					log.Printf("Could not notify frontend of err: %s due to: %s\n", err, sendErr)
+				}
 			}
-
-		case <-s.updateWalletChan:
-			// TODO something happened to the wallet. Update it and continue
 		case t := <-tick:
-			s.frontend.allMessages <- []byte(fmt.Sprintf("Tick tock: %s", t))
-
+			s.frontend.allMessages <- []byte(fmt.Sprintf("{'error':'null', 'result':'Tick tock: %s'}", t))
 		case <-s.quit:
 			break
 		}
@@ -96,8 +90,9 @@ type frontendServer struct {
 	upgrader    websocket.Upgrader
 	inUse       bool
 	conn        *websocket.Conn
-	allMessages chan []byte
+	allMessages chan []byte // A buffered channel that forwards commands to the frontend
 
+	// Channels to force a single websocket per instance of the frontendServer
 	takeHandle    chan bool
 	releaseHandle chan bool
 	closeNotif    chan bool
@@ -133,27 +128,47 @@ func (fs *frontendServer) readMessages() {
 			_, msg, err := fs.conn.ReadMessage()
 			if err != nil {
 				fs.releaseHandle <- true
+				log.Printf("frontend ws read failed with: %s\n", err)
 				return
 			}
-			if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
-				if err != nil {
-					fs.releaseHandle <- true
-					fmt.Printf("Marshal failed %s, %v", err, req)
-					return
-				}
-				fmt.Printf("%s : %v\n", req.Method(), req)
 
-				if req.Method() == "sendbulletin" {
-					fs.s.sendBulletinChan <- req
-				}
+			req, err := btcjson.ParseMarshaledCmd(msg)
+			if err == nil {
+				fs.s.fsRPCCmdChan <- req
 			} else {
-				log.Printf(err.Error())
+				fs.releaseHandle <- true
+				log.Printf("Marshal failed %s, %v\n", err, req)
+				return
 			}
 		}
 	}
 }
 
-// Writes all messages to the attached frontend websocket if it is exists.
+// sendError composes a btcjson.error Reply from the given cmd and its
+// associated error and then pushes it into the reply channel
+func (fs *frontendServer) sendError(cmd btcjson.Cmd, err error) error {
+
+	var id interface{} = cmd.Id()
+	reply := &btcjson.Reply{
+		Result: nil,
+		Error: &btcjson.Error{
+			Message: err.Error(),
+		},
+		Id: &id,
+	}
+
+	b, err := json.Marshal(reply)
+	if err != nil {
+		return err
+	}
+
+	// Send the bytes to the writing channel
+	fs.allMessages <- b
+
+	return nil
+}
+
+// Writes all messages to the attached frontend websocket if it exists.
 func (fs *frontendServer) writeMessages() {
 
 	for {

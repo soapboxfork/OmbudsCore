@@ -11,16 +11,17 @@ import (
 	"net/http"
 
 	"github.com/btcsuite/btcd/btcjson"
-	"github.com/btcsuite/btcd/btcjson/btcws"
+	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcrpcclient"
 	"github.com/btcsuite/websocket"
 	"github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 type walletCtrl struct {
-	s      *server
-	ws     *websocket.Conn
-	rpcCfg *btcrpcclient.ConnConfig
+	s                      *server
+	ws                     *websocket.Conn
+	acceptedFrontendCmds   map[string]struct{} // Commands that the frontend can send to the wallet
+	acceptedWalletForwards map[string]struct{} // Commands from the wallet that are sent to the frontend
 }
 
 func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
@@ -49,15 +50,19 @@ func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 		return nil, err
 	}
 
-	rpcCfg, err := setupRpcCfg(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	wc := &walletCtrl{
-		ws:     ws,
-		s:      s,
-		rpcCfg: rpcCfg,
+		ws: ws,
+		s:  s,
+		acceptedFrontendCmds: map[string]struct{}{
+			"sendbulletin":     struct{}{},
+			"composebulletin":  struct{}{},
+			"sendtoaddress":    struct{}{},
+			"listtransactions": struct{}{},
+			"walletpassphrase": struct{}{},
+		},
+		acceptedWalletForwards: map[string]struct{}{
+			"accountbalance": struct{}{},
+		},
 	}
 
 	return wc, nil
@@ -68,33 +73,43 @@ func (wc *walletCtrl) notificationListener() {
 	for {
 		_, msg, err := wc.ws.ReadMessage()
 		if err != nil {
-			log.Fatal(err)
+			// TODO handle reinitalization
+			//log.Printf("Wallet WS broke with: $s\n", err)
+			continue
 		}
-		if req, err := btcjson.ParseMarshaledCmd(msg); err == nil {
-			if req.Id() != nil {
+
+		cmd, perr := btcjson.ParseMarshaledCmd(msg)
+		if perr == nil {
+			// Unmarshaled a btcjson.cmd
+			if !wc.approvedForFrontend(cmd) {
+				log.Printf("Dropping cmd: [%s]\n", cmd.Method())
 				continue
 			}
-
-			fmt.Printf("%s : %v\n", req.Method(), req)
-			switch cmd := req.(type) {
-			case *btcws.BlockConnectedNtfn:
-				// new block
-			case *btcws.BlockDisconnectedNtfn:
-				// Update gui and send message something funky is up
-				//m := WalletMessage{MWarn, "A block was disconnected. That is odd."}
-			case *btcws.AccountBalanceNtfn:
-				// New balance
-			case *btcws.TxNtfn:
-				// provides details JSON
-			default:
-				log.Printf("Ignoring wallet cmd: %s", cmd.Method())
-			}
-		} else {
-			log.Printf(err.Error())
 		}
-	}
 
-	<-wc.s.quit
+		reply := btcjson.Reply{}
+		rerr := json.Unmarshal(msg, &reply)
+		if rerr == nil {
+			// Unmarshaled a btcjson.Reply, check to see if it has a good id.
+			if reply.Id != nil {
+				s := fmt.Sprintf("%v", *reply.Id)
+				if s[:8] != "frontend" {
+					log.Printf("Bad reply id: [%s]\n", *reply.Id)
+					continue
+				}
+			} else {
+				log.Printf("Bad reply: [%v]\n", reply)
+				continue
+			}
+		}
+
+		if perr != nil && rerr != nil {
+			log.Printf("Wallet sent bad json: %s\n", perr)
+			continue
+		}
+
+		wc.s.frontend.allMessages <- msg
+	}
 }
 
 // send sends a JSON-RPC command to the specified RPC server and examines the
@@ -137,7 +152,7 @@ func sendCommand(cfg *btcrpcclient.ConnConfig, command btcjson.Cmd) (interface{}
 
 // Updates the internal state of the application while sending the bulletin.
 // The function first authenticates to the wallet and then it will try to send bulletins.
-func (wc *walletCtrl) SendBulletin(board, msg string) (bool, string) {
+func (wc *walletCtrl) SendBulletin(board, msg string) (*wire.ShaHash, error) {
 
 	// Create a five second window to send the bulletin
 	timeout := int64(5)
@@ -148,51 +163,57 @@ func (wc *walletCtrl) SendBulletin(board, msg string) (bool, string) {
 
 	unlockCmd, err := btcjson.NewWalletPassphraseCmd(id, passphrase, timeout)
 	if err != nil {
-		return false, err.Error()
+		return nil, err
 	}
-	/*_, err = sendCommand(wc.rpcCfg, unlockCmd)
-	if err != nil {
-		return false, err.Error()
-	}*/
+
 	err = wc.ws.WriteJSON(unlockCmd)
-	if err != nil {
-		return false, err.Error()
-	}
-
-	addr := "mxNtgU2vUrD4pbJUxTRUi4iEtBthTAF1ta"
-	sendCmd := rpcexten.NewSendBulletinCmd(id, addr, board, msg)
-
-	//	res, err := sendCommand(wc.rpcCfg, cmd)
-
-	err = wc.ws.WriteJSON(sendCmd)
-	if err != nil {
-		return false, err.Error()
-	}
-	// TODO store results of send in settings
-	if err != nil {
-		log.Println(err)
-		return false, err.Error()
-	} else {
-		//txid := res.(string)
-		//log.Printf("rpcwallet reported success: %s\n", txid)
-		return true, "success!"
-	}
-}
-
-func setupRpcCfg(cfg *config) (*btcrpcclient.ConnConfig, error) {
-
-	certs, err := ioutil.ReadFile(cfg.CAFile)
 	if err != nil {
 		return nil, err
 	}
 
-	rpcCfg := &btcrpcclient.ConnConfig{
-		Host:                cfg.RPCConnect,
-		User:                cfg.Username,
-		Pass:                cfg.Password,
-		Certificates:        certs,
-		Endpoint:            "ws",
-		DisableConnectOnNew: true,
+	addr := "n37T77JKnFFZJN4udvyasZUwVhpidvq9gb"
+	sendCmd := rpcexten.NewSendBulletinCmd(id, addr, board, msg)
+
+	err = wc.ws.WriteJSON(sendCmd)
+	if err != nil {
+		return nil, err
 	}
-	return rpcCfg, nil
+
+	// TODO store results of send in settings
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	/*
+
+		txid, err := wire.NewShaHashFromStr(res.(string))
+		if err != nil {
+			return nil, err
+		}*/
+
+	return nil, nil
+}
+
+// Check to see if the passed rpc command is approved to be sent to the
+// the wallet.
+func (wc *walletCtrl) approvedForWallet(cmd btcjson.Cmd) bool {
+	_, ok := wc.acceptedFrontendCmds[cmd.Method()]
+	return ok
+}
+
+// fowardCmd accepts btcjson cmds and forwards them to the wallet.
+func (wc *walletCtrl) forwardCmd(cmd btcjson.Cmd) error {
+	if !wc.approvedForWallet(cmd) {
+		return fmt.Errorf("Cmd [%s] not approved", cmd.Method())
+	}
+	err := wc.ws.WriteJSON(cmd)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (wc *walletCtrl) approvedForFrontend(cmd btcjson.Cmd) bool {
+	_, ok := wc.acceptedWalletForwards[cmd.Method()]
+	return ok
 }
