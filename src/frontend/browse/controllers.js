@@ -2,6 +2,9 @@
 
 angular.module('browseModule')
 .controller('parentBrowseCtrl', function($scope) {
+    $scope.activeBoard = null;
+    $scope.activeAuthor = null;
+
     $scope.favTog = false;
     $scope.isFavorite = function(val, i) {
         if ($scope.favTog) {
@@ -29,7 +32,6 @@ angular.module('browseModule')
         }
     });
 
-    $scope.activeBoard = null;
 
     $scope.openBoard = function(board) {
         if (board.summary.urlName === "") {
@@ -106,7 +108,6 @@ angular.module('browseModule')
     $controller('parentBrowseCtrl', {$scope: $scope});
 
 
-
     var lastRoute = $route.current;
     $scope.$on('$locationChangeSuccess', function(event, d) {
         var re = new RegExp(/^\/b\/author|^\/b\/a\/bltn/);
@@ -115,7 +116,6 @@ angular.module('browseModule')
         }
     });
 
-    $scope.activeAuthor = null;
 
     $scope.openAuthor = function(author) {
         if (author.active == true) {

@@ -23,7 +23,12 @@
             </div>
         </div>
     </div>
-    <div class="layoutPane bltnPane">
+    <div class="layoutPane bltnPane" ng-hide="activeBoard !== null || activeAuthor !== null">
+        <div class="banner">
+            <h2>Blank Spaces</h2>
+        </div>
+    </div>
+    <div class="layoutPane bltnPane" ng-show="activeBoard !== null || activeAuthor !== null">
         <div class="head banner">
             <div ng-if="inBoard">
                 <div class="topline">
