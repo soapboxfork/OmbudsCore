@@ -47,11 +47,11 @@ var ombWebApp = angular.module("ombWebApp", [
     // Documents the panes we have in the application
     var service = {
         panes : [
-            {name: 'browse', active: false},  
-            {name: 'send', active: false},  
-            {name: 'wallet', active: false},  
-            {name: 'settings', active: false},
-            {name: 'twitter', active: false},
+            {name: 'browse'},  
+            {name: 'send'},  
+            {name: 'wallet'},  
+            {name: 'settings'},
+            {name: 'twitter'},
         ]
     };
 
@@ -66,13 +66,13 @@ var ombWebApp = angular.module("ombWebApp", [
     }
 
     var gex = /^\/([a-z]+)/
-    var m = $location.path().match(gex)
+    var m = $location.path().match(gex);
     if (m != null) {
         var curPane = service.getPane(m[1]);
         if (curPane != null) {
-            curPane.active = true;
+            service.activePane = curPane
         } else {
-            service.panes[0].active = true;
+            service.activePane = service.panes.getPane('settings')
         }
     }
 
@@ -83,14 +83,11 @@ var ombWebApp = angular.module("ombWebApp", [
         return service.panes
     }
 
-    service.activePane = service.panes[0]
     service.selectPane = function(pane) {
         for (var i = 0; i < service.panes.length; i++) {
             var cp = service.panes[i];
             if (pane.name === cp.name) {
-                cp.active = true; 
-            } else {
-                cp.active = false;
+                service.activePane = cp
             }
         }
     }
