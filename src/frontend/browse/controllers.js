@@ -182,6 +182,8 @@ angular.module('browseModule')
 })
 .controller('bltnCtrl', function($scope, markdownService, settingsService) {
 // Functions to bind into the current scope:
+    var bltn = $scope.bltn;
+
     $scope.moreDetail = function(bltn) {
         bltn.detail = !bltn.detail;
     }
@@ -215,7 +217,9 @@ angular.module('browseModule')
     }
 
     if (settingsService.renderMd) {
-        $scope.bltn.renderMd = true;
-        $scope.renderMd($scope.bltn);
+        bltn.renderMd = true;
+        if (bltn.hasOwnProperty('msg') && bltn.msg !== "") {
+            $scope.renderMd(bltn);
+        }
     }
 });
