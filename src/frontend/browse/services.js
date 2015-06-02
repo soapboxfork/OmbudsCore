@@ -145,6 +145,7 @@ singleton.factory('pubRecordService', function($http, $interval, $q) {
     return service;
 });
 
+
 function addBoardUrl(bltn) {
     if (bltn.hasOwnProperty('board')) {
         bltn.boardUrl = encodeURIComponent(bltn.board);

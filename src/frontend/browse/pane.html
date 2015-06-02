@@ -1,4 +1,3 @@
-<div id="browsePane">
     <div id="browseWrap">
         <div class="control-widget banner">
             <div class="top line">
@@ -24,22 +23,33 @@
             </div>
         </div>
     </div>
-    <div class="threeQPane layoutPane bltnPane">
+    <div class="layoutPane bltnPane">
         <div class="head banner">
             <div ng-if="inBoard">
                 <div class="topline">
                     <div class="title board">{{ activeBoard.summary.name }}</div>
-                    <input type="checkbox" class="renderBox" />
                     <img class="favorite active" />
                 </div>
-                <div class="bottomline"><small>{{ activeBoard.summary.numBltns | plural:'Bulletins' }} 
+                <div class="bottomline">
+                    <small>{{ activeBoard.summary.numBltns | plural:'Bulletins' }} 
                         last seen at {{ activeBoard.summary.lastActive | nicedate }}
+                    </small>
+                </div>
+            </div>
+            <div ng-if="inAuthor">
+                <div class="topline">
+                    <author-icon addr="activeAuthor.summary.addr"></author-icon>
+                    <div class="title author">{{ activeAuthor.summary.addr }}</div>
+                    <img class="favorite active" />
+                </div>
+                <div class="bottomline">
+                    <small>{{ activeAuthor.summary.numBltns | plural:'Bulletins' }} 
+                        first seen on {{ activeAuthor.summary.firstBlkTs | nicedate }}
                     </small>
                 </div>
             </div>
         </div>
         <div id="contentPane" class="boardDisplay">
-
             <div ng-if="inBoard" ng-repeat="bltn in activeBoard.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
             <div ng-if="inAuthor" ng-repeat="bltn in activeAuthor.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
         </div>

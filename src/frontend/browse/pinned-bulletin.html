@@ -10,7 +10,7 @@
             </div>
         </div> 
         <div ng-if="inAuthor" class="boardBox">
-            In <a ng-if="bltn.boardUrl != ''" href="/#/b/board/{{ bltn.board }}">{{ bltn.board | limitTo:15 }}</a>
+            In <a ng-if="bltn.boardUrl != ''" href="/#/b/board/{{ bltn.board }}">{{ bltn.board | limitTo:13 }}{{ bltn.board.length > 13 ? '...' : '' }}</a>
             <a class="nil" ng-if="bltn.boardUrl == ''" href="/#/b/nilboard">The Nil Board</a>
         </div>
 

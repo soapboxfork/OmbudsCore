@@ -1,4 +1,4 @@
-angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'markdownModule'])
+angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'markdownModule', 'settingsModule'])
 // TODO handle nested routing properly by reworking controllers
 .config(['$routeProvider', function($routeProvider) {
 
@@ -43,4 +43,3 @@ angular.module('markdownModule', ['ngSanitize'])
         }
     }
 });
-

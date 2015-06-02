@@ -1,15 +1,23 @@
-/*********************** Browse Styles ***********************/
+/************************ Class Macros ***********************/
+
+.title.author {
+    font-family: monospace;
+    font-size: 1.15em;
+    font-weight: bold;
+}
+
+/*********************** Page Structure *************************/
 
 #browseWrap {
-    width: 375px;
-    height: 625px;
+    width: 330px;
+    height: 100%;
     float: left;
 }
 
 #contentPane {
-    width: 525px;
-    height: 625px;
-    padding: 10px 1px 0 1px;
+    width: 537px;
+    height: 535px;
+    padding: 20px 13px 15px 27px;
     float: left;
     overflow-y: scroll;
 }
@@ -23,7 +31,7 @@
 #listView {
     overflow-y: scroll;
     width: 100%;
-    height: 90%;
+    height: 568px;
 }
 
 .nil {
@@ -31,8 +39,16 @@
     color: #95a5a6;
 }
 
+#browsePane div.banner.head {
+    margin-bottom: 0px;
+}
+
 
 /*********************** Control Widget Styles ************************/
+
+div.control-widget.banner {
+    margin-bottom: 0px;
+}
 
 .control-widget .line {
     margin: 0 15px;
@@ -45,7 +61,7 @@
 .control-widget .label {
     font-size: 1.5em;
     font-weight: bold;
-    margin-top: 15px;
+    margin-top: 9px;
 }
 
 .control-widget .label a {
@@ -119,6 +135,15 @@
 
 /********************* Bltn Banner Styles **********************/
 
+div.bltnPane {
+    width: 576px;
+}
+
+div.bltnPane .banner {
+    margin-bottom: 0;
+}
+
+
 .bltnPane .head {
 }
 
@@ -127,17 +152,34 @@
     float: right;
 }
 
-.bltnPane .head img {
-    
+.bltnPane .head img.favorite {
+    margin-top: 18px;
+    margin-right: 5px;
 }
 
+.bltnPane .head input.renderBox {
+    margin-top: 15px;
+}
+
+.bltnPane .head div.topline,
+.bltnPane .head div.bottomline {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+
+.bltnPane .head div.title {
+    display: inline-block;
+    margin-top: 12px;
+}
+
+.bltnPane .head div.topline div.author-icon {
+
+}
 
 
 /********************** Bulletin List View Styles ***************************/
 
-div.boardDisplay {
-    margin: 0 20px 0 30px;
-}
 
 
 div.card {
@@ -282,7 +324,7 @@ div.pinnedBulletin.linked {
     margin-bottom: 14px;
 }
 
-.pinnedBulletin .markdown * {
+.pinnedBulletin .markdown img {
     max-width: 436px;
     max-height: 436px;
 }
@@ -329,11 +371,6 @@ div.pinnedBulletin.linked {
     font-weight: bold;
 }
 
-.browseAuthor .title.author {
-    font-family: monospace;
-    font-size: 1.15em;
-    font-weight: bold;
-}
 
 .browseAuthor .side-bar.active {
     height: 63px;

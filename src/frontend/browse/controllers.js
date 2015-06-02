@@ -1,9 +1,7 @@
 'use strict'; 
 
 angular.module('browseModule')
-.controller('boardCtrl', function($scope, $location, $route, $routeParams, pubRecordService, markdownService) {
-    // captures /b/bltn /b/board /browse
-    $scope.inBoard = true;
+.controller('parentBrowseCtrl', function($scope) {
     $scope.favTog = false;
     $scope.isFavorite = function(val, i) {
         if ($scope.favTog) {
@@ -14,7 +12,14 @@ angular.module('browseModule')
             }
         } 
         return true;
-    }
+    };
+    
+})
+.controller('boardCtrl', function($scope, $location, $route, $routeParams, $controller, pubRecordService, markdownService) {
+    // captures /b/bltn /b/board /browse
+    $scope.inBoard = true;
+    $controller('parentBrowseCtrl', {$scope: $scope});
+
 
     var lastRoute = $route.current;
     $scope.$on('$locationChangeSuccess', function(event, d) {
@@ -95,20 +100,11 @@ angular.module('browseModule')
     }
 
 })
-.controller('authorCtrl', function($scope, $location, $route, $routeParams, pubRecordService, markdownService) {
+.controller('authorCtrl', function($scope, $location, $route, $routeParams, $controller, pubRecordService, markdownService) {
     // captures /b/authors/ /b/author/<addr> /b/a/bltn/<txid>
     $scope.inAuthor = true;
-    $scope.favTog = false;
-    $scope.isFavorite = function(val, i) {
-        if ($scope.favTog) {
-            if (val.favorite) {
-                return true;
-            } else {
-                return false;
-            }
-        } 
-        return true;
-    }
+    $controller('parentBrowseCtrl', {$scope: $scope});
+
 
 
     var lastRoute = $route.current;
@@ -184,7 +180,7 @@ angular.module('browseModule')
         });
     }
 })
-.controller('bltnCtrl', function($scope, markdownService) {
+.controller('bltnCtrl', function($scope, markdownService, settingsService) {
 // Functions to bind into the current scope:
     $scope.moreDetail = function(bltn) {
         bltn.detail = !bltn.detail;
@@ -216,5 +212,10 @@ angular.module('browseModule')
     $scope.renderMd = function(bltn) {
         var html = markdownService.makeHtml(bltn.msg);
         bltn.markdown = html;
+    }
+
+    if (settingsService.renderMd) {
+        $scope.bltn.renderMd = true;
+        $scope.renderMd($scope.bltn);
     }
 });
