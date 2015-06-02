@@ -2,9 +2,9 @@
 </div>
 <div class="modal-content card"> 
     <label>Enter wallet passphrase:<input type="password" ng-model="passphrase" /></label>
-    <div class="notif" ng-class="status" ng-bind="modalMsg"></div>
-    <button class="btn green" ng-disabled="!actionEnabled" ng-click="actionEnabled && handleComposeBltn(passphrase)"> 
-        Compose
+    <div class="notif" ng-class="status" ng-bind="modalMsg" ng-bind-html="modalHtmlMsg" ></div>
+    <button class="btn green" ng-disabled="!actionEnabled" ng-click="actionEnabled && actionHandle(passphrase)"> 
+        {{ action }}
     </button>
     <button class="btn gray" ng-click="closeModal()">
         Close

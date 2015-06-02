@@ -6,14 +6,15 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
     ombWebSocket, 
     walletService, 
     draftService, 
-    paneState, 
+    sendPaneState, 
     markdownService, 
-    ModalService
+    ModalService,
+    todoService
 ){
 
     $scope.draftBltn = draftService;
     $scope.wallet = walletService;
-    $scope.state = paneState;
+    $scope.state = sendPaneState;
 
     $scope.inAuthor = true;
     $scope.testBltn = {};
@@ -33,11 +34,11 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
 
     $scope.updateEst = updateEst;
 
-    updateEst(paneState.estimate);
+    updateEst(sendPaneState.estimate);
 
     $scope.toggleRender = function() {
-        paneState.renderTog = !paneState.renderTog;
-        if (paneState.renderTog) {
+        sendPaneState.renderTog = !sendPaneState.renderTog;
+        if (sendPaneState.renderTog) {
             // Create a new bltn and load it into scope.            
             var now = new Date().getTime();
             var testBltn = {
@@ -46,53 +47,106 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
                 timestamp: now,
                 author: walletService.address
             };
-            paneState.testBltn = testBltn;
+            sendPaneState.testBltn = testBltn;
         } 
     }
 
-    $scope.handleSendBltn = function() {
+    $scope.notImpl = todoService.notImplemented;
 
-        ombWebSocket.composeBulletin(draftService)
-        .then(function(txid) {
-            console.log("Sendbulletin succeeded", txid);
-        }, function(failure) {
-            console.log("Sendbulletin failed", failure);
+    $scope.showSendModal = function() {
+        ModalService.showModal({
+            templateUrl: "send/passphraseModal.html",
+            controller: "sendModalCtrl"
         });
-        draftService.msg = '';
-        draftService.board = '';
-    };
+    }
 
     $scope.showComposeModal = function() {
         ModalService.showModal({
-            templateUrl: "send/composeModal.html",
+            templateUrl: "send/passphraseModal.html",
             controller: "composeModalCtrl"
         });
     }
 
 })
-.controller('composeModalCtrl', function($scope, $q, close, draftService, ombWebSocket) {
+.controller('passphraseModalCtrl', function($scope, ModalService) {
+
     $scope.passphrase = "";
     $scope.actionEnabled = true;
-    console.log("Hit the modal Ctrl");
 
-    function setModalMsg(color, msg) {
+    console.log("Hit the passphrase Ctrl");
+
+    $scope.setModalMsg = function(color, msg) {
         $scope.status = color;
+        $scope.modalHtml = "";
         $scope.modalMsg = msg;
     };
 
-    setModalMsg("blue", "This command will create a new bulletin, but it will not send it."+
-                        " To send the bulletin copy and paste the returned hex string into a service that transmits raw bitcoin transactions.");
+    $scope.setModalHtml = function(color, elem) {
+        $scope.color = color;
+        $scope.modalMsg = "";
+        $scope.modalHtmlMsg = elem;
+    }
+})
+.controller('sendModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService) {
+    $controller('passphraseModalCtrl', {$scope: $scope});
 
     $scope.closeModal = function() {
         close(); 
     };
 
-    $scope.handleComposeBltn = function(passphrase) {
+    $scope.action = "Send";
+
+    $scope.setModalMsg("red",  "This command will create a new bulletin and submit it to the bitcoin network."+
+        " Be careful! Anything you say will be publicly recorded in the TestNet block chain.");
+
+    console.log("hit sendModalCtrl");
+
+    $scope.actionHandle = function(passphrase) {
         if (passphrase === "") {
-            setModalMsg("red", "Enter a passphrase!");
+            $scope.setModalMsg("red", "Enter a passphrase!");
             return;
         }
+        ombWebSocket.unlockWallet(passphrase)
+        .then(/* success */ function(reply) {
+            $scope.passphrase = "";
+            $scope.actionEnabled = false;
+            console.log("send unlocked wallet", reply);
+            return ombWebSocket.sendBulletin(draftService);
+        }).then(/* success */ function(reply) {
+            var txidhref = "/#/b/bltn/" + reply.result;
+            var anchor = "<a href='"+txidhref+"' >"+reply.result+"</a>";
+            $scope.setModalHtml("green", anchor);
+            console.log("send suceeded:", reply);
+            sendPaneState.resetDraft();
+            $scope.actionEnabled = true;
+        }, /* failure */ function(reply) {
+            console.log("send failed for reason:", reply);
+            $scope.passphrase = "";
+            $scope.setModalMsg("red", reply.error.message);
+            $scope.actionEnabled = true;
+        });
+    };
+})
+.controller('composeModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService) {
+    $controller('passphraseModalCtrl', {$scope: $scope});
 
+    $scope.closeModal = function() {
+        close(); 
+    };
+
+
+    $scope.action = "Compose";
+
+    $scope.setModalMsg("blue", "This command will create a new bulletin, but it will not send it."+
+        " To send the bulletin copy and paste the returned hex string into"+ 
+    " a service that transmits raw bitcoin transactions.");
+
+
+    $scope.actionHandle = function(passphrase) {
+        if (passphrase === "") {
+            $scope.setModalMsg("red", "Enter a passphrase!");
+            return;
+        }
         ombWebSocket.unlockWallet(passphrase)
         .then(/* success */ function(reply) {
             $scope.passphrase = "";
@@ -101,14 +155,13 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
             return ombWebSocket.composeBulletin(draftService);
         })
         .then(/* success */ function(reply) {
-            setModalMsg("green", reply.result);
-            draftService.msg = '';
-            draftService.board = '';
+            $scope.setModalMsg("green", reply.result);
+            sendPaneState.resetDraft();
             $scope.actionEnabled = true;
 
         }, /* failure */ function(reply) {
             $scope.passphrase = "";
-            setModalMsg("red", reply.error.message);
+            $scope.setModalMsg("red", reply.error.message);
             $scope.actionEnabled = true;
         });
     };
@@ -121,13 +174,22 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
     };
     return draftBltn;
 })
-.factory('paneState', function() {
+.factory('sendPaneState', function(draftService) {
     // Holds the state of the pane across initializations
     //
     var state = {
         renderTog: false, // The toggle for the bltn renderer
         testBltn: {},
         estimate: { 'val': '0.000', 'len': 0 },
+    };
+
+    state.resetDraft = function() {
+        state.renderTog = false
+        draftService.msg = '';
+        draftService.board = '';
+        state.estimate.len = 0;
+        state.estimate.val = '0.000';
     }
+
     return state;
 });

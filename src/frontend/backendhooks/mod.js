@@ -61,6 +61,7 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         var responded = false;
         var timeoutSecs = 5;
         setTimeout(timeoutSecs*1000, function() {
+            console.log("msg time out fired");
             if (!responded) {
                 msg = {
                     error: {
@@ -71,6 +72,7 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
             }
         });
         return function(msg) {
+            console.log("callback saw a msg", msg);
             if (msg.error !== null) {
                 deferred.reject(msg);
             } else {
@@ -198,4 +200,22 @@ singleton.factory('ombSettingService', function($http) {
             } else { return false }
         }
     }
+})
+.factory('todoService', function(ModalService) {
+    var service = {}; 
+    
+    service.notImplemented = function() {
+        ModalService.showModal({
+            templateUrl: "backendhooks/notImplemented.html",
+            controller: "notImplModalCtrl",
+        });
+    }
+
+    return service
+})
+.controller('notImplModalCtrl', function($scope, close) {
+    $scope.closeModal = function() {
+        close();
+    }
 });
+

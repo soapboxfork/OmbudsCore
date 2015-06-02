@@ -8,7 +8,7 @@ body {
 }
 
 #globalWrap {
-    width: 1300px;
+    width: 1056px;
     height: 625px;
 }
 
@@ -188,7 +188,7 @@ div.modal-background {
 }
 
 div.modal-content {
-    height: 200px;
+    min-height: 200px;
     width: 400px;
     top: 180px;
     left: 300px;
