@@ -19,17 +19,12 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
     $scope.inAuthor = true;
     $scope.testBltn = {};
 
-    function prec(i) {
-        return i.toFixed(3);
-    }
-
     var txFee = 50000;
 
     function updateEst(estimate) {
         estimate.len = draftService.board.length + draftService.msg.length;
-        estimate.rawval = (txFee + Math.ceil(estimate.len/20)*567)*walletService.unitPerSat;
-        console.log(estimate.rawval);
-        estimate.val = estimate.rawval.toFixed(4);
+        estimate.rawval = (txFee + Math.ceil(estimate.len/20)*567) / walletService.unitPerSat;
+        estimate.val = estimate.rawval;
     };
 
     $scope.updateEst = updateEst;

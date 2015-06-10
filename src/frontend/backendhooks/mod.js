@@ -2,46 +2,8 @@
 
 var singleton = angular.module('backendHooks', ['ngWebSocket']);
 
-
-singleton.factory('ahimsaRestService', function($http, $interval) {
-  
-  var serverInfo = { 'blkHeight': 0 };
-
-  function updateService() { 
-      $http.get('/api/status').then(function(result) {
-          serverInfo = result.data;
-      });
-  }
-
-  updateService();
-  $interval(updateService, 15*1000, 0, true);
-
- 
-  
-  // the endpoint must be from the same origin, otherwise this doesn't work!
-  return {
-    'getAllBoards': function() {
-      return $http.get('/api/boards')
-    },
-    'getBoard': function(urlname) {
-    // Use the encode function to prevent user submitted data from doing funky stuff with the url.
-      return $http.get('/api/board/' + encodeURIComponent(urlname))
-    },
-    'getNilBoard': function() {
-      return $http.get('/api/nilboard')
-    },
-    'getBulletin': function(txid) {
-        return $http.get('/api/bulletin/'+txid)
-    },
-    'getBlockCount': function() {
-        return serverInfo.blkCount;
-    },
- }
-});
-
 singleton.factory('ombWebSocket', function($websocket, $q) {
     var msgStream = $websocket('ws://localhost:1055/ws/');
-    var collection = [];
 
     var uniqueId = function() {
         var ctr = 0;
@@ -59,21 +21,21 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
         var responded = false;
-        var timeoutSecs = 5;
-        setTimeout(timeoutSecs*1000, function() {
-            console.log("msg time out fired");
+        var timeoutSecs = 3;
+        window.setTimeout(function() {
             if (!responded) {
-                msg = {
+                var msg = {
                     error: {
                         message: "The request timed out",
                     },
                 };
                 deferred.reject(msg);
             }
-        });
+        }, timeoutSecs*1000);
+
         return function(msg) {
-            console.log("callback saw a msg", msg);
             if (msg.error !== null) {
+                responded = true;
                 deferred.reject(msg);
             } else {
                 responded = true;
@@ -86,6 +48,8 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     // functions that will be evaluated when the cmd returns.
     function ResponseCtrl() {
         this.ids = {};
+        // each entry 
+        this.notifHandlers = {};
         this.register = function(id, callback) {
             if (this.ids.hasOwnProperty(id)) {
                 this.ids[id].push(callback);
@@ -93,6 +57,34 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
                 this.ids[id] = [callback];
             }
         };
+
+        this.registerNotifListener = function(method, func) {
+            if (this.notifHandlers.hasOwnProperty(method)) {
+                throw "Notification listener already registered for: " + method;
+                return
+            }
+            this.notifHandlers[method] = func;
+        }
+
+        this.handleMessage = function(msg) {
+            console.log("handling Msg", msg);
+            
+            // handle id response
+            if (this.ids.hasOwnProperty(msg.id)) {
+                var callbacks = this.ids[msg.id];
+                angular.forEach(callbacks, function(callback) {
+                    callback(msg);
+                });
+                delete this.ids[msg.id];
+            }
+
+            // handle notification
+            if (msg.hasOwnProperty("method") && this.notifHandlers.hasOwnProperty(msg.method)) {
+                var func = this.notifHandlers[msg.method];
+                func(msg);
+            }
+
+        }
     };
     var responseCtrl = new ResponseCtrl();
 
@@ -102,16 +94,10 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         try {
             msg = JSON.parse(event.data);
         } catch (e) {
+            console.log(e);
             return;
         }
-
-        if (responseCtrl.ids.hasOwnProperty(msg.id)) {
-            var callbacks = responseCtrl.ids[msg.id];
-            angular.forEach(callbacks, function(callback) {
-                callback(msg);
-            });
-            delete responseCtrl.ids[msg.id];
-        }
+        responseCtrl.handleMessage(msg);
     });
 
     function BtcMsg(method) {
@@ -134,7 +120,7 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
        msgStream.send(JSON.stringify(msg));
 
        return deferred.promise;
-   }
+    }
 
     function composeBulletin(draft){ 
        var msg = BtcMsg("composebulletin");
@@ -160,11 +146,26 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         return deferred.promise;
     }
 
+    function getAccountBalance(minConf) {
+        var msg = BtcMsg("getbalance");
+        msg.params = ["*", minConf];
+
+        var deferred = $q.defer();
+        var callback = errorDiscrim(deferred);
+        responseCtrl.register(msg.id, callback);
+        msgStream.send(JSON.stringify(msg));
+        
+
+        return deferred.promise;
+    }
+
+
     return {
         'sendBulletin': sendBulletin,
         'composeBulletin': composeBulletin,
         'unlockWallet': unlockWallet,
-        'collection': collection 
+        'registerNotifListener': function(m, f) { responseCtrl.registerNotifListener(m, f); },
+        'getAccountBalance': getAccountBalance
     }
 });
 
