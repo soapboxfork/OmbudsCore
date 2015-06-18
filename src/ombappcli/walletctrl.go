@@ -11,10 +11,8 @@ import (
 	"net/http"
 
 	"github.com/btcsuite/btcd/btcjson"
-	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcrpcclient"
 	"github.com/btcsuite/websocket"
-	"github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 type walletCtrl struct {
@@ -59,9 +57,11 @@ func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 			"sendtoaddress":    struct{}{},
 			"listtransactions": struct{}{},
 			"walletpassphrase": struct{}{},
+			"getbalance":       struct{}{},
 		},
 		acceptedWalletForwards: map[string]struct{}{
 			"accountbalance": struct{}{},
+			"blockconnected": struct{}{},
 		},
 	}
 
@@ -74,7 +74,7 @@ func (wc *walletCtrl) notificationListener() {
 		_, msg, err := wc.ws.ReadMessage()
 		if err != nil {
 			// TODO handle reinitalization
-			//log.Printf("Wallet WS broke with: $s\n", err)
+			log.Printf("Wallet WS broke with: $s\n", err)
 			continue
 		}
 
@@ -85,21 +85,21 @@ func (wc *walletCtrl) notificationListener() {
 				log.Printf("Dropping cmd: [%s]\n", cmd.Method())
 				continue
 			}
+			log.Printf("Forwarding cmd: [%s]\n", cmd.Method())
 		}
 
 		reply := btcjson.Reply{}
 		rerr := json.Unmarshal(msg, &reply)
 		if rerr == nil {
 			// Unmarshaled a btcjson.Reply, check to see if it has a good id.
+			s := fmt.Sprintf("%v", reply.Result)
+			log.Printf("Saw Resp: [%s]", s)
 			if reply.Id != nil {
 				s := fmt.Sprintf("%v", *reply.Id)
 				if s[:8] != "frontend" {
 					log.Printf("Bad reply id: [%s]\n", *reply.Id)
 					continue
 				}
-			} else {
-				log.Printf("Bad reply: [%v]\n", reply)
-				continue
 			}
 		}
 
@@ -108,7 +108,10 @@ func (wc *walletCtrl) notificationListener() {
 			continue
 		}
 
-		wc.s.frontend.allMessages <- msg
+		err = wc.s.frontend.TryWrite(msg)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
@@ -134,8 +137,8 @@ func send(cfg *btcrpcclient.ConnConfig, msg []byte) (interface{}, error) {
 	return reply.Result, nil
 }
 
-// sendCommand sends btcjson cmds along to the rpcclient specified in ConnConfig.  A prefix is added to any errors that occur indicating
-// what step failed.
+// sendCommand sends btcjson cmds along to the rpcclient specified in ConnConfig.
+// A prefix is added to any errors that occur indicating what step failed.
 func sendCommand(cfg *btcrpcclient.ConnConfig, command btcjson.Cmd) (interface{}, error) {
 	msg, err := json.Marshal(command)
 	if err != nil {
@@ -150,50 +153,6 @@ func sendCommand(cfg *btcrpcclient.ConnConfig, command btcjson.Cmd) (interface{}
 	return reply, nil
 }
 
-// Updates the internal state of the application while sending the bulletin.
-// The function first authenticates to the wallet and then it will try to send bulletins.
-func (wc *walletCtrl) SendBulletin(board, msg string) (*wire.ShaHash, error) {
-
-	// Create a five second window to send the bulletin
-	timeout := int64(5)
-
-	//TODO change passphrase
-	passphrase := "nalgene"
-	id := "ombwebapp"
-
-	unlockCmd, err := btcjson.NewWalletPassphraseCmd(id, passphrase, timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	err = wc.ws.WriteJSON(unlockCmd)
-	if err != nil {
-		return nil, err
-	}
-
-	addr := "n37T77JKnFFZJN4udvyasZUwVhpidvq9gb"
-	sendCmd := rpcexten.NewSendBulletinCmd(id, addr, board, msg)
-
-	err = wc.ws.WriteJSON(sendCmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO store results of send in settings
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	/*
-
-		txid, err := wire.NewShaHashFromStr(res.(string))
-		if err != nil {
-			return nil, err
-		}*/
-
-	return nil, nil
-}
-
 // Check to see if the passed rpc command is approved to be sent to the
 // the wallet.
 func (wc *walletCtrl) approvedForWallet(cmd btcjson.Cmd) bool {
@@ -206,6 +165,7 @@ func (wc *walletCtrl) forwardCmd(cmd btcjson.Cmd) error {
 	if !wc.approvedForWallet(cmd) {
 		return fmt.Errorf("Cmd [%s] not approved", cmd.Method())
 	}
+	log.Printf("Forwarding [%s] to the wallet\n", cmd.Method())
 	err := wc.ws.WriteJSON(cmd)
 	if err != nil {
 		return err

@@ -63,7 +63,7 @@ func (s *server) Stop() {
 // Listen for events to handler
 func (s *server) eventHandler() {
 
-	tick := time.Tick(2 * time.Second)
+	tick := time.Tick(60 * time.Second)
 
 	for {
 		select {
@@ -77,7 +77,11 @@ func (s *server) eventHandler() {
 				}
 			}
 		case t := <-tick:
-			s.frontend.allMessages <- []byte(fmt.Sprintf("{'error':'null', 'result':'Tick tock: %s'}", t))
+			msg := []byte(fmt.Sprintf(`{"error":"null", "result":"Tick tock: %s"}`, t))
+			err := s.frontend.TryWrite(msg)
+			if err != nil {
+				log.Println(err)
+			}
 		case <-s.quit:
 			break
 		}
@@ -174,11 +178,14 @@ func (fs *frontendServer) writeMessages() {
 	for {
 		select {
 		case b := <-fs.allMessages:
+			log.Printf("Writing: [%s]", b)
 			if err := fs.conn.WriteMessage(websocket.TextMessage, b); err != nil {
+				log.Printf("Write failed to write: [%s] with: ", b, err)
 				fs.releaseHandle <- true
 				return
 			}
 		case <-fs.closeNotif:
+			log.Printf("Closing writeMessage Channle channel")
 			return
 		}
 	}
@@ -188,30 +195,34 @@ func (fs *frontendServer) writeMessages() {
 // can be made. connMonitor also drains the allMessages channel when nothing is
 // there to deal with messages to the websocket.
 func (fs *frontendServer) connMonitor() {
-
-	go func() {
-		for {
-			if !fs.inUse {
-				// drains the channel if the socket is not in use.
-				<-fs.allMessages
-			} else {
-				// wait for the channel to close again.
-				<-fs.closeNotif
-			}
-		}
-	}()
-
 	for {
 		select {
 		case <-fs.takeHandle:
 			// Take the conn's handle
-			fs.inUse = true
 			fs.closeNotif = make(chan bool)
+			fs.inUse = true
 		case <-fs.s.quit:
 			fs.closeConn()
 		case <-fs.releaseHandle:
 			fs.closeConn()
 		}
+	}
+}
+
+// TryWrite will try to write the serialized msg into the frontends allMessages
+// channel. If the channel is full, that means nothing is draining it on, so we
+// will bump the first message out of the channel and add this msg to the back
+// of the queue.
+func (fs *frontendServer) TryWrite(msg []byte) error {
+	select {
+	// Push msg into channel
+	case fs.allMessages <- msg:
+		return nil
+	// If channel is full, discard first msg then push
+	default:
+		delMsg := <-fs.allMessages
+		fs.allMessages <- msg
+		return fmt.Errorf("Dropped msg: [%s]", delMsg)
 	}
 }
 
@@ -225,7 +236,8 @@ func (fs *frontendServer) closeConn() {
 }
 
 // The frontend server will register and authenticate a single websocket connection
-// that can send and recieve messages.
+// that can send and recieve messages. It will start a reader and a writer that
+// pulls messages from the websocket.
 func (fs *frontendServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if fs.inUse {
