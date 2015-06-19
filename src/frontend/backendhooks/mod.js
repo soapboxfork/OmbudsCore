@@ -21,7 +21,7 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
         var responded = false;
-        var timeoutSecs = 3;
+        var timeoutSecs = 10;
         window.setTimeout(function() {
             if (!responded) {
                 var msg = {
@@ -43,6 +43,15 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
             }
         };
     };
+
+    // Creates a promise and sends the msg into the websocket.
+    function deferAndHandle(msg) {
+        var deferred = $q.defer();
+        var callback = errorDiscrim(deferred);
+        responseCtrl.register(msg.id, callback);
+        msgStream.send(JSON.stringify(msg));
+        return deferred.promise;
+    }
 
     // The response controller holds an id that maps to a list of callback
     // functions that will be evaluated when the cmd returns.
@@ -113,59 +122,39 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     function sendBulletin(draft) {
        var msg = BtcMsg("sendbulletin");
        msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
-
-       var deferred = $q.defer();
-       var callback = errorDiscrim(deferred);
-       responseCtrl.register(msg.id, callback);
-       msgStream.send(JSON.stringify(msg));
-
-       return deferred.promise;
-    }
+       return deferAndHandle(msg);
+   }
 
     function composeBulletin(draft){ 
        var msg = BtcMsg("composebulletin");
        msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
-
-       var deferred = $q.defer();
-       var callback = errorDiscrim(deferred);
-       responseCtrl.register(msg.id, callback);
-       msgStream.send(JSON.stringify(msg));
-
-       return deferred.promise;    
+       return deferAndHandle(msg);
     }
 
     function unlockWallet(passphrase) {
         var msg = BtcMsg("walletpassphrase");
         msg.params = [passphrase, 5];
-
-        var deferred = $q.defer();
-        var callback = errorDiscrim(deferred);
-        responseCtrl.register(msg.id, callback);
-        msgStream.send(JSON.stringify(msg));
-
-        return deferred.promise;
+        return deferAndHandle(msg);
     }
 
     function getAccountBalance(minConf) {
         var msg = BtcMsg("getbalance");
         msg.params = ["*", minConf];
-
-        var deferred = $q.defer();
-        var callback = errorDiscrim(deferred);
-        responseCtrl.register(msg.id, callback);
-        msgStream.send(JSON.stringify(msg));
-        
-
-        return deferred.promise;
+        return deferAndHandle(msg);
     }
 
+    function listTransactions() {
+        var msg = BtcMsg("listtransactions");
+        return deferAndHandle(msg);
+    }
 
     return {
         'sendBulletin': sendBulletin,
         'composeBulletin': composeBulletin,
         'unlockWallet': unlockWallet,
-        'registerNotifListener': function(m, f) { responseCtrl.registerNotifListener(m, f); },
-        'getAccountBalance': getAccountBalance
+        'listTransactions': listTransactions,
+        'getAccountBalance': getAccountBalance,
+        'registerNotifListener': function(m, f) { responseCtrl.registerNotifListener(m, f); }
     }
 });
 

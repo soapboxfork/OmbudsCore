@@ -65,7 +65,10 @@ body {
 }
 
 .threeQPane {
-    width: 57%;
+    display: inline-block;
+    width: 75%;
+    height: 100%;
+    float: left;
 }
 
 .banner {

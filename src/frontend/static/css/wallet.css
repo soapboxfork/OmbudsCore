@@ -51,3 +51,79 @@
     margin-top: 15px;
 }
 
+
+/***************** Wallet Pane Styles ******************/
+
+select#selType {
+    float: right;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+
+/***************** List Transactions Styles ******************/
+
+div.wallet-tx-list {
+    max-height: 530px;
+    overflow: auto;
+}
+
+table {
+    border-spacing: 0;
+    width: 100%;
+}
+
+table>thead>tr>th {
+    vertical-align: bottom;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+table>tbody>tr>td {
+    padding: 8px;
+    text-align: left;
+    border-top: 1px solid #ddd;
+}
+
+table>tbody>tr>td.amnt {
+    padding: 5px;
+}
+
+table>tbody>tr>td div {
+    display: inline-block;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+table>tbody>tr>td div.pos {
+    background-color: #dff0d8;
+}
+
+table>tbody>tr>td div.neg {
+    background-color: rgb(255, 150, 150);;
+}
+div.wallet-tx-list table>tbody>tr:nth-of-type(odd) {
+      background-color: #f9f9f9;
+}
+
+/***** This must change *****/
+
+th#a {
+    width: 104px;
+}
+
+th#b {
+    width: 191px;
+}
+
+th#c {
+    width: 140px;
+}
+
+th#d {
+    width: 94px;
+}
+
+th#e {
+    width: 126px;
+}

@@ -1,46 +1,47 @@
 <div id="WalletPane">
-    <div class="halfPane">
+    <div class="quartPane">
         <div class="banner">
             <h2>Balance</h2>
         </div>
         <div class="sub-banner">
             <wallet-widget info="wallet"></wallet-widget>
         </div>
+        <button id="sendBtcBtn" class="btn" ng-click="notImpl()">
+            Send BTC
+        </button>
     </div>
-    <div class="halfPane">
+    <div class="threeQPane">
         <div class="banner">
-            <h2>Recent Transactions</h2>
+            <h2>Recent Transactions
+                <select id=selType name="listView" ng-model="filtOption" ng-change="filterFunc()">
+                    <option value="all">All</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </h2>
         </div>
         <div class="sub-banner">
-            <select name="listView">
-                <option value="txs">Confirmed</option>
-                <option value="txs">Pending</option>
-                <option value="txs">All</option>
-            </select>
-            <table> 
-                <thead>
-                    <tr>
-                        <th>Txid</th>
-                        <th>Depth</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tr>
-                    <td>debe323a590e</td>
-                    <td>323</td>
-                    <td>0.05</td>
-                </tr>
-                <tr>
-                    <td>debe323a590e</td>
-                    <td>323</td>
-                    <td>0.05</td>
-                </tr>
-                <tr>
-                    <td>debe323a590e</td>
-                    <td>323</td>
-                    <td>0.05</td>
-                </tr>
-            </table>
-        </div>
+                <table> 
+                    <thead>
+                        <tr>
+                            <th id=a>Type</th>
+                            <th id=b>Transaction Id</th>
+                            <th id=c>Amount</th>
+                            <th id=d>Confirms</th>
+                            <th id=e>Time Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    
+                </table>
+                <div class=wallet-tx-list>
+                    <table>
+                        <tbody>
+                            <tr class="tx-row" ng-repeat="tx in transactions | orderBy:'-timereceived'" tx="tx"></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
     </div>
 </div>

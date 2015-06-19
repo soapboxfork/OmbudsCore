@@ -1,27 +1,87 @@
 'use strict';
 
 angular.module('walletModule', ['monospaced.qrcode'])
-.controller('walletPaneCtrl', function($scope, walletService) {
+.controller('walletPaneCtrl', function($scope, walletService, txListService, todoService) {
     $scope.wallet = walletService;
+    $scope.notImpl = todoService.notImplemented;
+
+    $scope.transactions = txListService.transactions
+
+    $scope.filterFunc = function() {
+        if ($scope.filtOption === "all") {
+            txListService.showEverything(); 
+        } else if ($scope.filtOption === "confirmed") {
+            txListService.onlyConfirmed(); 
+        } else if ($scope.filtOption === "pending") {
+            txListService.onlyPending();
+        } else {
+            debugger;
+        }
+    };
+
+    $scope.filtOption = txListService.filtOption;
 })
-.directive('walletWidget', function(){
-    return {
-        scope: {
-            wallet: '=info' 
-        },
-        templateUrl: '/wallet/wallet-widget.html',
-        restrict: 'E'
+.factory('txListService', function(ombWebSocket) {
+    var txBucket = [];
+    
+    var service = {
+        transactions: [],
+        filtOption: 'all',
+        'showEverything': showEverything,
+        'onlyConfirmed' : onlyConfirmed,
+        'onlyPending'   : onlyPending
     }
-})
-.directive('coinAmnt', function() {
-    return {
-        scope : {
-            amount: "=",
-            unit: "="
-        },
-        templateUrl: 'wallet/coin-amnt.html',
-        restrict: 'E'
+
+    function showEverything() {
+        service.transactions.length = 0;
+        angular.forEach(txBucket, function(tx) {
+            service.transactions.push(tx);
+        });
     }
+
+    function pushAll(lst) {
+        service.transactions.length = 0;
+        angular.forEach(lst, function(tx) {
+            service.transactions.push(tx);
+        });
+    }
+
+    function onlyConfirmed() {
+        var res = txBucket.filter(function(tx) {
+            if (tx.confirmations > 0) {
+                return true;
+            }
+            return false;
+        });
+        service.transactions.length = 0;
+        pushAll(res);
+    }
+
+    function onlyPending() {
+        service.transactions.length = 0;
+        var res = txBucket.filter(function(tx) {
+            if (tx.confirmations > 0) {
+                return false;
+            }
+            return true;
+        });
+        pushAll(res);
+    }
+
+    ombWebSocket.listTransactions()
+    .then(function(resp) {
+        // initialize the txBucket.
+        txBucket = resp.result;
+
+        // empty existing tx array...
+        service.transactions.length = 0;
+        angular.forEach(resp.result, function(tx) {
+            tx.amount *= 1000;
+            service.transactions.push(tx); 
+        });
+    });
+    
+    return service
 })
 .factory('walletService', function(ombWebSocket) {
     var wallet = {
@@ -33,7 +93,7 @@ angular.module('walletModule', ['monospaced.qrcode'])
 
     function convBTCtoUnit(btc) {
         // unitPerSat / satoshis * btc 
-        var valInUnits = wallet.unitPerSat / (1e8 * btc);
+        var valInUnits = (1e8 * btc) / wallet.unitPerSat;
         return valInUnits;
     }
 
