@@ -74,13 +74,19 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         $scope.status = color;
         $scope.modalHtml = "";
         $scope.modalMsg = msg;
+        $scope.showTextModal = true;
+        $scope.showLinkModal = false;
     };
 
-    $scope.setModalHtml = function(color, elem) {
-        $scope.color = color;
-        $scope.modalMsg = "";
-        $scope.modalHtmlMsg = elem;
-    }
+    $scope.setModalLink = function(color, href, text) {
+        $scope.status = color;
+        $scope.link = {
+            href: href,
+            text: text
+        };
+        $scope.showTextModal = false;
+        $scope.showLinkModal = true;
+    };
 })
 .controller('sendModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService) {
     $controller('passphraseModalCtrl', {$scope: $scope});
@@ -105,17 +111,13 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         .then(/* success */ function(reply) {
             $scope.passphrase = "";
             $scope.actionEnabled = false;
-            console.log("send unlocked wallet", reply);
             return ombWebSocket.sendBulletin(draftService);
         }).then(/* success */ function(reply) {
             var txidhref = "/#/b/bltn/" + reply.result;
-            var anchor = "<a href='"+txidhref+"' >"+reply.result+"</a>";
-            $scope.setModalHtml("green", anchor);
-            console.log("send suceeded:", reply);
+            $scope.setModalLink("green", txidhref, reply.result);
             sendPaneState.resetDraft();
             $scope.actionEnabled = true;
         }, /* failure */ function(reply) {
-            console.log("send failed for reason:", reply);
             $scope.passphrase = "";
             $scope.setModalMsg("red", reply.error.message);
             $scope.actionEnabled = true;
