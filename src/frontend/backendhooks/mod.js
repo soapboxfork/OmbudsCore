@@ -21,7 +21,7 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
         var responded = false;
-        var timeoutSecs = 10;
+        var timeoutSecs = 2;
         window.setTimeout(function() {
             if (!responded) {
                 var msg = {
@@ -148,17 +148,22 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         return deferAndHandle(msg);
     }
 
+    function getInfo() {
+        var msg = BtcMsg("getinfo");
+        return deferAndHandle(msg);
+    }
+
     return {
         'sendBulletin': sendBulletin,
         'composeBulletin': composeBulletin,
         'unlockWallet': unlockWallet,
         'listTransactions': listTransactions,
         'getAccountBalance': getAccountBalance,
+        'getInfo': getInfo,
         'registerNotifListener': function(m, f) { responseCtrl.registerNotifListener(m, f); }
     }
-});
-
-singleton.factory('ombSettingService', function($http) {
+})
+.factory('ombSettingService', function($http) {
     var settings;
 
     $http.get('/settings/').then(function(result) {
@@ -190,6 +195,21 @@ singleton.factory('ombSettingService', function($http) {
             } else { return false }
         }
     }
+})
+.factory('blkHeightService', function(ombWebSocket) {
+    var service = {
+        height: 0
+    }
+
+    ombWebSocket.getInfo().then(function(resp) {
+        service.height = resp.result.blocks;
+    });
+    
+    ombWebSocket.registerNotifListener('blockconnected', function(resp) {
+        service.height = resp.params[1];
+    });
+
+    return service;
 })
 .factory('todoService', function(ModalService) {
     var service = {}; 

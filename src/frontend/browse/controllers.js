@@ -102,7 +102,15 @@ angular.module('browseModule')
     }
 
 })
-.controller('authorCtrl', function($scope, $location, $route, $routeParams, $controller, pubRecordService, markdownService) {
+.controller('authorCtrl', function(
+    $scope, 
+    $location, 
+    $route, 
+    $routeParams, 
+    $controller, 
+    pubRecordService, 
+    markdownService
+) {
     // captures /b/authors/ /b/author/<addr> /b/a/bltn/<txid>
     $scope.inAuthor = true;
     $controller('parentBrowseCtrl', {$scope: $scope});
@@ -180,7 +188,7 @@ angular.module('browseModule')
         });
     }
 })
-.controller('bltnCtrl', function($scope, markdownService, settingsService) {
+.controller('bltnCtrl', function($scope, markdownService, settingsService, blkHeightService) {
 // Functions to bind into the current scope:
     var bltn = $scope.bltn;
 
@@ -190,17 +198,17 @@ angular.module('browseModule')
 
     var base = "/static/images/"
     $scope.depthImg = function(bltn) {
-        var curHeight = 446000;
+        var curHeight = blkHeightService.height;
+        if (curHeight === 0) {
+            return base + '0conf.png';
+        }
 
         if (!angular.isDefined(bltn.blk)) {
             // The bltn is not mined
             return base + "0conf.png"       
         } else {
             // The bltn is in some block
-            var diff = 9001;
-            if (bltn.hasOwnProperty('blkHeight')) {
-                diff = curHeight - bltn.blkHeight;
-            }
+            var diff = curHeight - bltn.blkHeight;
 
             if (diff > 3) {
                 // The bltn is somewhere in the chain
