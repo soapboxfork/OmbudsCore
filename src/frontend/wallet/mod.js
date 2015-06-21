@@ -126,9 +126,5 @@ angular.module('walletModule', ['monospaced.qrcode'])
         }
     });
 
-    ombWebSocket.registerNotifListener("blockconnected", function(json_obj) {
-        console.log("blkconnected", json_obj);
-    });
-
     return wallet;
 });

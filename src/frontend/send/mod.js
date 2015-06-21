@@ -153,7 +153,6 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         })
         .then(/* success */ function(reply) {
             $scope.setModalMsg("green", reply.result);
-            sendPaneState.resetDraft();
             $scope.actionEnabled = true;
 
         }, /* failure */ function(reply) {

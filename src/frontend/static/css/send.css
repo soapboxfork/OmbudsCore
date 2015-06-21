@@ -3,7 +3,14 @@
 }
 
 #sendPane .sub-banner {
-    margin-right: 15px
+    margin-right: 15px;
+    height: 568px;
+}
+
+#sendPane .bltnPreview {
+    height: 550px;
+    overflow-y: scroll;
+    padding: 1px;
 }
 
 #sendPane #sendBox {
@@ -18,13 +25,11 @@
 #sendPane input.board {
     width: 100%;
     height: 25px;
-    padding-left: 6px;
 }
 
 #sendPane textarea.content {
     width: 100%;
     height: 400px;
     font-size: 1em;
-    padding: 6px;
 }
 
