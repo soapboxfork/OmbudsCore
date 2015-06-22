@@ -58,6 +58,7 @@ func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 			"listtransactions": struct{}{},
 			"walletpassphrase": struct{}{},
 			"getbalance":       struct{}{},
+			"getinfo":          struct{}{},
 		},
 		acceptedWalletForwards: map[string]struct{}{
 			"accountbalance": struct{}{},
@@ -80,9 +81,8 @@ func (wc *walletCtrl) notificationListener() {
 
 		cmd, perr := btcjson.ParseMarshaledCmd(msg)
 		if perr == nil {
-			// Unmarshaled a btcjson.cmd
+			// Unmarshaled a btcjson.cmd, drop the cmd if it is not of interest to us.
 			if !wc.approvedForFrontend(cmd) {
-				log.Printf("Dropping cmd: [%s]\n", cmd.Method())
 				continue
 			}
 			log.Printf("Forwarding cmd: [%s]\n", cmd.Method())
