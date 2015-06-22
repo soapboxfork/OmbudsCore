@@ -1,4 +1,4 @@
-angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'markdownModule', 'settingsModule'])
+angular.module('browseModule', ['ngWebSocket', 'ngRoute', 'markdownModule', 'settingsModule', 'backendHooks'])
 // TODO handle nested routing properly by reworking controllers
 .config(['$routeProvider', function($routeProvider) {
 

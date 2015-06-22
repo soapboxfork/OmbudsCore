@@ -55,8 +55,8 @@
             </div>
         </div>
         <div id="contentPane" class="boardDisplay">
-            <div ng-if="inBoard" ng-repeat="bltn in activeBoard.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
-            <div ng-if="inAuthor" ng-repeat="bltn in activeAuthor.bltns | orderBy:'timestamp' track by bltn.txid" class="pinBulletin"></div>
+            <div ng-if="inBoard" ng-repeat="bltn in activeBoard.bltns | orderBy:'-timestamp' track by bltn.txid" class="pinBulletin"></div>
+            <div ng-if="inAuthor" ng-repeat="bltn in activeAuthor.bltns | orderBy:'-timestamp' track by bltn.txid" class="pinBulletin"></div>
         </div>
     </div>
 </div>

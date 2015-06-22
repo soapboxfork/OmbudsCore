@@ -31,8 +31,8 @@
     <div class="detail" ng-show="bltn.detail">
         <table class="">
             <tr><td>Author:</td><td><a href="/#/b/author/{{ bltn.author }}">{{ bltn.author }}</a></td></tr>
-            <tr><td>Tx Timestamp:</td><td>{{ bltn.timestamp }}</td></tr>
-            <tr><td>Block Timestamp:</td><td>{{ bltn.blkTimestamp }}</td></tr>
+            <tr><td>Tx Timestamp:</td><td>{{ bltn.timestamp | nicedatetime }}</td></tr>
+            <tr><td>Block Timestamp:</td><td>{{ bltn.blkTimestamp | nicedatetime }}</td></tr>
             <tr><td>Tx Hash:</td><td class="tiny"><a ng-click="bltn.linked = true" href="/#/b/bltn/{{ bltn.txid }}">{{ bltn.txid }}</a></td></tr>
             <tr><td>Block Hash:</td><td class="tiny">{{ bltn.blk }}</td></tr>
         </table>
