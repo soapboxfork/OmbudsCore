@@ -1,0 +1,15 @@
+div.setup {
+    padding: 10px;
+}
+
+div.setup label {
+    display: block;
+}
+    
+div.setup table {
+    border-bottom: 1px solid #ddd;
+}
+
+div.setup .btn {
+    display: block;
+}

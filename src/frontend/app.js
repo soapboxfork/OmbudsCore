@@ -31,8 +31,76 @@ var ombWebApp = angular.module("ombWebApp", [
         controller: 'walletPaneCtrl',
         templateUrl: 'wallet/pane.html'
     })
+    .when('/setup', {
+        controller: 'setupCtrl',
+        templateUrl: 'setup.html'
+    })
     .otherwise('/settings');
 }])
+.controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService) {
+    $scope.loading = true;
+    $scope.language = "en";
+    var waitSecs = 30;
+
+    $scope.dialogCtr = 1;
+    $scope.dialogLast = 4;
+    $scope.waitSecs = waitSecs;
+    $scope.notImpl = todoService.notImplemented;
+
+    $scope.forward = function() {
+        switch ($scope.dialogCtr) {
+        case 1:
+            switch ($scope.language) {
+                case "gb-en":
+                case "gr":
+                case "tk":
+                    // TODO add easter egg
+                    $scope.notImpl();
+                    break;
+                default:
+                    break;
+            }
+            // Start the countdown timer.
+            if ($scope.waitSecs == waitSecs) {
+                $interval(function() {
+                    $scope.waitSecs -=1 
+                }, 1000, 30)
+            }
+            break;
+        case 2: 
+            break;
+        default:
+            break;
+        }
+        $scope.dialogCtr += 1;
+    }
+    
+    $scope.back = function() {
+        $scope.dialogCtr -= 1;
+    }
+
+    $scope.finishSetup = function() {
+        $location.path('/');
+    }
+
+    appInitService.getStatus().then(function (confd) {
+        // If the system is not configured, prompt the initialization modal.
+        if (!confd) {
+            $scope.loading = false;
+            var config = {
+                passphrase: "malgene"
+            }
+            appInitService.initSystem(config)
+            .then(function() {
+                console.log("System succesfully initialized!");
+            }, function(msg) {
+                console.log("Initialize failed with: " + msg); 
+            });
+        }
+        // The system is configured. Redirect to settings 
+        //$location.path('/');
+    });
+})
 .controller('paneCtrl', function($scope, locationService, todoService) {
     $scope.panes = locationService.getAllPanes();
     $scope.activePane = locationService.activePane;
@@ -42,7 +110,6 @@ var ombWebApp = angular.module("ombWebApp", [
     };
     $scope.notImpl = todoService.notImplemented;
     $scope.paneUrl = function(name){ return "/#/"+name; };
-
 })
 .factory('locationService', function($location) {
     // Documents the panes we have in the application

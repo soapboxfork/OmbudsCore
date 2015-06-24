@@ -224,8 +224,8 @@ div.modal-content div.notif {
     font-weight: bold;
     padding: 10px 20px 10px 20px;
     text-decoration: none;
-    width: 130px;
-    height: 38px;
+    min-width: 130px;
+    min-height: 38px;
     background: #AAA;
     display: block;
 }
@@ -259,6 +259,14 @@ div.modal-content div.notif {
     background: #4E7EA5;
 }
 
+.btn.red {
+    background: #e85252;
+}
+
+.btn.red:hover {
+    background: #f19797;
+}
+
 /******************* Background Colors *****************/
 .red {
     background: #f2dede;
@@ -271,6 +279,21 @@ div.modal-content div.notif {
 .blue {
     background: #d9edf7;
 }
+
+/***************** Tables ******************/
+ 
+table>thead>tr>th {
+    vertical-align: bottom;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+table>tbody>tr>td {
+    padding: 8px;
+    text-align: left;
+    border-top: 1px solid #ddd;
+}
+
 
 /***************** Scrollbars ****************/
 ::-webkit-scrollbar {
