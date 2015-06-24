@@ -26,17 +26,18 @@ type Favorites struct {
 }
 
 type Preferences struct {
-	RenderAllMd     bool `json:"renderMd"`  // Flag to render all markdown in every board.
-	LastActive      int  `json:"lastLogin"` // The last time the user browsed content.
-	DisplayTooltips bool `json:"tooltips"`  // Flag that toggles tooltips in the gui.
+	RenderAllMd     bool   `json:"renderMd"`  // Flag to render all markdown in every board.
+	LastActive      int    `json:"lastLogin"` // The last time the user browsed content.
+	DisplayTooltips bool   `json:"tooltips"`  // Flag that toggles tooltips in the gui.
+	TwitAppToken    string `json:"appToken"`
+	TwitUserToken   string `json:"userToken"`
 }
 
 type settings struct {
-	Address       string      `json:"address"`
-	Favorites     Favorites   `json:"favorites"`
-	TwitAppToken  string      `json:"appToken"`
-	TwitUserToken string      `json:"userToken"`
-	Preferences   Preferences `json:"preferences"`
+	Initialized bool        `json:"initialized"` // Flag that handles initial startup functionality
+	Address     string      `json:"address"`
+	Favorites   Favorites   `json:"favorites"`
+	Preferences Preferences `json:"preferences"`
 }
 
 func (h *settingCtrl) Commit() error {
@@ -204,12 +205,79 @@ func (setc *settingCtrl) saveFavorite(sf SingleFav) error {
 	return nil
 }
 
+// isInitialized ensures that the wallet and the json setting 'Initialized' are
+// in sync. It does this by asking the wallet a question about
+func (setc *settingCtrl) isInitialized() (bool, error) {
+	// check the internal initialized param
+
+	// check the state of the wallet
+
+	// if they are different log the error and throw the error
+
+	// Otherwise the system is (momentarily) sync
+}
+
+// initializeSystem
+func (setc *settingCtrl) initializeSystem(params rpcexten.SystemSetupParams) error {
+
+}
+
+type walletSetupJson struct {
+	Passphrase string `json:"passphrase"`
+}
+
+// handleWalletSetup listens for http posts with parameters to configure a new
+// wallet for the frontend. It signifies completion of the task with a 201.
+// This signifies that an HD wallet, a wallet address and new settings have
+// been saved and succesfully created.
+func (setc *settingCtrl) handleWalletSetup() func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, request *http.Request) {
+		var ws walletSetupJson
+		// Decode the request
+		decoder := json.NewDecoder(request.Body)
+		err := decoder.Decode(&ws)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Validate the request
+		if ws == "" {
+			validationErr = fmt.Errorf("json did not validate")
+			http.Error(w, validationErr, http.StatusBadRequest)
+			return
+		}
+		// Check to see if the system is already initialized
+		ok, err := setc.isInitialized()
+		if err != nil {
+			initErr = fmt.Errorf("System init check failed with [%s]", err)
+			http.Error(w, initErr, http.StatusInternalServerError)
+			return
+		}
+
+		// The system is already initialized. Return with not modified
+		if ok {
+			err = fmt.Errorf("System already initialized")
+			http.Error(w, err, http.StatusNotModified)
+			return
+		}
+
+		// If not Handle initializing the system.
+		err := setc.initializeSystem()
+		if err != nil {
+			err = fmt.Errorf("System initiliaztion failed with [%s]", err)
+			http.Error(w, err, http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
 func (setc *settingCtrl) Handler(prefix string) http.Handler {
 	p := prefix
 	router := mux.NewRouter()
-	router.HandleFunc(p+"favorite/", setc.handleFavorite())
-	//router.HandleFunc(p+"twitter/", setc.registerUser())
-	//router.HandleFunc(p+"prefs/", setc.setPreferences())
+	router.HandleFunc(p+"initialize", setc.handleWalletSetup())
+	router.HandleFunc(p+"favorite", setc.handleFavorite())
+	//router.HandleFunc(p+"twitter", setc.registerUser())
+	//router.HandleFunc(p+"prefs", setc.setPreferences())
 	router.HandleFunc(p, setc.allSettingsHandler())
 	return router
 }

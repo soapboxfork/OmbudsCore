@@ -185,7 +185,7 @@ func (fs *frontendServer) writeMessages() {
 				return
 			}
 		case <-fs.closeNotif:
-			log.Printf("Closing writeMessage Channle channel")
+			log.Printf("Closing writeMessage channel")
 			return
 		}
 	}
