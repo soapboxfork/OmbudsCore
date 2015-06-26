@@ -18,17 +18,19 @@ import (
 type walletCtrl struct {
 	s                      *server
 	ws                     *websocket.Conn
+	rpcCfg                 *btcrpcclient.ConnConfig
+	connected              bool                // Flag for a valid wallet connection
 	acceptedFrontendCmds   map[string]struct{} // Commands that the frontend can send to the wallet
 	acceptedWalletForwards map[string]struct{} // Commands from the wallet that are sent to the frontend
 }
 
 func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
-	cert, err := ioutil.ReadFile(cfg.CAFile)
+	certs, err := ioutil.ReadFile(cfg.CAFile)
 	if err != nil {
 		return nil, err
 	}
 	pool := x509.NewCertPool()
-	pool.AppendCertsFromPEM(cert)
+	pool.AppendCertsFromPEM(certs)
 
 	tlsCfg := &tls.Config{
 		RootCAs:    pool,
@@ -48,9 +50,19 @@ func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 		return nil, err
 	}
 
+	rpcCfg := &btcrpcclient.ConnConfig{
+		Host:         cfg.RPCConnect,
+		User:         cfg.Username,
+		Pass:         cfg.Password,
+		Certificates: certs,
+		Endpoint:     "ws",
+	}
+
 	wc := &walletCtrl{
-		ws: ws,
-		s:  s,
+		ws:        ws,
+		connected: true,
+		rpcCfg:    rpcCfg,
+		s:         s,
 		acceptedFrontendCmds: map[string]struct{}{
 			"sendbulletin":     struct{}{},
 			"composebulletin":  struct{}{},
@@ -69,13 +81,24 @@ func newWalletCtrl(s *server, cfg *config) (*walletCtrl, error) {
 	return wc, nil
 }
 
+func (wc *walletCtrl) Start() {
+	go wc.notificationListener()
+}
+
+func (wc *walletCtrl) IsConnected() bool {
+	return wc.connected
+}
+
 // Listens for notifications from the wallet
 func (wc *walletCtrl) notificationListener() {
 	for {
 		_, msg, err := wc.ws.ReadMessage()
 		if err != nil {
 			// TODO handle reinitalization
-			log.Printf("Wallet WS broke with: $s\n", err)
+			if wc.connected {
+				wc.connected = false
+				log.Printf("Wallet WS broke with: $s\n", err)
+			}
 			continue
 		}
 
@@ -139,13 +162,13 @@ func send(cfg *btcrpcclient.ConnConfig, msg []byte) (interface{}, error) {
 
 // sendCommand sends btcjson cmds along to the rpcclient specified in ConnConfig.
 // A prefix is added to any errors that occur indicating what step failed.
-func sendCommand(cfg *btcrpcclient.ConnConfig, command btcjson.Cmd) (interface{}, error) {
-	msg, err := json.Marshal(command)
+func (wc *walletCtrl) sendCommand(cmd btcjson.Cmd) (interface{}, error) {
+	msg, err := cmd.MarshalJSON()
 	if err != nil {
 		return nil, fmt.Errorf("createMessage: %v", err.Error())
 	}
 
-	reply, err := send(cfg, msg)
+	reply, err := send(wc.rpcCfg, msg)
 	if err != nil {
 		return nil, fmt.Errorf("rpcCommand: %v", err.Error())
 	}

@@ -52,7 +52,8 @@ func newServer(cfg *config) (*server, error) {
 }
 
 func (s *server) Start() {
-	go s.walletCtrl.notificationListener()
+	s.walletCtrl.Start()
+
 	go s.eventHandler()
 }
 

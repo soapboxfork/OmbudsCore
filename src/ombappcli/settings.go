@@ -10,7 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/btcsuite/btcutil"
 	"github.com/gorilla/mux"
+	"github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 type settingCtrl struct {
@@ -209,21 +211,58 @@ func (setc *settingCtrl) saveFavorite(sf SingleFav) error {
 // in sync. It does this by asking the wallet a question about
 func (setc *settingCtrl) isInitialized() (bool, error) {
 	// check the internal initialized param
+	status := setc.settings.Initialized
 
 	// check the state of the wallet
+	if setc.s.walletCtrl.IsConnected() {
+		cmd := &rpcexten.GetWalletStateCmd{}
+		resp, err := setc.s.walletCtrl.sendCommand(cmd)
+		if err != nil {
+			return false, err
+		}
+		walstate, ok := resp.(rpcexten.GetWalletStateResult)
+		if !ok {
+			return false, fmt.Errorf("Wallet provided bad state resp")
+		}
 
-	// if they are different log the error and throw the error
+		// if they are different log the error and throw the error
+		if walstate.HasWallet != status {
+			return false, fmt.Errorf("wallet and ombappcli are not in sync.")
+		}
+	}
 
-	// Otherwise the system is (momentarily) sync
+	// Otherwise the system is (momentarily) in sync
+	return status, nil
 }
 
 // initializeSystem
-func (setc *settingCtrl) initializeSystem(params rpcexten.SystemSetupParams) error {
+func (setc *settingCtrl) initializeSystem(cmd *rpcexten.WalletSetupCmd) error {
+	log.Println("sending walletSetupCmd")
+	resp, err := setc.s.walletCtrl.sendCommand(cmd)
+	if err != nil {
+		return err
+	}
+	// Validate that it is a real address
+	var addr, ok = resp.(string)
+	if !ok {
+		return fmt.Errorf("Wallet provided bad addr")
+	}
+	_, err = btcutil.DecodeAddress(addr, activeNet.Params)
+	if err != nil {
+		return err
+	}
+	// Set the address
+	setc.settings.Address = addr
 
-}
+	// System is now ready to operate.
+	setc.settings.Initialized = true
 
-type walletSetupJson struct {
-	Passphrase string `json:"passphrase"`
+	// Write it all to disk.
+	if err = setc.Commit(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // handleWalletSetup listens for http posts with parameters to configure a new
@@ -232,42 +271,51 @@ type walletSetupJson struct {
 // been saved and succesfully created.
 func (setc *settingCtrl) handleWalletSetup() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, request *http.Request) {
-		var ws walletSetupJson
 		// Decode the request
-		decoder := json.NewDecoder(request.Body)
-		err := decoder.Decode(&ws)
+		raw, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		log.Printf("%s\n", raw)
+
+		cmd := &rpcexten.WalletSetupCmd{}
+		err = cmd.UnmarshalJSON(raw)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		// Validate the request
-		if ws == "" {
-			validationErr = fmt.Errorf("json did not validate")
-			http.Error(w, validationErr, http.StatusBadRequest)
+		log.Printf("%v", cmd)
+		if len(cmd.Passphrase) < 6 {
+			validationErr := fmt.Errorf("json did not validate")
+			http.Error(w, validationErr.Error(), http.StatusBadRequest)
 			return
 		}
 		// Check to see if the system is already initialized
 		ok, err := setc.isInitialized()
 		if err != nil {
-			initErr = fmt.Errorf("System init check failed with [%s]", err)
-			http.Error(w, initErr, http.StatusInternalServerError)
+			initErr := fmt.Errorf("System init check failed with: %s", err)
+			http.Error(w, initErr.Error(), http.StatusInternalServerError)
 			return
 		}
-
 		// The system is already initialized. Return with not modified
 		if ok {
 			err = fmt.Errorf("System already initialized")
-			http.Error(w, err, http.StatusNotModified)
+			http.Error(w, err.Error(), http.StatusNotModified)
+			return
+		}
+		// If not initialize the wallet and ombappcli
+		err = setc.initializeSystem(cmd)
+		if err != nil {
+			err = fmt.Errorf("System initiliaztion failed with: %s", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		// If not Handle initializing the system.
-		err := setc.initializeSystem()
-		if err != nil {
-			err = fmt.Errorf("System initiliaztion failed with [%s]", err)
-			http.Error(w, err, http.StatusInternalServerError)
-			return
-		}
+		// Write the new address to the frontend client
+		w.Write([]byte("success"))
 	}
 }
 
