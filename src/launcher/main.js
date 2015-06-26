@@ -29,19 +29,19 @@ app.on('ready', function() {
 
         // and load the index.html of the app.
         //mainWindow.loadUrl('file://' + __dirname + '/index.html');
-        mainWindow.loadUrl('http://localhost:1055');
+            mainWindow.loadUrl('http://localhost:1055/#/setup');
 
-        // Emitted when the window is closed.
-        mainWindow.on('closed', function() {
-            // Dereference the window object, usually you would store windows
-            // in an array if your app supports multi windows, this is the time
-            // when you should delete the corresponding element.
-            mainWindow = null;
-        });
+                // Emitted when the window is closed.
+                mainWindow.on('closed', function() {
+                    // Dereference the window object, usually you would store windows
+                    // in an array if your app supports multi windows, this is the time
+                    // when you should delete the corresponding element.
+                    mainWindow = null;
+                });
 
-        initMenu(mainWindow);
+                initMenu(mainWindow);
     }
-    
+
 
     function initMenu (window) {
         var webContents = window.webContents;
@@ -99,6 +99,14 @@ app.on('ready', function() {
                             webContents.goBack();
                         }
                     }
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Quit',
+                    accelerator: 'CommandorControl+Q',
+                    selector: 'terminate:'
                 }
             ]
         }
