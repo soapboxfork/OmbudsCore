@@ -1,5 +1,20 @@
 div.setup {
-    padding: 10px;
+    position: relative;
+}
+
+/***** Disables the functions on the left.... */
+div.setup #hider {
+    position: absolute;
+    left: -150px;
+    top: 0;
+    width: 150px;
+    height: 625px;
+    background: #000;
+    opacity: 0.75;
+}
+
+div.setup #firstWelc i {
+   color: gray; 
 }
 
 div.setup label {
@@ -13,3 +28,8 @@ div.setup table {
 div.setup .btn {
     display: block;
 }
+
+div.setup h1.wait {
+    text-align: center;
+}
+

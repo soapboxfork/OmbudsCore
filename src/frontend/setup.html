@@ -1,0 +1,70 @@
+<div class="setup fullPane">
+    <div id="hider">&nbsp</div>
+    <div class="top-info banner" ng-show="dialogCtr > 1">
+        <h2>Step {{ dialogCtr }} of {{ dialogLast }}</h2>
+    </div>
+    <div ng-show="dialogCtr == 1">
+        <div id="firstWelc" class="banner"><h2>This is OmbudsCore <i>TestNet Edition</i> Version 0.1.1</h2></div>
+        <div class="sub-banner">
+            <h1>Welcome</h1>
+            This version is running on Bitcoin's Testnet which means everything is made up and the coins don't matter.
+            However, we am still trying to take this seriously so if you find any sort of errors, even spelling and 
+            grammatical mistakes, please report them!
+            </p>
+            <p>
+            If you are unsure of anything or just want to have a talk feel free to email me - Nick - at
+            nskelsey@gmail.com, you can mail Alex at askuck@gmail.com, 
+            and you can report issues via <a href="https://github.com/soapboxsys/OmbudsCore/issues">github</a>.
+            </p>
+            <h2>What language do you speak?</h2>
+            <table>
+                <tr>
+                    <td><label>English:</label><td><input ng-model="language" type="radio"  value="en"/></td>
+                    </tr>
+                    <tr>
+                        <td><label>Greek:</label><td><input ng-model="language" type="radio"  value="gr" /></td>
+                        </tr>
+                        <tr>
+                            <td><label>Turkish:</label><td><input ng-model="language" type="radio" value="tk" /></td>
+                            </tr>
+                            <tr>
+                                <td><label>British English:</label><td><input ng-model="language" type="radio" value="en-uk" /></td>
+                                </tr>
+
+                            </table>
+                            <button class="btn green" ng-click="forward()">Let's go!</button>
+                        </div>
+                    </div>
+                    <div class="sub-banner" ng-show="dialogCtr == 2">
+                        <h1>Take a moment to read this<span ng-hide="waitSecs == 0"> (or just wait <span ng-bind="waitSecs">30</span> seconds)</span>.</h1>
+                        <ol>
+                            <li>Your use of this software is a political act. 
+                            Understand why we have written this software before you use it.</li>
+                            <li>This software does not hide your identity.</li>
+                            <li>This software is in alpha. It is not feature complete.</li>
+                            <li>This software is under no warranty and it has both known and unknown security vulernabilities.</li>
+                            <li>Nothing stored in a block chain is truly permanent.</li>
+                            <li>Nothing stored on the TestNet block chain is permanent at all</li>
+                            <li>There is no way to edit or delete a bulletin once you have sent it.</li>
+                            <li>Do not deposit more bitcoin in your Ombuds wallet than you can afford to lose.</li>
+                            <li>Like Bitcoin, Ombuds is an expirement, use it at your own risk.</li>
+                            <li>This interface and the underlying system will drastically change.</li>
+                        </ol>
+                        <button class="btn blue" title="This is just the illusion of choice." ng-click="back()">Go Back</button>
+                    <button class="btn red" title="Take a look in the rabbit hole." ng-disabled="waitSecs !== 0" ng-click="forward()">Accept Risks</button>    </div>
+                <div class="sub-banner" ng-show="dialogCtr == 3">
+                    <h2>Enter a Wallet passphrase</h2>
+                    <p>This passphrase will be used only to lock and unlock the private keys in your Ombuds' wallet.
+                    <div>
+                        <input ng-model="config.passphrase" type="password" />
+                        <input ng-model="extrapw" type="password" />
+                        <p class="status" ng-class="{'red': (extrapw != config.passphrase)}">Everything seems good</p>
+                    </div>
+                    <button class="btn green" ng-click="forward()" >Create a Wallet!</button>
+                </div>
+                <div class="sub-banner" ng-show="dialogCtr == 4">
+                    <h2>Hold onto these keys</h2>
+                    <p>Write down or print this seed out. It is the key to getting back to your coins.</p>
+                    <button class="btn green" ng-click="finishSetup()">Let's play</button>
+                </div>
+            </div>

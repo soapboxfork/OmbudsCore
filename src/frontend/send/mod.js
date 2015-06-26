@@ -23,7 +23,7 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
 
     function updateEst(estimate) {
         estimate.len = draftService.board.length + draftService.msg.length;
-        estimate.rawval = (txFee + Math.ceil(estimate.len/20)*567) / walletService.unitPerSat;
+        estimate.rawval = (txFee + Math.ceil(estimate.len/20)*567) / walletService.satPerUnit;
         estimate.val = estimate.rawval;
     };
 
@@ -88,7 +88,7 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         $scope.showLinkModal = true;
     };
 })
-.controller('sendModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService) {
+.controller('sendModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService, walletService) {
     $controller('passphraseModalCtrl', {$scope: $scope});
 
     $scope.closeModal = function() {
@@ -111,7 +111,7 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         .then(/* success */ function(reply) {
             $scope.passphrase = "";
             $scope.actionEnabled = false;
-            return ombWebSocket.sendBulletin(draftService);
+            return ombWebSocket.sendBulletin(draftService, walletService.address);
         }).then(/* success */ function(reply) {
             var txidhref = "/#/b/bltn/" + reply.result;
             $scope.setModalLink("green", txidhref, reply.result);
@@ -124,7 +124,7 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
         });
     };
 })
-.controller('composeModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService) {
+.controller('composeModalCtrl', function($scope, $q, $controller, close, ombWebSocket, sendPaneState, draftService, walletService) {
     $controller('passphraseModalCtrl', {$scope: $scope});
 
     $scope.closeModal = function() {
@@ -149,7 +149,7 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
             $scope.passphrase = "";
             $scope.actionEnabled = false;
             console.log("unlocked wallet", reply);
-            return ombWebSocket.composeBulletin(draftService);
+            return ombWebSocket.composeBulletin(draftService, walletService.address);
         })
         .then(/* success */ function(reply) {
             $scope.setModalMsg("green", reply.result);

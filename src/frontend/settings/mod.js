@@ -58,20 +58,28 @@ angular.module('settingsModule', [])
     };
 })
 .factory('walletSetts', function(globalSettings) {
-    var walletSetts = {
+    var settings = {
         address: "tw1nk1eT0es"
     }
 
-    var initProm = globalSettings.initProm.then(function(settings) {
-        walletSetts.address = settings.address
+    // TODO use a promise to fulfill the request
+    var callback = function(){};
+    function registerAuthorCb(cb) {
+        callback = cb;
+    }
+
+    var initProm = globalSettings.initProm.then(function(globalSetts) {
+        settings.address = globalSetts.address
+        callback(settings.address)
     });
     
     return {
+        'registerAuthorCb': registerAuthorCb,
         'initProm': initProm,
-        'settings': walletSetts
+        'settings': settings
     };
 })
-.factory('appInitService', function(globalSettings, $http) {
+.factory('appInitService', function(globalSettings, $http, uniqueId) {
     var initSetts = {
         initialized: false
     };
@@ -90,12 +98,20 @@ angular.module('settingsModule', [])
     function initSystem(config) {
         // All we are doing here is setting up the wallet. For now.
         // config -> { passphrase: <str>, }
-        var prom = $http.post('/api/settings/initialize', { passphrase: config.passphrase })
+        
+        var walletSetup = {
+            method: "walletsetup",
+            jsonrpc: "1.0",
+            id: uniqueId(),
+            params: [config.passphrase]
+        };
+        
+        var prom = $http.post('/api/settings/initialize', walletSetup)
         .success(function(data, status) {
-            //debugger;
+            debugger;
         })
         .error(function(data, status) {
-            //debugger;
+            debugger;
         });
         return prom;
     }

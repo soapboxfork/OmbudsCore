@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('walletModule', ['monospaced.qrcode'])
+angular.module('walletModule', ['monospaced.qrcode', 'settingsModule'])
 .controller('walletPaneCtrl', function($scope, walletService, txListService, todoService) {
     $scope.wallet = walletService;
     $scope.notImpl = todoService.notImplemented;
@@ -15,6 +15,7 @@ angular.module('walletModule', ['monospaced.qrcode'])
         } else if ($scope.filtOption === "pending") {
             txListService.onlyPending();
         } else {
+            consoloe.log("Never meant to get here...");
             debugger;
         }
     };
@@ -83,17 +84,22 @@ angular.module('walletModule', ['monospaced.qrcode'])
     
     return service
 })
-.factory('walletService', function(ombWebSocket) {
+.factory('walletService', function(ombWebSocket, walletSetts) {
     var wallet = {
         balance: { pending: 0.0, confirmed: 0.0},
         unit: 'mBTC',
-        address: 'n37T77JKnFFZJN4udvyasZUwVhpidvq9gb',
-        unitPerSat: 1e5
+        address: walletSetts.settings.address,
+        satPerUnit: 1e5
     };
 
+    // TODO this should be a promise
+    walletSetts.registerAuthorCb(function(addr){
+        wallet.address = addr;
+    });
+
     function convBTCtoUnit(btc) {
-        // unitPerSat / satoshis * btc 
-        var valInUnits = (1e8 * btc) / wallet.unitPerSat;
+        // TODO review this conversion.
+        var valInUnits = (1e8 * btc) / wallet.satPerUnit;
         return valInUnits;
     }
 
@@ -113,6 +119,7 @@ angular.module('walletModule', ['monospaced.qrcode'])
 
      
     ombWebSocket.registerNotifListener("accountbalance", function(rawBalNotif) {
+        // Transform the raw message into a readable format.
         var balNotif = {
             account: rawBalNotif.params[0],
             balance: rawBalNotif.params[1],

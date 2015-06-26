@@ -188,7 +188,7 @@ angular.module('browseModule')
         });
     }
 })
-.controller('bltnCtrl', function($scope, markdownService, settingsService, blkHeightService) {
+.controller('bltnCtrl', function($scope, markdownService, browseSetts, blkHeightService) {
 // Functions to bind into the current scope:
     var bltn = $scope.bltn;
 
@@ -223,11 +223,13 @@ angular.module('browseModule')
         var html = markdownService.makeHtml(bltn.msg);
         bltn.markdown = html;
     }
-
-    if (settingsService.renderMd) {
-        bltn.renderMd = true;
-        if (bltn.hasOwnProperty('msg') && bltn.msg !== "") {
-            $scope.renderMd(bltn);
-        }
-    }
+    
+    browseSetts.initProm.then(function() {
+        if (browseSetts.settings.renderMd) {
+            bltn.renderMd = true;
+            if (bltn.hasOwnProperty('msg') && bltn.msg !== "") {
+                $scope.renderMd(bltn);
+            }
+        }    
+    });
 });

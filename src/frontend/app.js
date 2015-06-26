@@ -40,16 +40,18 @@ var ombWebApp = angular.module("ombWebApp", [
 .controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService) {
     $scope.loading = true;
     $scope.language = "en";
-    var waitSecs = 30;
+    var waitSecs = 2;//20;
 
     $scope.dialogCtr = 1;
     $scope.dialogLast = 4;
     $scope.waitSecs = waitSecs;
     $scope.notImpl = todoService.notImplemented;
+    $scope.config = { passphrase: ""}
 
     $scope.forward = function() {
         switch ($scope.dialogCtr) {
         case 1:
+        // Choose language
             switch ($scope.language) {
                 case "gb-en":
                 case "gr":
@@ -64,10 +66,21 @@ var ombWebApp = angular.module("ombWebApp", [
             if ($scope.waitSecs == waitSecs) {
                 $interval(function() {
                     $scope.waitSecs -=1 
-                }, 1000, 30)
+                }, 1000, waitSecs)
             }
             break;
         case 2: 
+        // Accept Risks
+            break;
+        case 3:
+        // Create Wallet
+            var config = { passphrase: $scope.config.passphrase };
+            appInitService.initSystem(config)
+            .then(function() {
+                console.log("System succesfully initialized!");
+            }, function(msg) {
+                console.log("Initialize failed with: " + msg); 
+            });
             break;
         default:
             break;
@@ -90,12 +103,6 @@ var ombWebApp = angular.module("ombWebApp", [
             var config = {
                 passphrase: "malgene"
             }
-            appInitService.initSystem(config)
-            .then(function() {
-                console.log("System succesfully initialized!");
-            }, function(msg) {
-                console.log("Initialize failed with: " + msg); 
-            });
         }
         // The system is configured. Redirect to settings 
         //$location.path('/');

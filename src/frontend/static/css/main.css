@@ -77,6 +77,13 @@ body {
     float: left;
 }
 
+.fullPane {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    float: left;
+}
+
 .banner {
     height: 55px;
     border-bottom: 2px solid #BBBBBB;
@@ -97,7 +104,6 @@ body {
 div.sub-banner {
     margin-left: 15px;
 }
-
 
 
 /*********************** Pane Styles ***********************/

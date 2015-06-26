@@ -2,21 +2,8 @@
 
 var singleton = angular.module('backendHooks', ['ngWebSocket']);
 
-singleton.factory('ombWebSocket', function($websocket, $q) {
+singleton.factory('ombWebSocket', function($websocket, $q, uniqueId) {
     var msgStream = $websocket('ws://localhost:1055/ws/');
-
-    var uniqueId = function() {
-        var ctr = 0;
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1);
-        }
-        return function() {
-            ctr += 1;
-            return "frontend-" + ctr + "-" + s4();
-        }
-    }();
 
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
@@ -119,15 +106,16 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         return msg;
     };
 
-    function sendBulletin(draft) {
+    function sendBulletin(draft, addr) {
        var msg = BtcMsg("sendbulletin");
-       msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
+       msg.params = [addr, draft.board, draft.msg];
        return deferAndHandle(msg);
    }
 
-    function composeBulletin(draft){ 
+    function composeBulletin(draft, addr){ 
        var msg = BtcMsg("composebulletin");
-       msg.params = ["n37T77JKnFFZJN4udvyasZUwVhpidvq9gb", draft.board, draft.msg];
+       msg.params = [addr, draft.board, draft.msg];
+       debugger;
        return deferAndHandle(msg);
     }
 
@@ -163,39 +151,6 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
         'registerNotifListener': function(m, f) { responseCtrl.registerNotifListener(m, f); }
     }
 })
-.factory('ombSettingService', function($http) {
-    var settings;
-
-    $http.get('/settings/').then(function(result) {
-        settings = result.data;
-    });
-
-    function addFavoriteBoard(name) {
-        $http.post('/settings/favorite/', {'type': 'board', 'val': name})
-        .success(function(data){
-            console.log("added favorite!")
-        })
-        .error(function(data){
-            console.log('failed to add favorite');
-        });
-    }
-
-    function delFavoriteBoard(name) {
-        $http.post('/settings/favorite/', {'type': 'board', 'val': name, 'method':'delete'})
-    }
-    
-
-    return {
-        'getFavoriteBoards': function() { return settings.favorites.boards },
-        'addFavoriteBoard': addFavoriteBoard,
-        'delFavoriteBoard': delFavoriteBoard,
-        'isFavoriteBoard': function(name) { 
-            if(settings.favorites.boards.indexOf(name) >= 0) {
-                return true
-            } else { return false }
-        }
-    }
-})
 .factory('blkHeightService', function(ombWebSocket) {
     var service = {
         height: 0
@@ -222,6 +177,18 @@ singleton.factory('ombWebSocket', function($websocket, $q) {
     }
 
     return service
+})
+.factory('uniqueId', function() {
+    var ctr = 0;
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return function() {
+        ctr += 1;
+        return "frontend-" + ctr + "-" + s4();
+    }
 })
 .controller('notImplModalCtrl', function($scope, close) {
     $scope.closeModal = function() {
