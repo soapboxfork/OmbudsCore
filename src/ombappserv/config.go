@@ -25,8 +25,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/go-flags"
+	"github.com/soapboxsys/ombudslib/ombutil"
 )
 
 const (
@@ -39,7 +39,7 @@ const (
 )
 
 var (
-	ombudsHomeDir     = btcutil.AppDataDir("ombudscore", false)
+	ombudsHomeDir     = ombutil.AppDataDir("ombudscore", false)
 	guiHomeDir        = filepath.Join(ombudsHomeDir, "gui")
 	defaultDataDir    = guiHomeDir
 	btcwalletDir      = filepath.Join(ombudsHomeDir, "wallet")

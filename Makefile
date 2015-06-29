@@ -26,8 +26,7 @@ internal: $(PKG)
 	cp src/launcher.py $(BINPATH)/launcher.py
 
 	# move frontend files into the resource dir.
-	mkdir -p $(RESPATH)/frontend
-	cp -r $(OMBCOREPATH)/src/frontend $(RESPATH)/frontend
+	cp -r $(OMBCOREPATH)/src/frontend $(RESPATH)
 
 	# move the atom app into place
 	mkdir -p $(RESPATH)/app
@@ -41,9 +40,9 @@ clean:
 	rm -rf build/$(APP)
 
 compile: $(PKG)
-	go build -o $(BINPATH)/ombfullnode github.com/soapboxsys/ombfullnode 
-	go build -o $(BINPATH)/ombwallet github.com/soapboxsys/ombwallet 
-	go build -o $(BINPATH)/ombappserv github.com/soapboxsys/OmbudsCore/src/ombappserv
+	go build -a -o $(BINPATH)/ombfullnode github.com/soapboxsys/ombfullnode 
+	go build -a -o $(BINPATH)/ombwallet github.com/soapboxsys/ombwallet 
+	go build -a -o $(BINPATH)/ombappserv github.com/soapboxsys/OmbudsCore/src/ombappserv
 
 install: $(PKG)
 	go get -u -v -o $(BINPATH)/ombfullnode github.com/soapboxsys/ombfullnode
