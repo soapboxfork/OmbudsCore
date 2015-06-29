@@ -6,9 +6,11 @@ from os.path import abspath, expanduser
 
 
 def appDataDir(appname):
-    home = expanduser("~")
+    '''For OSX the app data dir is located in /Library/App...
+    This is a break from the convention to allow for an easier install.
+    '''
     if sys.platform == "darwin":
-        datadir = os.path.join(home, "Library", "Application Support")
+        datadir = os.path.join("/Library", "Application Support")
         return os.path.join(datadir, appname.capitalize())
 
     if sys.platform == "windows":
@@ -20,9 +22,9 @@ def appDataDir(appname):
     hiddendir = "." + appname.lower()
     # Return the default app directory
     return os.path.join(home, hiddendir)
-    
 
 
+# NOTICE: A cheap hack and very dangerous.
 APP_PATH = abspath(os.path.join(__file__, "./../../.."))
 BIN = os.path.join(APP_PATH, "Contents", "MacOS")
 RES = os.path.join(APP_PATH, "Contents", "Resources")
@@ -38,11 +40,10 @@ GUI_CFG = os.path.join(GUI_DIR, "gui.conf")
 CTL_DIR = os.path.join(APP_DIR, "ctl")
 CTL_CFG = os.path.join(CTL_DIR, "ctl.conf")
 
-def run_webapp(stdout):
-    #static_path = os.path.join(GO_PATH, "src","github.com","NSkelsey","ahimsarest","ombwebapp")
-    static_path = os.path.join(RES, "webapp")
-    opts = ["-staticpath=" + static_path]
-    cmd = [os.path.join(BIN, "ombwebapp")] + opts
+def run_ombappserv(stdout):
+    static_path = os.path.join(RES, "frontend")
+    opts = ["--staticpath=" + static_path]
+    cmd = [os.path.join(BIN, "ombappserv")] + opts
 
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
@@ -61,8 +62,11 @@ def run_ombfullnode(stdout):
     #print cmd
     return subprocess.Popen(cmd, stdout=stdout)
 
-def run_ombcli(stdout):
-    cmd = [os.path.join(BIN, "ombcli")]
+def run_electroncli(stdout):
+    # TODO remove default_app from atom
+    js_path = os.path.join(RES, "app", "main.js")
+    opts = [js_path]
+    cmd = [os.path.join(BIN, "Electron")] + opts
 
     subprocess.call(cmd, stdout=stdout)
 
@@ -80,19 +84,19 @@ def main():
 
     time.sleep(3)
 
-    # Start ahimsarest
-    webservproc = run_webapp(null)
+    # Start ombwallet
+    walletproc = run_ombwallet(null)
 
     time.sleep(3)
 
-    # Start ombwallet
-    walletproc = run_ombwallet(null)
+    # Start ombappserv
+    webservproc = run_ombappserv(null)
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
     # Start ombuds client gui and block until process returns.
-    run_ombcli(null)
+    run_electroncli(null)
 
     webservproc.kill()
     walletproc.kill()
