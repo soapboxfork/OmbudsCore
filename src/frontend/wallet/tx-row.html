@@ -1,6 +1,6 @@
 <td>{{ tx.category }}</td>
-<td><a href="/#/b/bltn/{{ tx.txid }}">{{ tx.txid | limitTo:12 }}</a></td>
-<td class="amnt"><div ng-class="{pos: (tx.amount >= 0), neg: (tx.amount < 0)}">{{ tx.amount | number:2 }}<div></td>
+<td><a class="monospace" href="/#/b/bltn/{{ tx.txid }}">{{ tx.txid | limitTo:12 }}</a></td>
+<td class="amnt"><div ng-class="{pos: (tx.amount >= 0), neg: (tx.amount < 0)}">{{ tx.amount | number:2 }}</div></td>
 <td>{{ tx.confirmations }}</td>
 <td>{{ tx.timereceived | nicedate }}</td>
 

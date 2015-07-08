@@ -8,7 +8,7 @@ singleton.factory('ombWebSocket', function($websocket, $q, uniqueId) {
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
         var responded = false;
-        var timeoutSecs = 2;
+        var timeoutSecs = 4;
         window.setTimeout(function() {
             if (!responded) {
                 var msg = {
@@ -115,7 +115,6 @@ singleton.factory('ombWebSocket', function($websocket, $q, uniqueId) {
     function composeBulletin(draft, addr){ 
        var msg = BtcMsg("composebulletin");
        msg.params = [addr, draft.board, draft.msg];
-       debugger;
        return deferAndHandle(msg);
     }
 

@@ -84,14 +84,19 @@ angular.module('walletModule', ['monospaced.qrcode', 'settingsModule'])
     
     return service
 })
-.factory('walletService', function(ombWebSocket, walletSetts) {
-    var wallet = {
-        balance: { pending: 0.0, confirmed: 0.0},
-        unit: 'mBTC',
-        address: walletSetts.settings.address,
-        satPerUnit: 1e5
-    };
-
+.service('createEmptyWallet', function() {
+    return function(addr) {
+        return {
+            balance: { pending: 0.0, confirmed: 0.0},
+            unit: 'mBTC',
+            address: addr,
+            satPerUnit: 1e5
+        }
+    }
+})
+.factory('walletService', function(ombWebSocket, walletSetts, createEmptyWallet) {
+    var wallet = createEmptyWallet(walletSetts.settings.address);
+    
     // TODO this should be a promise
     walletSetts.registerAuthorCb(function(addr){
         wallet.address = addr;

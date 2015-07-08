@@ -27,9 +27,19 @@ div.setup table {
 
 div.setup .btn {
     display: block;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 div.setup h1.wait {
+    text-align: center;
+}
+
+div.setup div.status {
+    margin-top: 15px;
+    width: 50%;
+    border-radius: 4px;
+    padding: 5px;
     text-align: center;
 }
 

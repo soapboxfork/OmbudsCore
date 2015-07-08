@@ -1,5 +1,5 @@
 <div class="pane-btn-wrap" ng-class="{ 'active': pane === activePane }">
-    <a ng-click="'twitter' !== pane.name ? selectPane(pane) : notImpl()" href="{{ paneUrl(pane.name) }}">
+    <a ng-click="('twitter' !== pane.name) && ('status' !== pane.name) ? selectPane(pane) : notImpl()" href="{{ paneUrl(pane.name) }}">
         <img ng-src="static/images/{{ pane.name }}.png" />
     <h4>{{ pane.name }}</h4>
     </a>

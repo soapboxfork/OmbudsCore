@@ -3,13 +3,5 @@
     <coin-amnt unit="wallet.unit" amount="wallet.balance.confirmed" ></coin-amnt>
     <h3>Pending Balance</h3>
     <coin-amnt unit="wallet.unit" amount="wallet.balance.pending" ></coin-amnt>
-    <div class="biggerWrap">
-        <div class="addressWrap">
-            <author-icon addr="wallet.address"></author-icon>
-            <div class="addressBox"><a class="address" href="/#/b/author/{{ wallet.address }}" ng-bind="wallet.address"></a></div>
-        </div>
-        <qrcode size="150" data="{{ wallet.address }}"></qrcode>
-        <div class="addrBox">
-        </div>
-    </div>
+    <wallet-qr address="wallet.address"></wallet-qr>
 </div>

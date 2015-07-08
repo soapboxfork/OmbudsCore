@@ -37,7 +37,7 @@ var ombWebApp = angular.module("ombWebApp", [
     })
     .otherwise('/settings');
 }])
-.controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService) {
+.controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService, settingUtils) {
     $scope.loading = true;
     $scope.language = "en";
     var waitSecs = 2;//20;
@@ -47,6 +47,7 @@ var ombWebApp = angular.module("ombWebApp", [
     $scope.waitSecs = waitSecs;
     $scope.notImpl = todoService.notImplemented;
     $scope.config = { passphrase: ""}
+
 
     $scope.forward = function() {
         switch ($scope.dialogCtr) {
@@ -74,13 +75,25 @@ var ombWebApp = angular.module("ombWebApp", [
             break;
         case 3:
         // Create Wallet
+            // Copy the fields of the $scope's config object into a new one
+            // With only the fields we intend to pass created.
             var config = { passphrase: $scope.config.passphrase };
             appInitService.initSystem(config)
-            .then(function() {
-                console.log("System succesfully initialized!");
-            }, function(msg) {
-                console.log("Initialize failed with: " + msg); 
+            .then(function(resp) {
+                console.log("System walked through init correctly");
+                settingUtils.getAddress().then(function(address) {
+                    $scope.pubAddress = address;
+                    $scope.dialogCtr += 1;
+                    console.log("System pulled address.");
+                });
+            }, function(resp) {
+                var msg = "Failed with: " + resp.status + " : " + resp.data;
+                console.log(msg);
+                $scope.setupMsg = msg;
+                $scope.extrapw = "";
+                $scope.config.passphrase = "";
             });
+            return;
             break;
         default:
             break;
@@ -126,6 +139,7 @@ var ombWebApp = angular.module("ombWebApp", [
             {name: 'send'},  
             {name: 'wallet'},  
             {name: 'settings'},
+            {name: 'status'},
             {name: 'twitter'},
         ]
     };

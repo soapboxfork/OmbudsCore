@@ -35,7 +35,7 @@
 
 .wallet-widget .addressWrap svg {
     position: absolute;
-    top: 18px;
+    top: 23px;
     left: 10px;
 }
 
@@ -80,7 +80,7 @@ div.wallet-tx-list {
 .wallet-tx-list table>tbody>tr>td div {
     display: inline-block;
     border-radius: 3px;
-    padding: 3px;
+    padding: 4px;
 }
 
 .wallet-tx-list table>tbody>tr>td div.pos {
@@ -94,24 +94,21 @@ div.wallet-tx-list table>tbody>tr:nth-of-type(odd) {
       background-color: #f9f9f9;
 }
 
-/***** This must change *****/
-
-th#a {
-    width: 104px;
+table.table-header {
+    width: 100%;
 }
 
-th#b {
-    width: 191px;
+.table-header th {
+    width: 20%;
+    text-align: center;
 }
 
-th#c {
-    width: 140px;
+div.wallet-tx-list td {
+    width: 20%;
+    text-align: center;
+    padding: 0;
 }
 
-th#d {
-    width: 94px;
-}
-
-th#e {
-    width: 126px;
+.wallet-tx-list .monospace {
+    font-family: monospace;
 }

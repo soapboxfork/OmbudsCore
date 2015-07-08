@@ -69,14 +69,21 @@ angular.module('settingsModule', [])
     }
 
     var initProm = globalSettings.initProm.then(function(globalSetts) {
-        settings.address = globalSetts.address
-        callback(settings.address)
+        settings.address = globalSetts.address;
+        callback(settings.address);
+    });
+
+    var refresh = globalSettings.refresh().then(function(globalSetts) {
+        settings.address = globalSetts.address;
+        callback(settings.address);
+        return settings;
     });
     
     return {
         'registerAuthorCb': registerAuthorCb,
         'initProm': initProm,
-        'settings': settings
+        'settings': settings,
+        'refresh': refresh
     };
 })
 .factory('appInitService', function(globalSettings, $http, uniqueId) {
@@ -108,10 +115,10 @@ angular.module('settingsModule', [])
         
         var prom = $http.post('/api/settings/initialize', walletSetup)
         .success(function(data, status) {
-            debugger;
+            return data;
         })
         .error(function(data, status) {
-            debugger;
+            return data;
         });
         return prom;
     }
@@ -130,8 +137,29 @@ angular.module('settingsModule', [])
         return settings;
     });
 
+
+    var refresh = function() {
+        var prom = $http.get('/api/settings/').then(function(result) {
+            settings = result.data;
+            return settings;
+        });
+        return prom;
+    }
+
     return {
         'initProm': initProm,
-        'settings': settings
+        'settings': settings,
+        'refresh': refresh
     };
-});
+})
+.service('settingUtils', function($http) {
+
+    return {
+        'getAddress': function() {
+            return $http.get('/api/settings/').then(function(resp) {
+                return resp.data.address;
+            });
+        }
+    }
+})
+

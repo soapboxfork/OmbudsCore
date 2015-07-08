@@ -54,17 +54,20 @@
                     <button class="btn red" title="Take a look in the rabbit hole." ng-disabled="waitSecs !== 0" ng-click="forward()">Accept Risks</button>    </div>
                 <div class="sub-banner" ng-show="dialogCtr == 3">
                     <h2>Enter a Wallet passphrase</h2>
-                    <p>This passphrase will be used only to lock and unlock the private keys in your Ombuds' wallet.
+                    <p>This passphrase will be used only to lock and unlock the private keys in your wallet.
                     <div>
-                        <input ng-model="config.passphrase" type="password" />
-                        <input ng-model="extrapw" type="password" />
-                        <p class="status" ng-class="{'red': (extrapw != config.passphrase)}">Everything seems good</p>
+                        <input ng-model="config.passphrase" type="password" placeholder="Enter password"/>
+                        <input ng-model="extrapw" type="password" placeholder="Reenter password"/>
+                        <div class="status green" ng-show="(extrapw.length > 0) && (extrapw == config.passphrase)" ng-bind="'Passwords match!'"></div>
+                        <div class="status red" ng-show="setupMsg.length > 0" ng-bind="setupMsg"></div>
                     </div>
                     <button class="btn green" ng-click="forward()" >Create a Wallet!</button>
                 </div>
                 <div class="sub-banner" ng-show="dialogCtr == 4">
-                    <h2>Hold onto these keys</h2>
-                    <p>Write down or print this seed out. It is the key to getting back to your coins.</p>
+                    <h2>This is your publishing address!</h2>
+                    <div class="wallet-widget">
+                        <wallet-qr address="pubAddress"></wallet-qr>
+                    </div>
                     <button class="btn green" ng-click="finishSetup()">Let's play</button>
                 </div>
             </div>

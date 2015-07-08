@@ -28,4 +28,13 @@ angular.module('walletModule')
         templateUrl: 'wallet/tx-row.html',
         restrict: 'C'
     }
+})
+.directive('walletQr', function() {
+    return {
+        scope : {
+            address: "=",
+        },
+        templateUrl: 'wallet/wallet-qr.html',
+        restrict: 'E'
+    }
 });
