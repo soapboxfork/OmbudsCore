@@ -37,11 +37,15 @@ var ombWebApp = angular.module("ombWebApp", [
     })
     .otherwise('/settings');
 }])
-.controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService, settingUtils) {
-    $scope.loading = true;
+.service('appVersion', function() { 
+    var appVersion = "0.1.1";
+    return {v: appVersion};
+})
+.controller('setupCtrl', function($scope, $location, $interval, appInitService, todoService, settingUtils, appVersion) {
     $scope.language = "en";
     var waitSecs = 2;//20;
 
+    $scope.version = appVersion.v;
     $scope.dialogCtr = 1;
     $scope.dialogLast = 4;
     $scope.waitSecs = waitSecs;
@@ -111,14 +115,10 @@ var ombWebApp = angular.module("ombWebApp", [
 
     appInitService.getStatus().then(function (confd) {
         // If the system is not configured, prompt the initialization modal.
-        if (!confd) {
-            $scope.loading = false;
-            var config = {
-                passphrase: "malgene"
-            }
+        if (confd) {
+            // The system is configured. Redirect to settings 
+            $location.path('/');
         }
-        // The system is configured. Redirect to settings 
-        //$location.path('/');
     });
 })
 .controller('paneCtrl', function($scope, locationService, todoService) {

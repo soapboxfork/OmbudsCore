@@ -1,11 +1,11 @@
 <div class="halfPane settings">
     <div class="banner">
-        <h2>System</h2>
+        <h2>System <small>Version {{ settings.version }}</small></h2>
     </div>
     <div class="sub-banner">
 
         <div class="browseBox">
-            <p>Always Render Markdown:<input type="checkbox" label="" checked="false" ng-model="settings.renderMd" /></p>
+            <p>Always Render Markdown:<input type="checkbox" label="" checked="false" ng-model="browseSetts.renderMd" /></p>
             <p>Display Tooltips:<input type="checkbox" ng-click="notImpl()"/></p>
         </div>
 

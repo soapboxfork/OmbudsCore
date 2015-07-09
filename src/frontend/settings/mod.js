@@ -1,7 +1,8 @@
 angular.module('settingsModule', [])
-.controller('settingsPaneCtrl', function($scope, globalSettings, todoService) {
+.controller('settingsPaneCtrl', function($scope, globalSettings, browseSetts, todoService) {
     $scope.notImpl = todoService.notImplemented;
-    $scope.settings = globalSettings;
+    $scope.browseSetts = browseSetts.settings;
+    $scope.settings = globalSettings.settings;
      
 })
 .factory('ombSettingsService', function($http, walletService) {
@@ -49,7 +50,7 @@ angular.module('settingsModule', [])
 
 
     var initProm = globalSettings.initProm.then(function(settings) {
-        browseSetts.renderMd = settings.renderMd;
+        browseSetts.renderMd = settings.preferences.renderMd;
     });
 
     return {
@@ -129,8 +130,10 @@ angular.module('settingsModule', [])
         'settings': initSetts
     };
 })
-.factory('globalSettings', function($http) {
-    var settings = {};
+.factory('globalSettings', function($http, appVersion) {
+    var settings = {
+        version: appVersion.v
+    };
 
     var initProm = $http.get('/api/settings/').then(function(result) {
         settings = result.data;

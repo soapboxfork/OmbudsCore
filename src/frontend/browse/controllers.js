@@ -210,6 +210,11 @@ angular.module('browseModule')
             // The bltn is in some block
             var diff = curHeight - bltn.blkHeight;
 
+            // TODO deal with blk of unknown height
+            if (diff < 0) {
+                return base + "unknownconf.png"
+            }
+
             if (diff > 3) {
                 // The bltn is somewhere in the chain
                 return base + "totalconf.png"
