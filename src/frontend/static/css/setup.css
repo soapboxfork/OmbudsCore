@@ -31,6 +31,16 @@ div.setup .btn {
     margin-right: 0;
 }
 
+div.setup .create-wallet-wrap {
+    width: 100%;
+    height: 50px;
+}
+
+div.setup .btn.create-wallet {
+    display: inline-block;
+    float: left;
+}
+
 div.setup h1.wait {
     text-align: center;
 }
@@ -43,3 +53,9 @@ div.setup div.status {
     text-align: center;
 }
 
+div.setup div.spinner-wrap {
+    float: left;
+    display: inline-block;
+    margin-left: 15px;
+    margin-top: 15px;
+}

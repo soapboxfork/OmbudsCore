@@ -51,6 +51,7 @@ var ombWebApp = angular.module("ombWebApp", [
     $scope.waitSecs = waitSecs;
     $scope.notImpl = todoService.notImplemented;
     $scope.config = { passphrase: ""}
+    $scope.walletBtnEnabled = true;
 
 
     $scope.forward = function() {
@@ -79,6 +80,7 @@ var ombWebApp = angular.module("ombWebApp", [
             break;
         case 3:
         // Create Wallet
+            $scope.walletBtnEnabled = false;
             // Copy the fields of the $scope's config object into a new one
             // With only the fields we intend to pass created.
             var config = { passphrase: $scope.config.passphrase };
@@ -89,13 +91,16 @@ var ombWebApp = angular.module("ombWebApp", [
                     $scope.pubAddress = address;
                     $scope.dialogCtr += 1;
                     console.log("System pulled address.");
+                    $scope.walletBtnEnabled = true;
                 });
             }, function(resp) {
-                var msg = "Failed with: " + resp.status + " : " + resp.data;
+                var txt = resp.data != "" ? resp.data : "Which is a strange error!";
+                var msg = "Failed with: " + resp.status + " : " + txt;
                 console.log(msg);
                 $scope.setupMsg = msg;
                 $scope.extrapw = "";
                 $scope.config.passphrase = "";
+                $scope.walletBtnEnabled = true;
             });
             return;
             break;
@@ -117,7 +122,7 @@ var ombWebApp = angular.module("ombWebApp", [
         // If the system is not configured, prompt the initialization modal.
         if (confd) {
             // The system is configured. Redirect to settings 
-            $location.path('/');
+            //$location.path('/');
         }
     });
 })

@@ -58,10 +58,16 @@
                     <div>
                         <input ng-model="config.passphrase" type="password" placeholder="Enter password"/>
                         <input ng-model="extrapw" type="password" placeholder="Reenter password"/>
-                        <div class="status green" ng-show="(extrapw.length > 0) && (extrapw == config.passphrase)" ng-bind="'Passwords match!'"></div>
-                        <div class="status red" ng-show="setupMsg.length > 0" ng-bind="setupMsg"></div>
+                                        </div>
+                    <div class="create-wallet-wrap">
+                        <button class="btn green create-wallet" ng-click="forward()" ng-disabled="!walletBtnEnabled" >Create a Wallet!</button>
+                        <div class="fade spinner-wrap" ng-show="!walletBtnEnabled">
+                            <div class="inner-circles-loader">Loading...</div>
+                        </div>
                     </div>
-                    <button class="btn green" ng-click="forward()" >Create a Wallet!</button>
+                    <div class="status green" ng-show="(extrapw.length > 0) && (extrapw == config.passphrase)" ng-bind="'Passwords match!'"></div>
+                    <div class="status red" ng-show="setupMsg.length > 0" ng-bind="setupMsg"></div>
+
                 </div>
                 <div class="sub-banner" ng-show="dialogCtr == 4">
                     <h2>This is your publishing address!</h2>

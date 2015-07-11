@@ -319,3 +319,19 @@ table>tbody>tr>td {
 ::-webkit-scrollbar-thumb:window-inactive {
     background:rgba(0,0,0,0.05);
 }
+
+/******************* Element Fade in Fade Out *********************/
+
+
+.fade.ng-hide-add.ng-hide-add-active,
+.fade.ng-hide-remove.ng-hide-remove-active {
+    transition:300ms linear all;
+}
+
+.fade.ng-hide {
+    opacity:0;
+}
+
+.fade.ng-show{
+    opacity:1;
+}
