@@ -5,6 +5,14 @@ var singleton = angular.module('backendHooks', ['ngWebSocket']);
 singleton.factory('ombWebSocket', function($websocket, $q, uniqueId) {
     var msgStream = $websocket('ws://localhost:1055/ws/');
 
+    msgStream.onOpen(function() {
+        console.log("ombappserv socket opened.");
+    });
+
+    msgStream.onClose(function() {
+        console.log("ombappserv websocket closed.");
+    });
+
     // Handles the promise api for commands pushed into the websocket.
     var errorDiscrim = function(deferred) {
         var responded = false;
@@ -63,7 +71,7 @@ singleton.factory('ombWebSocket', function($websocket, $q, uniqueId) {
         }
 
         this.handleMessage = function(msg) {
-            console.log("handling Msg", msg);
+            console.log("Socket saw msg");
             
             // handle id response
             if (this.ids.hasOwnProperty(msg.id)) {

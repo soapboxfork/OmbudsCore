@@ -62,5 +62,15 @@
         <script src="/wallet/directives.js"></script>
         <script src="/settings/mod.js"></script>
         <script src="/app.js"></script>
+
+        <script>
+            // Prevents pinch zoom of page.
+            document.addEventListener('mousewheel', function(e) {
+              // When deltaY is a float this is a zoom event.
+              if(e.deltaY % 1 !== 0) {
+                e.preventDefault();
+              }
+            });
+        </script>
     </body>
 </html>

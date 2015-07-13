@@ -113,8 +113,8 @@ angular.module('sendModule', ['backendHooks', 'walletModule', 'browseModule', 'a
             $scope.actionEnabled = false;
             return ombWebSocket.sendBulletin(draftService, walletService.address);
         }).then(/* success */ function(reply) {
-            var txidhref = "/#/b/bltn/" + reply.result;
-            $scope.setModalLink("green", txidhref, reply.result);
+            var boardhref = "/#/b/board/" + draftService.board;
+            $scope.setModalLink("green", boardhref, reply.result);
             sendPaneState.resetDraft();
             $scope.actionEnabled = true;
         }, /* failure */ function(reply) {

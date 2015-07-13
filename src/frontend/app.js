@@ -122,7 +122,7 @@ var ombWebApp = angular.module("ombWebApp", [
         // If the system is not configured, prompt the initialization modal.
         if (confd) {
             // The system is configured. Redirect to settings 
-            //$location.path('/');
+            $location.path('/');
         }
     });
 })
