@@ -179,7 +179,7 @@ func (fs *frontendServer) writeMessages() {
 	for {
 		select {
 		case b := <-fs.allMessages:
-			log.Printf("Writing: [%s]", b)
+			log.Printf("Writing: %s to the frontend", b[:peek(b)])
 			if err := fs.conn.WriteMessage(websocket.TextMessage, b); err != nil {
 				log.Printf("Write failed to write: [%s] with: ", b, err)
 				fs.releaseHandle <- true

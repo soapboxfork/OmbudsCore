@@ -115,10 +115,16 @@ func (wc *walletCtrl) notificationListener() {
 		rerr := json.Unmarshal(msg, &reply)
 		if rerr == nil {
 			// Unmarshaled a btcjson.Reply, check to see if it has a good id.
-			s := fmt.Sprintf("%v", reply.Result)
-			log.Printf("Saw Resp: [%s]", s)
+			if reply.Result == nil {
+				log.Println("Saw empty reply")
+			} else {
+				s := fmt.Sprintf("%v", reply.Result)
+				log.Printf("Saw response: %s", s[:peek([]byte(s))])
+			}
 			if reply.Id != nil {
 				s := fmt.Sprintf("%v", *reply.Id)
+				// If the responses does not have a frontend ID is definitely not
+				// formatted correctued...
 				if s[:8] != "frontend" {
 					log.Printf("Bad reply id: [%s]\n", *reply.Id)
 					continue

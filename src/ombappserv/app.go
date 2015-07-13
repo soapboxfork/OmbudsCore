@@ -68,3 +68,15 @@ func main() {
 	log.Println("Stopping Server...")
 	server.Stop()
 }
+
+// peek returns the proper length to slice a byte array to for logging purposes.
+// It will either produce an int no more than max size or spit out the length of
+// the array.
+func peek(b []byte) int {
+	var max = 70
+	if len(b) > max {
+		return max
+	} else {
+		return len(b)
+	}
+}
