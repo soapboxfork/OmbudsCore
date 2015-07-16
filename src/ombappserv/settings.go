@@ -12,14 +12,16 @@ import (
 
 	"github.com/btcsuite/btcutil"
 	"github.com/gorilla/mux"
+	"github.com/mrjones/oauth"
 	"github.com/soapboxsys/ombudslib/rpcexten"
 )
 
 type settingCtrl struct {
-	s        *server
-	settings settings
-	file     string
-	dirPath  string
+	s            *server
+	settings     settings
+	twitConsumer oauth.Consumer
+	file         string
+	dirPath      string
 }
 
 type Favorites struct {
@@ -28,11 +30,10 @@ type Favorites struct {
 }
 
 type Preferences struct {
-	RenderAllMd     bool   `json:"renderMd"`  // Flag to render all markdown in every board.
-	LastActive      int    `json:"lastLogin"` // The last time the user browsed content.
-	DisplayTooltips bool   `json:"tooltips"`  // Flag that toggles tooltips in the gui.
-	TwitAppToken    string `json:"appToken"`
-	TwitUserToken   string `json:"userToken"`
+	RenderAllMd     bool              `json:"renderMd"`  // Flag to render all markdown in every board.
+	LastActive      int               `json:"lastLogin"` // The last time the user browsed content.
+	DisplayTooltips bool              `json:"tooltips"`  // Flag that toggles tooltips in the gui.
+	TwitterAccess   oauth.AccessToken `json:"twitterOauth"`
 }
 
 type settings struct {
@@ -66,10 +67,21 @@ func newSettingCtrl(s *server, dirpath string) (*settingCtrl, error) {
 		return nil, err
 	}
 
+	tc := oauth.NewConsumer(
+		TWIT_CONSUMER_KEY,
+		TWIT_CONSUMER_SECRET,
+		oauth.ServiceProvider{
+			RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
+			AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
+			AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
+		},
+	)
+
 	setc := &settingCtrl{
-		file:     fpath,
-		dirPath:  dirpath,
-		settings: *g,
+		file:         fpath,
+		dirPath:      dirpath,
+		settings:     *g,
+		twitConsumer: *tc,
 	}
 
 	setc.s = s
@@ -324,7 +336,12 @@ func (setc *settingCtrl) Handler(prefix string) http.Handler {
 	router := mux.NewRouter()
 	router.HandleFunc(p+"initialize", setc.handleWalletSetup())
 	router.HandleFunc(p+"favorite", setc.handleFavorite())
-	//router.HandleFunc(p+"twitter", setc.registerUser())
+
+	getToken, postAuth := setc.authTwitterUser()
+	router.HandleFunc(p+"oauth/twitter/1", getToken)
+	router.HandleFunc(p+"oauth/twitter/2", postAuth)
+	router.HandleFunc(p+"oauth/tweet", setc.createTweet())
+
 	//router.HandleFunc(p+"prefs", setc.setPreferences())
 	router.HandleFunc(p, setc.allSettingsHandler())
 	return router

@@ -45,9 +45,9 @@ func main() {
 	server.Start()
 
 	apiPrefix := "/api/"
-	api := ahimsarest.Handler(apiPrefix, db)
-
 	shPrefix := "/api/settings/"
+
+	api := ahimsarest.Handler(apiPrefix, db)
 	settingH := server.settingCtrl.Handler(shPrefix)
 
 	mux := http.NewServeMux()
