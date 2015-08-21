@@ -97,7 +97,7 @@ div.control-widget.banner {
 .list-elem .side-bar.active {
     background-color: #2A8DEA;
     width: 10px;
-    height: 65px;
+    height: 71px;
     position: absolute;
     display: inline;
     top: -1px;
@@ -373,6 +373,6 @@ div.pinnedBulletin.linked {
 
 
 .browseAuthor .side-bar.active {
-    height: 63px;
+    height: 68px;
 }
 

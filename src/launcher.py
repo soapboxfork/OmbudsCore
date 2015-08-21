@@ -10,7 +10,7 @@ def appDataDir(appname):
     This is a break from the convention to allow for an easier install.
     '''
     if sys.platform == "darwin":
-        datadir = os.path.join("/Library", "Application Support")
+        datadir = os.path.join("/", "Library", "Application Support")
         return os.path.join(datadir, appname.capitalize())
 
     if sys.platform == "windows":
@@ -29,8 +29,8 @@ APP_PATH = abspath(os.path.join(__file__, "./../../.."))
 BIN = os.path.join(APP_PATH, "Contents", "MacOS")
 RES = os.path.join(APP_PATH, "Contents", "Resources")
 
-GO_PATH = os.environ.get("GOPATH")
 APP_DIR = appDataDir("ombudscore")
+APP_LOG = os.path.join(APP_DIR, "app.log")
 NODE_DIR = os.path.join(APP_DIR, "node")
 NODE_CFG = os.path.join(NODE_DIR, "node.conf")
 WAL_DIR = os.path.join(APP_DIR, "wallet")
@@ -40,35 +40,35 @@ GUI_CFG = os.path.join(GUI_DIR, "gui.conf")
 CTL_DIR = os.path.join(APP_DIR, "ctl")
 CTL_CFG = os.path.join(CTL_DIR, "ctl.conf")
 
-def run_ombappserv(stdout):
+def run_ombappserv(out):
     static_path = os.path.join(RES, "frontend")
     opts = ["--staticpath=" + static_path]
     cmd = [os.path.join(BIN, "ombappserv")] + opts
 
     #print cmd
-    return subprocess.Popen(cmd, stdout=stdout)
+    return subprocess.Popen(cmd, stdout=out, stderr=subprocess.STDOUT)
     
-def run_ombwallet(stdout):
+def run_ombwallet(out):
     opts = ["--debuglevel=warn"]
     cmd = [os.path.join(BIN, "ombwallet")] + opts
 
     #print cmd
-    return subprocess.Popen(cmd, stdout=stdout)
+    return subprocess.Popen(cmd, stdout=out, stderr=subprocess.STDOUT)
 
-def run_ombfullnode(stdout):
+def run_ombfullnode(out):
     opts = ["--debuglevel=warn"]
     cmd = [os.path.join(BIN, "ombfullnode")] + opts
 
     #print cmd
-    return subprocess.Popen(cmd, stdout=stdout)
+    return subprocess.Popen(cmd, stdout=out, stderr=subprocess.STDOUT)
 
-def run_electroncli(stdout):
+def run_electroncli(out):
     # TODO remove default_app from atom
     js_path = os.path.join(RES, "app", "main.js")
     opts = [js_path]
     cmd = [os.path.join(BIN, "Electron")] + opts
 
-    subprocess.call(cmd, stdout=stdout)
+    subprocess.call(cmd, stdout=out, stderr=subprocess.STDOUT)
 
 
 def main():
@@ -76,33 +76,35 @@ def main():
     # Assert/do some system config
     idempotent_conf()
     
-    null = open(os.devnull, "w")
-    null = sys.stdout
+    #null = open(os.devnull, "w")
+    log = open(APP_LOG, "a")
+    #log = sys.stdout
 
     # Start ombnode
-    nodeproc = run_ombfullnode(null)
+    nodeproc = run_ombfullnode(log)
 
     time.sleep(3)
 
     # Start ombwallet
-    walletproc = run_ombwallet(null)
+    walletproc = run_ombwallet(log)
 
     time.sleep(3)
 
     # Start ombappserv
-    webservproc = run_ombappserv(null)
+    webservproc = run_ombappserv(log)
 
     # Register signal handler for SIGINTs
     signal.signal(signal.SIGINT, sig_handler([nodeproc, walletproc]))
 
     # Start ombuds client gui and block until process returns.
-    run_electroncli(null)
+    run_electroncli(log)
 
+    # After the electron cli is stopped, stop everything else.
     webservproc.kill()
     walletproc.kill()
     nodeproc.kill()
 
-    null.close()
+    log.close()
     syslog(LOG_ERR, "All subprocesses successfully stopped. Bailing out.")
 
 def try_mkdir(path):

@@ -1,12 +1,5 @@
 'use strict';
 
-/*angular.module('exceptionOverride', []).factory('$exceptionHandler', function() {
-return function(exception, cause) {
-exception.message += ' (caused by "' + cause + '")';
-//        throw exception;
-};
-})*/
-
 var ombWebApp = angular.module("ombWebApp", [
     'ngAnimate',
     'ngRoute',
@@ -17,6 +10,7 @@ var ombWebApp = angular.module("ombWebApp", [
     'sendModule',
     'settingsModule',
     'walletModule',
+    'statusModule'
 ])
 .config(["$routeProvider", function($routeProvider) {
     $routeProvider.when('/send', {
@@ -30,6 +24,10 @@ var ombWebApp = angular.module("ombWebApp", [
     .when('/wallet', {
         controller: 'walletPaneCtrl',
         templateUrl: 'wallet/pane.html'
+    })
+    .when('/status', {
+        controller: 'statusPaneCtrl',
+        templateUrl: 'status/pane.html'
     })
     .when('/setup', {
         controller: 'setupCtrl',
@@ -127,62 +125,44 @@ var ombWebApp = angular.module("ombWebApp", [
     });
 })
 .controller('paneCtrl', function($scope, locationService, todoService) {
-    $scope.panes = locationService.getAllPanes();
-    $scope.activePane = locationService.activePane;
-    $scope.selectPane = function(pane) {
-        locationService.selectPane(pane);
-        $scope.activePane = pane;
-    };
+    $scope.paneMgr = locationService;
     $scope.notImpl = todoService.notImplemented;
     $scope.paneUrl = function(name){ return "/#/"+name; };
 })
 .factory('locationService', function($location) {
-    // Documents the panes we have in the application
+    var settings = {name: 'settings'};
     var service = {
+        // All of the panes we have in the application
         panes : [
             {name: 'browse'},  
             {name: 'send'},  
             {name: 'wallet'},  
-            {name: 'settings'},
+            // So we can change the pointer.
+            settings,
             {name: 'status'},
-            {name: 'twitter'},
-        ]
+        ],
+        // The default pane if no pane is set.
+        activePane: settings
     };
 
-    service.getPane = function(name) {
+    // Returns the pane associated with the given name.
+    service.selectPane = function(paneName) {
         for (var i = 0; i < service.panes.length; i++) {
-            var pane = service.panes[i];
-            if (name === pane.name) {
-                return pane;
+            var cp = service.panes[i];
+            if (paneName === cp.name) {
+                service.activePane = cp;
+                console.log(paneName)
+                return
             }
         }
-        return null;
     }
 
+    // Set the pane based on the location we are currently looking at.
     var gex = /^\/([a-z]+)/
     var m = $location.path().match(gex);
     if (m != null) {
-        var curPane = service.getPane(m[1]);
-        if (curPane != null) {
-            service.activePane = curPane;
-        } 
-    } else {
-        service.activePane = service.getPane('settings');
-    }
-
-
-    // NOTE! This must come first
-    service.getAllPanes = function() {
-        return service.panes
-    }
-
-    service.selectPane = function(pane) {
-        for (var i = 0; i < service.panes.length; i++) {
-            var cp = service.panes[i];
-            if (pane.name === cp.name) {
-                service.activePane = cp
-            }
-        }
+        // has no effect if the match is not in panes.
+        var curPane = service.selectPane(m[1]);
     }
 
     return service;

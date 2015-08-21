@@ -1,7 +1,9 @@
 'use strict'; 
 
 angular.module('browseModule')
-.controller('parentBrowseCtrl', function($scope) {
+.controller('parentBrowseCtrl', function($scope, locationService) {
+    locationService.selectPane("browse");
+
     $scope.activeBoard = null;
     $scope.activeAuthor = null;
 

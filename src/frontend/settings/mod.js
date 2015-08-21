@@ -1,5 +1,6 @@
 angular.module('settingsModule', [])
-.controller('settingsPaneCtrl', function($scope, globalSettings, browseSetts, todoService) {
+.controller('settingsPaneCtrl', function($scope, globalSettings, browseSetts, todoService, locationService) {
+    locationService.selectPane("settings");
     $scope.notImpl = todoService.notImplemented;
     $scope.browseSetts = browseSetts.settings;
     $scope.settings = globalSettings.settings;

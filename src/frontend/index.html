@@ -15,9 +15,9 @@
     <body>
         <div id="globalWrap" ng-controller="paneCtrl">
             <div id="paneSelect">
-                <div class="banner"><div class="words" ng-bind="activePane.name"></div></div>
+                <div class="banner"><div class="words" ng-bind="paneMgr.activePane.name"></div></div>
                 <div class="pane-btn-container">
-                    <div class="pane-btn" ng-repeat="pane in panes"></div>
+                    <div class="pane-btn" ng-repeat="pane in paneMgr.panes"></div>
                 </div>
                 <div class="meta">
                     <p class="extra">This is open-source software. Please report all bugs, typos and errors <a href="https://github.com/soapboxsys/OmbudsCore/issues">here</a>.</p>
@@ -61,6 +61,7 @@
         <script src="/wallet/mod.js"></script>
         <script src="/wallet/directives.js"></script>
         <script src="/settings/mod.js"></script>
+        <script src="/status/mod.js"></script>
         <script src="/app.js"></script>
 
         <script>
